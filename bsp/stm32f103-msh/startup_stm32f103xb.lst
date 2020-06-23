@@ -462,16 +462,16 @@ ARM Macro Assembler    Page 8
               00000000 
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
-ork --depend=.\build\startup_stm32f103xb.d -o.\build\startup_stm32f103xb.o -IJ:
-\work\RT_Thread\rt-thread-Nano-3.1.3-pack\rt-thread-3.1.3\bsp\stm32f103-msh\RTE
- -IJ:\work\RT_Thread\rt-thread-Nano-3.1.3-pack\rt-thread-3.1.3\bsp\stm32f103-ms
-h\RTE\RTOS -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include -IC:\Keil_v5\ARM
-\PACK\Keil\STM32F1xx_DFP\1.0.5\Device\Include -IC:\Keil_v5\ARM\PACK\RealThread\
-RT-Thread\3.1.3\components\finsh -IC:\Keil_v5\ARM\PACK\RealThread\RT-Thread\3.1
-.3\include --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 
-514" --predefine="_RTE_ SETA 1" --predefine="STM32F10X_HD SETA 1" --list=startu
-p_stm32f103xb.lst libraries\CMSIS\Device\ST\STM32F1xx\Source\Templates\arm\star
-tup_stm32f103xb.s
+ork --depend=.\build\startup_stm32f103xb.d -o.\build\startup_stm32f103xb.o -IF:
+\mydemo\Electric_Adj_Light\RTT_SOFT\RT-Thread-Nano_1.3.1\bsp\stm32f103-msh\RTE 
+-IF:\mydemo\Electric_Adj_Light\RTT_SOFT\RT-Thread-Nano_1.3.1\bsp\stm32f103-msh\
+RTE\RTOS -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include -IC:\Keil_v5\ARM\P
+ACK\Keil\STM32F1xx_DFP\1.0.5\Device\Include -IC:\Keil_v5\ARM\PACK\RealThread\RT
+-Thread\3.1.3\components\finsh -IC:\Keil_v5\ARM\PACK\RealThread\RT-Thread\3.1.3
+\include --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 51
+4" --predefine="_RTE_ SETA 1" --predefine="STM32F10X_HD SETA 1" --list=startup_
+stm32f103xb.lst libraries\CMSIS\Device\ST\STM32F1xx\Source\Templates\arm\startu
+p_stm32f103xb.s
 
 
 
