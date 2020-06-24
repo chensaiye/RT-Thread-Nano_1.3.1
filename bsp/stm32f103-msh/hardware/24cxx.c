@@ -9,23 +9,25 @@
 #define Slave_Address 0xA0		//页大小
 #define IIC_24Cxx_TimeOut 10000
 
-extern I2C_HandleTypeDef hi2c1;
+extern I2C_HandleTypeDef hi2c2;
 
 extern void Error_Handler(void);
 
 //初始化IIC接口
-void AT24CXX_Init(void)
+static int AT24CXX_Init(void)
 {
-	//I2C1_Init();//IIC初始化
-	MX_I2C1_Init();
+	MX_I2C2_Init();//IIC初始化
+	return 0;
 }
+INIT_BOARD_EXPORT(AT24CXX_Init);
+
 //在AT24CXX指定地址写入一个数据
 //WriteAddr  :写入数据的目的地址    
 //DataToWrite:要写入的数据
 void AT24CXX_WriteOneByte(uint16_t WriteAddr,uint8_t DataToWrite)
 {				   	  	    																 
 	//I2C_Master_BufferWrite(I2C1,&DataToWrite,0x01,0XA0,WriteAddr);
-	HAL_I2C_Mem_Write(&hi2c1,Slave_Address,WriteAddr,I2C_MEMADD_SIZE_8BIT,&DataToWrite,1,IIC_24Cxx_TimeOut);
+	HAL_I2C_Mem_Write(&hi2c2,Slave_Address,WriteAddr,I2C_MEMADD_SIZE_8BIT,&DataToWrite,1,IIC_24Cxx_TimeOut);
 }
 
 //在AT24CXX里面的指定地址开始写入一页数据
@@ -34,7 +36,7 @@ void AT24CXX_WriteOneByte(uint16_t WriteAddr,uint8_t DataToWrite)
 void AT24CXX_WriteOnePage(uint16_t WriteAddr,uint8_t *pBuffer)//uint16_t NumToWrite)
 {
 	//I2C_Master_BufferWrite(I2C1,pBuffer,PageSize,0XA0,WriteAddr);
-	HAL_I2C_Mem_Write(&hi2c1,Slave_Address,WriteAddr,I2C_MEMADD_SIZE_8BIT,pBuffer,PageSize,IIC_24Cxx_TimeOut);
+	HAL_I2C_Mem_Write(&hi2c2,Slave_Address,WriteAddr,I2C_MEMADD_SIZE_8BIT,pBuffer,PageSize,IIC_24Cxx_TimeOut);
 }
 
 //在AT24CXX里面的指定地址开始写入指定个数的数据
@@ -58,7 +60,7 @@ void AT24CXX_Write(uint16_t WriteAddr,uint8_t *pBuffer,uint16_t NumToWrite)
 		if(NumToWrite<=writesize)				//比较总剩余直接数
 			writesize = NumToWrite;				//计算总剩余
 		//I2C_Master_BufferWrite(I2C1,pBuffer,writesize,0XA0,WriteAddr);	//写入
-		HAL_I2C_Mem_Write(&hi2c1,Slave_Address,WriteAddr,I2C_MEMADD_SIZE_8BIT,pBuffer,writesize,IIC_24Cxx_TimeOut);
+		HAL_I2C_Mem_Write(&hi2c2,Slave_Address,WriteAddr,I2C_MEMADD_SIZE_8BIT,pBuffer,writesize,IIC_24Cxx_TimeOut);
 		
 		NumToWrite -= writesize;				//重新计算总剩余字节数
 		WriteAddr += writesize;					//重新计算起始地址
@@ -76,7 +78,7 @@ void AT24CXX_Write(uint16_t WriteAddr,uint8_t *pBuffer,uint16_t NumToWrite)
 void AT24CXX_Read(uint16_t ReadAddr,uint8_t *pBuffer,uint16_t NumToRead)
 {
 	//I2C_Master_BufferRead(I2C1,pBuffer,NumToRead,0XA0,ReadAddr);
-	HAL_I2C_Mem_Read(&hi2c1,Slave_Address,ReadAddr,I2C_MEMADD_SIZE_8BIT,pBuffer,NumToRead,IIC_24Cxx_TimeOut);
+	HAL_I2C_Mem_Read(&hi2c2,Slave_Address,ReadAddr,I2C_MEMADD_SIZE_8BIT,pBuffer,NumToRead,IIC_24Cxx_TimeOut);
 } 
 //检查AT24CXX是否正常
 //这里用了24XX的最后一个地址(255)来存储标志字.

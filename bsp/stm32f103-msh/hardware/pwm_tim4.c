@@ -1,27 +1,9 @@
 #include "pwm_tim4.h" 
+#include <rtthread.h>
+
 TIM_HandleTypeDef htim4;
 extern void Error_Handler(void);
 
-///**
-//* @brief TIM_Base MSP Initialization
-//* This function configures the hardware resources used in this example
-//* @param htim_base: TIM_Base handle pointer
-//* @retval None
-//*/
-//void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
-//{
-//  if(htim_base->Instance==TIM4)
-//  {
-//  /* USER CODE BEGIN TIM4_MspInit 0 */
-
-//  /* USER CODE END TIM4_MspInit 0 */
-//    /* Peripheral clock enable */
-//    __HAL_RCC_TIM4_CLK_ENABLE();
-//  /* USER CODE BEGIN TIM4_MspInit 1 */
-
-//  /* USER CODE END TIM4_MspInit 1 */
-//  }
-//}
 
 static void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
 {
@@ -54,7 +36,7 @@ static void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
   * @param None
   * @retval None
   */
-void MX_TIM4_Init(void)
+int MX_TIM4_Init(void)
 {
 
   /* USER CODE BEGIN TIM4_Init 0 */
@@ -113,6 +95,9 @@ void MX_TIM4_Init(void)
 	HAL_TIM_Base_Start(&htim4);
   /* USER CODE END TIM4_Init 2 */
   HAL_TIM_MspPostInit(&htim4);
-
+	
+	return 0;
 }
+
+INIT_BOARD_EXPORT(MX_TIM4_Init);
 

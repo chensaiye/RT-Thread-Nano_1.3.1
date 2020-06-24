@@ -39,7 +39,7 @@ void AT24CXX_Read(uint16_t ReadAddr,uint8_t *pBuffer,uint16_t NumToRead);   	//´
 void AT24CXX_WriteOnePage(uint16_t WriteAddr,uint8_t *pBuffer);//u16 NumToWrite);
 	
 uint8_t AT24CXX_Check(void);  //¼ì²éÆ÷¼þ
-void AT24CXX_Init(void); //³õÊ¼»¯IIC
+static int AT24CXX_Init(void); //³õÊ¼»¯IIC
 #endif
 
 

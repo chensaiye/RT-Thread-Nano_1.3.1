@@ -1,6 +1,21 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
+#define DI_165B_Pin GPIO_PIN_3
+#define DI_165B_GPIO_Port GPIOB
+#define CLK_165B_Pin GPIO_PIN_4
+#define CLK_165B_GPIO_Port GPIOB
+#define LATCH_165B_Pin GPIO_PIN_5
+#define LATCH_165B_GPIO_Port GPIOB
+
+#define DI_RIR_Pin GPIO_PIN_15
+#define DI_RIR_GPIO_Port GPIOA
+#define CLK_RIR_Pin GPIO_PIN_12
+#define CLK_RIR_GPIO_Port GPIOC
+#define LATCH_RIR_Pin GPIO_PIN_2
+#define LATCH_RIR_GPIO_Port GPIOD
+
+
 //#define BUTTON_CAMERA_OFFSET			0x01
 //#define BUTTON_LONG_PRESS 1
 
@@ -68,7 +83,7 @@ void button_7( unsigned char flag );
 void button_8( unsigned char flag );
 void button_dummy( unsigned char flag );
 
-
+int thread_button_init(void);
 #endif
 
 

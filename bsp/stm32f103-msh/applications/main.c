@@ -12,10 +12,19 @@
 #include <rtthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "led_595.h"
 #include "tof10120.h" 
-#define LD2_GPIO_PORT  GPIOA
-#define LD2_PIN        GPIO_PIN_0
+#include "24cxx.h" 
+#include "button.h"
+#include "pwm_tim3.h"
+
+#define RUN_GPIO_PORT  GPIOB
+#define RUN_PIN        GPIO_PIN_12
+#define LED0_Pin GPIO_PIN_4
+#define LED0_GPIO_Port GPIOA
+#define LED1_Pin GPIO_PIN_1
+#define LED1_GPIO_Port GPIOB
 
 static void MX_GPIO_Init(void);
 
@@ -34,16 +43,22 @@ void Error_Handler(void)
 
 int main(void)
 {
+		uint8_t str[8]={0x11,0x22,0x33,0x44,0x55,0x66,6,7};
+		uint8_t test=0,i;
     MX_GPIO_Init();
-		TOF10120_Init();
-    while (1)
+		thread_button_init();
+		//TOF10120_Init();
+		//MX_TIM3_Init();
+		//AT24CXX_Check();
+		while (1)
     {
-        HAL_GPIO_WritePin(LD2_GPIO_PORT, LD2_PIN, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(RUN_GPIO_PORT, RUN_PIN, GPIO_PIN_SET);
         rt_thread_mdelay(500);
-        HAL_GPIO_WritePin(LD2_GPIO_PORT, LD2_PIN, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(RUN_GPIO_PORT, RUN_PIN, GPIO_PIN_RESET);
         rt_thread_mdelay(500);
 				
 				rt_kprintf("dis:%d mm\r\n", TOF10120_Read_Distence()); 
+				
     }
 }
 
@@ -53,14 +68,19 @@ static void MX_GPIO_Init(void)
 
 		__HAL_RCC_AFIO_CLK_ENABLE();//io复用使能
 		__HAL_AFIO_REMAP_SWJ_NOJTAG();//关闭jtag，使能SWD，可以用SWD模式调试 ,使用jtag调试口做普通io时，必须使能io复用
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    HAL_GPIO_WritePin(LD2_GPIO_PORT, LD2_PIN, GPIO_PIN_RESET);
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    HAL_GPIO_WritePin(RUN_GPIO_PORT, RUN_PIN, GPIO_PIN_RESET);
 
-    GPIO_InitStruct.Pin   = LD2_PIN;
+    GPIO_InitStruct.Pin   = RUN_PIN;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(LD2_GPIO_PORT, &GPIO_InitStruct);
+    HAL_GPIO_Init(RUN_GPIO_PORT, &GPIO_InitStruct);
+		
+		GPIO_InitStruct.Pin 	= LED0_Pin;
+		HAL_GPIO_Init(LED0_GPIO_Port, &GPIO_InitStruct);
+		GPIO_InitStruct.Pin 	= LED1_Pin;
+		HAL_GPIO_Init(LED1_GPIO_Port, &GPIO_InitStruct);
 }
 
 

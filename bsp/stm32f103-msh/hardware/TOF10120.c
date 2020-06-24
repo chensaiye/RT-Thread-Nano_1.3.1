@@ -11,15 +11,17 @@ extern void Error_Handler(void);
   * @param None
   * @retval None
   */
-extern I2C_HandleTypeDef hi2c2;
+extern I2C_HandleTypeDef hi2c1;
 
 
 //初始化IIC接口
-void TOF10120_Init(void)
+int TOF10120_Init(void)
 {
-	//I2C1_Init();//IIC初始化
-	MX_I2C2_Init();
+	MX_I2C1_Init();
+	return 0;
 }
+
+INIT_BOARD_EXPORT(TOF10120_Init);
 
 //在TOF10120_Write指定地址写入一个数据
 //WriteAddr  :写入数据的目的地址    
@@ -45,7 +47,7 @@ void TOF10120_Write(uint16_t WriteAddr,uint8_t *pBuffer,uint16_t NumToWrite)
 void TOF10120_Read(uint16_t ReadAddr,uint8_t *pBuffer,uint16_t NumToRead)
 {
 	//I2C_Master_BufferRead(I2C1,pBuffer,NumToRead,TOF_ADDRESS1,ReadAddr);
-	HAL_I2C_Mem_Read(&hi2c2,TOF_ADDRESS1,ReadAddr,I2C_MEMADD_SIZE_8BIT,pBuffer,NumToRead,10000);
+	HAL_I2C_Mem_Read(&hi2c1,TOF_ADDRESS1,ReadAddr,I2C_MEMADD_SIZE_8BIT,pBuffer,NumToRead,10000);
 } 
 
 uint16_t TOF10120_Read_Distence(void)
@@ -55,7 +57,7 @@ uint16_t TOF10120_Read_Distence(void)
 //		return 0;//error
 //	return ((buf[0]<<8) + buf[1]);
 	
-	if(HAL_I2C_Mem_Read(&hi2c2,TOF_ADDRESS1,FILTERED_DIS_REG,I2C_MEMADD_SIZE_8BIT,buf,0x02,10000)==HAL_OK)
+	if(HAL_I2C_Mem_Read(&hi2c1,TOF_ADDRESS1,FILTERED_DIS_REG,I2C_MEMADD_SIZE_8BIT,buf,0x02,10000)==HAL_OK)
 		return ((buf[0]<<8) + buf[1]);
 	else
 		return 0;

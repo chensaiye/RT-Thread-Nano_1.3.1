@@ -1,5 +1,6 @@
 #include "usart2.h" 
-
+#include <rthw.h>
+#include <rtthread.h>
 extern void Error_Handler(void);
 
 UART_HandleTypeDef huart2;
@@ -97,7 +98,7 @@ static void MX_DMA_Init(void)
   * @retval None
   */
 
-void MX_USART2_UART_Init(void)
+static int MX_USART2_UART_Init(void)
 {
 
   /* USER CODE BEGIN USART2_Init 0 */
@@ -132,9 +133,9 @@ void MX_USART2_UART_Init(void)
 //	HAL_UART_Receive(&huart2,USART2_RX_BUF,10,10000);
 	
   /* USER CODE END USART2_Init 2 */
-
+	return 0;
 }
-
+INIT_BOARD_EXPORT(MX_USART2_UART_Init);
 
 /**
 * @brief UART MSP Initialization

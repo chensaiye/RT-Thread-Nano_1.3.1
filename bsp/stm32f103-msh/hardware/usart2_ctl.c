@@ -5,7 +5,7 @@
 #include <string.h>
 /* USER CODE END Includes */
 
-extern void MX_USART2_UART_Init(void);
+//extern void MX_USART2_UART_Init(void);
 extern uint8_t USART2_RX_BUF[];
 extern uint16_t USART2_RX_STA;
 
@@ -23,7 +23,7 @@ void usart_ctl(void)
 {
   /* USER CODE BEGIN 1 */
 	char str[50]="test for uart2";
-	MX_USART2_UART_Init();
+	//MX_USART2_UART_Init();
 	
 	//HAL_UART_Transmit(&huart2,(uint8_t *)str,strlen(str),10000);
 	HAL_UART_Transmit_DMA(&huart2,(uint8_t *)str,strlen(str));

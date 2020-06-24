@@ -11,7 +11,7 @@
 #define FILTERED_DIS_REG	0x04
 
 
-void TOF10120_Init(void);
+int TOF10120_Init(void);
 void TOF10120_Read(uint16_t ReadAddr,uint8_t *pBuffer,uint16_t NumToRead);
 uint16_t TOF10120_Read_Distence(void);
 #endif

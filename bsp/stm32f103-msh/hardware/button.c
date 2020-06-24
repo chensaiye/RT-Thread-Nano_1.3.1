@@ -20,10 +20,6 @@
 #include <rthw.h>
 #include <rtthread.h>
 
-#define HC165_LATCH  GPIO_PIN_5	//GET_PIN(B, 5)
-#define HC165_CLK	GPIO_PIN_4		//GET_PIN(B, 4)
-#define HC165_DI  GPIO_PIN_3		//GET_PIN(B, 3)
-#define HC165_PORT	GPIOB
 
 #define BM1  GPIO_PIN_0	//GET_PIN(B, 5)
 #define BM2  GPIO_PIN_1		//GET_PIN(B, 4)
@@ -73,30 +69,29 @@ static int Button_IO_Init(void)
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 
 	__HAL_RCC_GPIOB_CLK_ENABLE();
-	__HAL_RCC_GPIOC_CLK_ENABLE();
 	
-	HAL_GPIO_DeInit(HC165_PORT,HC165_LATCH | HC165_CLK| HC165_DI);
-	GPIO_InitStruct.Pin   =  HC165_CLK| HC165_LATCH;
+	HAL_GPIO_DeInit(GPIOB,DI_165B_Pin | CLK_165B_Pin| LATCH_165B_Pin);
+	GPIO_InitStruct.Pin   =  CLK_165B_Pin| LATCH_165B_Pin;
 	GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull  = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(HC165_PORT, &GPIO_InitStruct);
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 	
-	GPIO_InitStruct.Pin   = HC165_DI;
+	GPIO_InitStruct.Pin   = DI_165B_Pin;
 	GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;
 	GPIO_InitStruct.Pull  = GPIO_NOPULL;
 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(HC165_PORT, &GPIO_InitStruct);
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 		
-	GPIO_InitStruct.Pin   = BM1 |BM2 |BM3 |BM4;
-	GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;
-	GPIO_InitStruct.Pull  = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	HAL_GPIO_Init(BM_PORT, &GPIO_InitStruct);
+//	GPIO_InitStruct.Pin   = BM1 |BM2 |BM3 |BM4;
+//	GPIO_InitStruct.Mode  = GPIO_MODE_INPUT;
+//	GPIO_InitStruct.Pull  = GPIO_NOPULL;
+//	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+//	HAL_GPIO_Init(BM_PORT, &GPIO_InitStruct);
 	
 	return 0;
 }
-INIT_BOARD_EXPORT(Button_IO_Init);
+//INIT_BOARD_EXPORT(Button_IO_Init);
 
 //获取一个有效按键值
 uint8_t get_button(void)
@@ -132,25 +127,25 @@ uint8_t get_button(void)
 uint8_t get_165_data(void)
 {
 	uint8_t i, byte;
-	HAL_GPIO_WritePin(HC165_PORT,HC165_LATCH,GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB,LATCH_165B_Pin,GPIO_PIN_RESET);
 	rt_hw_us_delay(100);
-	HAL_GPIO_WritePin(HC165_PORT,HC165_LATCH,GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOB,LATCH_165B_Pin,GPIO_PIN_SET);
 	// init byte
 	byte = 0;
 	// shift out at HC165_DI
 	for( i=0; i<8; i++ )
 	{
-		HAL_GPIO_WritePin(HC165_PORT,HC165_CLK,GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOB,CLK_165B_Pin,GPIO_PIN_RESET);
 		rt_hw_us_delay(100);
 		// set byte
-		if(HAL_GPIO_ReadPin(HC165_PORT,HC165_DI)==GPIO_PIN_SET)
+		if(HAL_GPIO_ReadPin(GPIOB,DI_165B_Pin)==GPIO_PIN_SET)
 			byte |= (0x80 >> i);
 		else
 			byte = byte;
-		HAL_GPIO_WritePin(HC165_PORT,HC165_CLK,GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOB,CLK_165B_Pin,GPIO_PIN_SET);
 		rt_hw_us_delay(100);
 	}
-	HAL_GPIO_WritePin(HC165_PORT,HC165_LATCH,GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB,LATCH_165B_Pin,GPIO_PIN_RESET);
 	
 	return byte;
 }
@@ -320,7 +315,7 @@ static void button_scan_entey(void *parameter)
 	static uint8_t new_button_status, mask_bit;
 	while(1)
   {
-		rt_thread_mdelay(50);
+		rt_thread_mdelay(10);
 		new_button_status = get_165_data();//get_button();//
 	
 		/* compare old status */
@@ -417,7 +412,7 @@ static void button_scan_entey(void *parameter)
 int thread_button_init(void)
 {
 	uint8_t i;
-	//Button_IO_Init();
+	Button_IO_Init();
 	for( i=0; i<BUTTON_NUMBER; i++ )
 	{
 		buttons[i].status = 0x20;
@@ -436,6 +431,7 @@ int thread_button_init(void)
 
     return 0;
 }
+//INIT_BOARD_EXPORT(thread_button_init);
 
 MSH_CMD_EXPORT(thread_button_init, thread button dev);
 
