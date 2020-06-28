@@ -82,7 +82,6 @@ int thread_usart2_init(void)
 
     return 0;
 }
-//INIT_BOARD_EXPORT(thread_button_init);
 
 MSH_CMD_EXPORT(thread_usart2_init, thread usart2 scan);
 

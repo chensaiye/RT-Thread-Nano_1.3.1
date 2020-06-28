@@ -78,7 +78,6 @@ int thread_usart3_init(void)
 
     return 0;
 }
-//INIT_BOARD_EXPORT(thread_usart3_init);
 
 MSH_CMD_EXPORT(thread_usart3_init, thread usart3 scan);
 

@@ -26,6 +26,7 @@
 #define LED1_Pin GPIO_PIN_1
 #define LED1_GPIO_Port GPIOB
 
+extern int thread_usart3_init(void);
 static void MX_GPIO_Init(void);
 
 
@@ -47,9 +48,8 @@ int main(void)
 		uint8_t test=0,i;
     MX_GPIO_Init();
 		thread_button_init();
-		//TOF10120_Init();
-		//MX_TIM3_Init();
-		AT24CXX_Check();
+		thread_usart3_init();
+		
 		while (1)
     {
         HAL_GPIO_WritePin(RUN_GPIO_PORT, RUN_PIN, GPIO_PIN_SET);
