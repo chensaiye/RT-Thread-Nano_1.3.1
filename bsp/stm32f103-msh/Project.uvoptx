@@ -174,6 +174,16 @@
           <WinNumber>1</WinNumber>
           <ItemText>temp</ItemText>
         </Ww>
+        <Ww>
+          <count>1</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>USART3_RX_STA</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>USART3_RX_BUF</ItemText>
+        </Ww>
       </WatchWindow1>
       <Tracepoint>
         <THDelay>0</THDelay>
@@ -219,6 +229,10 @@
           <Name>System Viewer\TIM3</Name>
           <WinId>35902</WinId>
         </Entry>
+        <Entry>
+          <Name>System Viewer\USART3</Name>
+          <WinId>35903</WinId>
+        </Entry>
       </SystemViewers>
     </TargetOption>
   </Target>
@@ -246,7 +260,7 @@
 
   <Group>
     <GroupName>STM32-HAL</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -700,6 +714,19 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
+    <File>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>36</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\hardware\usart3_ctl.c</PathWithFileName>
+      <FilenameWithoutPath>usart3_ctl.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
   </Group>
 
   <Group>
@@ -712,7 +739,7 @@
 
   <Group>
     <GroupName>::RTOS</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>1</RteFlg>

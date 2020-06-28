@@ -21,7 +21,6 @@ extern UART_HandleTypeDef huart2;
 
 static int MX_USART2_UART_Init(void);
 void HAL_UART_MspInit(UART_HandleTypeDef* huart); 
-void HAL_UART_MspDeInit(UART_HandleTypeDef* huart);
 
 #endif
 

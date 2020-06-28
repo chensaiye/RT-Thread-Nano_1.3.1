@@ -1,8 +1,110 @@
 #include "usart3.h" 
-
+#include <rthw.h>
+#include <rtthread.h>
 extern void Error_Handler(void);
 
 UART_HandleTypeDef huart3;
+
+uint8_t USART3_RX_BUF[USART3_REC_LEN];     //接收缓冲,最大USART_REC_LEN个字节.
+uint8_t USART3_TX_BUF[USART3_REC_LEN];     //接收缓冲,最大USART_REC_LEN个字节.
+uint16_t USART3_RX_STA=0;       //接收状态标记
+
+#ifdef	USART3_RXOVER_WITH_TIM
+TIM_HandleTypeDef htim7;
+
+/**
+  * @brief TIM7 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM7_Init(void)
+{
+
+  /* USER CODE BEGIN TIM7_Init 0 */
+
+  /* USER CODE END TIM7_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM7_Init 1 */
+
+  /* USER CODE END TIM7_Init 1 */
+  htim7.Instance = TIM7;
+  htim7.Init.Prescaler = 719;
+  htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim7.Init.Period = 100*20;
+  htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  if (HAL_TIM_Base_Init(&htim7) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim7, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM7_Init 2 */
+
+  /* USER CODE END TIM7_Init 2 */
+
+}
+
+/**
+  * @brief This function handles TIM7 global interrupt.
+  */
+void TIM7_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM7_IRQn 0 */
+
+  /* USER CODE END TIM7_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim7);
+  /* USER CODE BEGIN TIM7_IRQn 1 */
+	if((USART3_RX_STA&0x8000)==0)//接收未完成
+	{
+		USART3_RX_STA |= 0x8000;
+		HAL_TIM_Base_Stop_IT(&htim7);
+	}
+  /* USER CODE END TIM7_IRQn 1 */
+}
+
+
+#endif
+
+#ifdef USART3_TXSEND_WITH_DMA
+DMA_HandleTypeDef hdma_usart3_tx;
+
+/** 
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void) 
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Channel2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
+
+}
+
+/**
+  * @brief This function handles DMA1 channel2 global interrupt.
+  */
+void DMA1_Channel2_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel2_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel2_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart3_tx);
+  /* USER CODE BEGIN DMA1_Channel2_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel2_IRQn 1 */
+}
+
+#endif
 
 
 /**
@@ -10,11 +112,14 @@ UART_HandleTypeDef huart3;
   * @param None
   * @retval None
   */
-void MX_USART3_UART_Init(void)
+static int MX_USART3_UART_Init(void)
 {
 
   /* USER CODE BEGIN USART3_Init 0 */
-
+		//必须先使能DMA ，再初始化UART
+		#ifdef USART3_TXSEND_WITH_DMA
+		MX_DMA_Init();
+		#endif
   /* USER CODE END USART3_Init 0 */
 
   /* USER CODE BEGIN USART3_Init 1 */
@@ -33,84 +138,38 @@ void MX_USART3_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART3_Init 2 */
-
+	#ifdef	USART3_RXOVER_WITH_TIM
+		MX_TIM7_Init();
+	#endif
+	
+	return 0;
   /* USER CODE END USART3_Init 2 */
 
 }
+INIT_BOARD_EXPORT(MX_USART3_UART_Init);
 
 /**
-* @brief UART MSP Initialization
-* This function configures the hardware resources used in this example
-* @param huart: UART handle pointer
-* @retval None
-*/
-//void HAL_UART_MspInit(UART_HandleTypeDef* huart)
-//{
-//  GPIO_InitTypeDef GPIO_InitStruct = {0};
-//  if(huart->Instance==USART3)
-//  {
-//  /* USER CODE BEGIN USART3_MspInit 0 */
-
-//  /* USER CODE END USART3_MspInit 0 */
-//    /* Peripheral clock enable */
-//    __HAL_RCC_USART3_CLK_ENABLE();
-//  
-//    __HAL_RCC_GPIOC_CLK_ENABLE();
-//    /**USART3 GPIO Configuration    
-//    PC10     ------> USART3_TX
-//    PC11     ------> USART3_RX 
-//    */
-//    GPIO_InitStruct.Pin = GPIO_PIN_10;
-//    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-//    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-//    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-//    GPIO_InitStruct.Pin = GPIO_PIN_11;
-//    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-//    GPIO_InitStruct.Pull = GPIO_NOPULL;
-//    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-//    __HAL_AFIO_REMAP_USART3_PARTIAL();
-
-//  /* USER CODE BEGIN USART3_MspInit 1 */
-
-//  /* USER CODE END USART3_MspInit 1 */
-//  }
-
-//}
-
-/**
-* @brief UART MSP De-Initialization
-* This function freeze the hardware resources used in this example
-* @param huart: UART handle pointer
-* @retval None
-*/
-void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
+  * @brief This function handles USART2 global interrupt.
+  */
+void USART3_IRQHandler(void)
 {
-  if(huart->Instance==USART3)
-  {
-  /* USER CODE BEGIN USART3_MspDeInit 0 */
-
-  /* USER CODE END USART3_MspDeInit 0 */
-    /* Peripheral clock disable */
-    __HAL_RCC_USART3_CLK_DISABLE();
-  
-    /**USART3 GPIO Configuration    
-    PC10     ------> USART3_TX
-    PC11     ------> USART3_RX 
-    */
-    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_10|GPIO_PIN_11);
-
-  /* USER CODE BEGIN USART3_MspDeInit 1 */
-
-  /* USER CODE END USART3_MspDeInit 1 */
-  }
-
+  /* USER CODE BEGIN USART2_IRQn 0 */
+	#ifdef USART3_RXOVER_WITH_TIM
+	if((huart3.Instance->SR & USART_SR_RXNE) != RESET)
+	{
+		if((USART3_RX_STA&0x8000)==0)//接收未完成
+		{
+			USART3_RX_STA++;
+			__HAL_TIM_SET_COUNTER(&htim7,0);
+			HAL_TIM_Base_Start_IT(&htim7);
+		}
+	}
+	#endif
+  /* USER CODE END USART2_IRQn 0 */
+  HAL_UART_IRQHandler(&huart3);
+  /* USER CODE BEGIN USART2_IRQn 1 */
+	
+  /* USER CODE END USART2_IRQn 1 */
 }
-
-
-
-
-
 
 

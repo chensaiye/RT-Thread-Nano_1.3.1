@@ -31,7 +31,7 @@ static void MX_TIM6_Init(void)
   htim6.Instance = TIM6;
   htim6.Init.Prescaler = 719;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = 20*500;
+  htim6.Init.Period = 20*100;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
@@ -90,6 +90,21 @@ static void MX_DMA_Init(void)
   HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
 
 }
+
+/**
+  * @brief This function handles DMA1 channel7 global interrupt.
+  */
+void DMA1_Channel7_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel7_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel7_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart2_tx);
+  /* USER CODE BEGIN DMA1_Channel7_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel7_IRQn 1 */
+}
+
 #endif
 
 /**
@@ -102,7 +117,10 @@ static int MX_USART2_UART_Init(void)
 {
 
   /* USER CODE BEGIN USART2_Init 0 */
-	
+	//必须先使能DMA ，再初始化UART
+		#ifdef USART2_TXSEND_WITH_DMA
+		MX_DMA_Init();
+		#endif
   /* USER CODE END USART2_Init 0 */
 
   /* USER CODE BEGIN USART2_Init 1 */
@@ -121,11 +139,7 @@ static int MX_USART2_UART_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN USART2_Init 2 */
-	
-	#ifdef USART2_TXSEND_WITH_DMA
-		MX_DMA_Init();
-	#endif
-	
+		
 	#ifdef	USART2_RXOVER_WITH_TIM
 		MX_TIM6_Init();
 	#endif
@@ -198,41 +212,7 @@ INIT_BOARD_EXPORT(MX_USART2_UART_Init);
 //  
 //}
 
-/**
-* @brief UART MSP De-Initialization
-* This function freeze the hardware resources used in this example
-* @param huart: UART handle pointer
-* @retval None
-*/
-void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
-{
-  if(huart->Instance==USART2)
-  {
-  /* USER CODE BEGIN USART2_MspDeInit 0 */
 
-  /* USER CODE END USART2_MspDeInit 0 */
-    /* Peripheral clock disable */
-    __HAL_RCC_USART2_CLK_DISABLE();
-  
-    /**USART2 GPIO Configuration    
-    PA2     ------> USART2_TX
-    PA3     ------> USART2_RX 
-    */
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_2|GPIO_PIN_3);
-
-		#ifdef USART2_TXSEND_WITH_DMA
-    /* USART2 DMA DeInit */
-    HAL_DMA_DeInit(huart->hdmatx);
-		#endif
-		
-    /* USART2 interrupt DeInit */
-    HAL_NVIC_DisableIRQ(USART2_IRQn);
-  /* USER CODE BEGIN USART2_MspDeInit 1 */
-
-  /* USER CODE END USART2_MspDeInit 1 */
-  }
-  
-}
 
 /**
   * @brief This function handles USART2 global interrupt.

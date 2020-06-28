@@ -13,6 +13,9 @@
 #include <rthw.h>
 #include <rtthread.h>
 
+#include "usart3.h"
+#include "usart2.h"
+
 #define _SCB_BASE       (0xE000E010UL)
 #define _SYSTICK_CTRL   (*(rt_uint32_t *)(_SCB_BASE + 0x0))
 #define _SYSTICK_LOAD   (*(rt_uint32_t *)(_SCB_BASE + 0x4))
@@ -28,6 +31,13 @@ extern void Error_Handler(void);
 // frequency supplied to the SysTick timer and the processor
 // core clock.
 extern uint32_t SystemCoreClock;
+
+#ifdef USART2_TXSEND_WITH_DMA
+extern DMA_HandleTypeDef hdma_usart2_tx;
+#endif
+#ifdef USART3_TXSEND_WITH_DMA
+extern DMA_HandleTypeDef hdma_usart3_tx;
+#endif
 
 /**
   * Initializes the Global MSP.
@@ -284,10 +294,29 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 				HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 			/* USER CODE BEGIN USART2_MspInit 1 */
-//        GPIO_InitStruct.Pin = USART_TX_Pin | USART_RX_Pin;
-//        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-//        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-//        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+				#ifdef USART2_TXSEND_WITH_DMA
+				/* USART2 DMA Init */
+				/* USART2_TX Init */
+				hdma_usart2_tx.Instance = DMA1_Channel7;
+				hdma_usart2_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+				hdma_usart2_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+				hdma_usart2_tx.Init.MemInc = DMA_MINC_ENABLE;
+				hdma_usart2_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+				hdma_usart2_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+				hdma_usart2_tx.Init.Mode = DMA_NORMAL;
+				hdma_usart2_tx.Init.Priority = DMA_PRIORITY_LOW;
+				if (HAL_DMA_Init(&hdma_usart2_tx) != HAL_OK)
+				{
+					Error_Handler();
+				}
+
+				__HAL_LINKDMA(huart,hdmatx,hdma_usart2_tx);
+				#endif
+				
+				/* USART2 interrupt Init */
+				HAL_NVIC_SetPriority(USART2_IRQn, 2, 2);
+				HAL_NVIC_EnableIRQ(USART2_IRQn);
+				
 			/* USER CODE END USART2_MspInit 1 */
 			}
 		else if(huart->Instance==USART3)
@@ -296,6 +325,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 
 		/* USER CODE END USART3_MspInit 0 */
 			/* Peripheral clock enable */
+			__HAL_AFIO_REMAP_USART3_PARTIAL();
 			__HAL_RCC_USART3_CLK_ENABLE();
 		
 			__HAL_RCC_GPIOC_CLK_ENABLE();
@@ -312,11 +342,29 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 			GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 			GPIO_InitStruct.Pull = GPIO_NOPULL;
 			HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-			
-			__HAL_AFIO_REMAP_USART3_PARTIAL();
-
 		/* USER CODE BEGIN USART3_MspInit 1 */
+			
+		#ifdef USART3_TXSEND_WITH_DMA
+			/* USART3 DMA Init */
+    /* USART3_TX Init */
+    hdma_usart3_tx.Instance = DMA1_Channel2;
+    hdma_usart3_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    hdma_usart3_tx.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_usart3_tx.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_usart3_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+    hdma_usart3_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
+    hdma_usart3_tx.Init.Mode = DMA_NORMAL;
+    hdma_usart3_tx.Init.Priority = DMA_PRIORITY_LOW;
+    if (HAL_DMA_Init(&hdma_usart3_tx) != HAL_OK)
+    {
+      Error_Handler();
+    }
 
+    __HAL_LINKDMA(huart,hdmatx,hdma_usart3_tx);
+		#endif
+		/* USART3 interrupt Init */
+			HAL_NVIC_SetPriority(USART3_IRQn, 2, 2);
+			HAL_NVIC_EnableIRQ(USART3_IRQn);
 		/* USER CODE END USART3_MspInit 1 */
 		}
 }
@@ -395,13 +443,26 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
     /* Peripheral clock enable */
     __HAL_RCC_TIM6_CLK_ENABLE();
     /* TIM6 interrupt Init */
-    HAL_NVIC_SetPriority(TIM6_IRQn, 2, 0);
+    HAL_NVIC_SetPriority(TIM6_IRQn, 3, 3);
     HAL_NVIC_EnableIRQ(TIM6_IRQn);
   /* USER CODE BEGIN TIM6_MspInit 1 */
 
   /* USER CODE END TIM6_MspInit 1 */
   }
+	else if(htim_base->Instance==TIM7)
+  {
+  /* USER CODE BEGIN TIM7_MspInit 0 */
 
+  /* USER CODE END TIM7_MspInit 0 */
+    /* Peripheral clock enable */
+    __HAL_RCC_TIM7_CLK_ENABLE();
+    /* TIM7 interrupt Init */
+    HAL_NVIC_SetPriority(TIM7_IRQn, 3, 3);
+    HAL_NVIC_EnableIRQ(TIM7_IRQn);
+  /* USER CODE BEGIN TIM7_MspInit 1 */
+
+  /* USER CODE END TIM7_MspInit 1 */
+  }
 }
 
 TIM_HandleTypeDef htim2;

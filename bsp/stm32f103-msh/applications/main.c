@@ -49,7 +49,7 @@ int main(void)
 		thread_button_init();
 		//TOF10120_Init();
 		//MX_TIM3_Init();
-		//AT24CXX_Check();
+		AT24CXX_Check();
 		while (1)
     {
         HAL_GPIO_WritePin(RUN_GPIO_PORT, RUN_PIN, GPIO_PIN_SET);
@@ -57,7 +57,7 @@ int main(void)
         HAL_GPIO_WritePin(RUN_GPIO_PORT, RUN_PIN, GPIO_PIN_RESET);
         rt_thread_mdelay(500);
 				
-				rt_kprintf("dis:%d mm\r\n", TOF10120_Read_Distence()); 
+				//rt_kprintf("dis:%d mm\r\n", TOF10120_Read_Distence()); 
 				
     }
 }
