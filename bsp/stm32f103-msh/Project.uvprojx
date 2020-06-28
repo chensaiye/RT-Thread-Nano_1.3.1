@@ -649,6 +649,11 @@
               <FilePath>.\hardware\usart2_ctl.c</FilePath>
             </File>
             <File>
+              <FileName>usart3_ctl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hardware\usart3_ctl.c</FilePath>
+            </File>
+            <File>
               <FileName>pwm_tim3.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\hardware\pwm_tim3.c</FilePath>
@@ -758,11 +763,6 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
-            </File>
-            <File>
-              <FileName>usart3_ctl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\hardware\usart3_ctl.c</FilePath>
             </File>
           </Files>
         </Group>
