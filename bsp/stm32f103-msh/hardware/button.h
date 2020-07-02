@@ -1,6 +1,10 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
+#ifndef BUTTON_DEBUG
+#define BUTTON_DEBUG  1
+#endif
+
 #define DI_165B_Pin GPIO_PIN_3
 #define DI_165B_GPIO_Port GPIOB
 #define CLK_165B_Pin GPIO_PIN_4
@@ -17,9 +21,9 @@
 
 
 //#define BUTTON_CAMERA_OFFSET			0x01
-//#define BUTTON_LONG_PRESS 1
+#define BUTTON_LONG_PRESS 1
 
-#define BUTTON_NUMBER 8
+#define BUTTON_NUMBER 16
 
 #define BUTTON_1		0				//
 #define BUTTON_2 		1				//
@@ -27,13 +31,23 @@
 #define BUTTON_4 		3				//
 #define BUTTON_DUMMY 	4
 
+#define BUTTON_RIR1			8
+#define BUTTON_RIR2			9
+#define BUTTON_RIR3			10
+#define BUTTON_RIR4			11
+#define BUTTON_RIR5			12
+#define BUTTON_RIR6			13
+#define BUTTON_RIR7			14
+#define BUTTON_RIR8			15
+
 #define BUTTON_DOWN 0
 #define BUTTON_UP	1
 #define	BUTTON_LONG_PRESSED 2
 #define BUTTON_LONG_RELEASE 3
 
-#define BUTTON_LONG_TIMER	40	//长按延时时间 40*50ms =2S
+#define BUTTON_LONG_TIMER	200	//长按延时时间 200*10ms =2S
 
+#define CHANNEL_RIR_MAX 7
 
 //#define KEY1 	GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_13)
 //#define KEY2 	GPIO_ReadInputDataBit(GPIOC,GPIO_Pin_14)
@@ -68,7 +82,7 @@ extern button_type  buttons[BUTTON_NUMBER];
 #define	BUTTON_ENABLE			0x20
 #define	BUTTON_DISABLE			0xdf
 
-#define MAX_KIN_COL			4
+#define MAX_KIN_COL			14
 
 //void button_init(void);
 //uint8_t get_button(void);
@@ -82,6 +96,15 @@ void button_6( unsigned char flag );
 void button_7( unsigned char flag );
 void button_8( unsigned char flag );
 void button_dummy( unsigned char flag );
+
+void bt_rir_1( unsigned char flag );
+void bt_rir_2( unsigned char flag );
+void bt_rir_3( unsigned char flag );
+void bt_rir_4( unsigned char flag );
+void bt_rir_5( unsigned char flag );
+void bt_rir_6( unsigned char flag );
+void bt_rir_7( unsigned char flag );
+
 
 int thread_button_init(void);
 #endif

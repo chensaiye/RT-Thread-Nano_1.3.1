@@ -146,7 +146,7 @@ static int MX_USART3_UART_Init(void)
   /* USER CODE END USART3_Init 2 */
 
 }
-INIT_BOARD_EXPORT(MX_USART3_UART_Init);
+//INIT_BOARD_EXPORT(MX_USART3_UART_Init);
 
 /**
   * @brief This function handles USART2 global interrupt.

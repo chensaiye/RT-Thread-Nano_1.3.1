@@ -525,10 +525,8 @@ static int MX_TIM2_Init(void)
   /* USER CODE END TIM2_Init 2 */
 	return 0;
 }
-INIT_BOARD_EXPORT(MX_TIM2_Init);
+//INIT_BOARD_EXPORT(MX_TIM2_Init);
 
-//TIM_HandleTypeDef htim3;
-//TIM_HandleTypeDef htim4;
 
 
 //void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)

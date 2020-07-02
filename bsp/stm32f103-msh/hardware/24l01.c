@@ -3,6 +3,8 @@
 #include <rthw.h>
 #include <rtthread.h>
 
+#include "db.h"
+
 uint8_t TX_ADDRESS[TX_ADR_WIDTH]= {0x80,'-','Y','C','C'}; //发送地址
 uint8_t RX0_ADDRESS[RX_ADR_WIDTH]={0x80,'-','Y','C','C'}; //接受地址
 uint8_t RX1_ADDRESS[RX_ADR_WIDTH]={0x10,'-','Y','C','C'}; //接受地址  "YCC-"
@@ -32,7 +34,7 @@ void NRF24L01_Init(void)
 	GPIO_InitStruct.Pin = IRQ_NRF_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 	GPIO_InitStruct.Pull = GPIO_PULLUP;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	HAL_GPIO_Init(IRQ_NRF_GPIO_Port, &GPIO_InitStruct);
 	
 	/*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, CE_NRF_Pin, GPIO_PIN_RESET);//使能24L01
@@ -134,7 +136,7 @@ uint8_t NRF24L01_TxPacket(uint8_t *txbuf)
   NRF24L01_Write_Buf(WR_TX_PLOAD,txbuf,TX_PLOAD_WIDTH);//写数据到TX BUF  32个字节
  	HAL_GPIO_WritePin(GPIOC, CE_NRF_Pin, GPIO_PIN_SET);//启动发送	   
  	rt_hw_us_delay(8);
-	while(HAL_GPIO_ReadPin(GPIOA,IRQ_NRF_Pin)!=0);//等待发送完成
+	while(HAL_GPIO_ReadPin(IRQ_NRF_GPIO_Port,IRQ_NRF_Pin)!=0);//等待发送完成
 	sta=NRF24L01_Read_Reg(STATUS);  //读取状态寄存器的值	   
 	NRF24L01_Write_Reg(NRF_WRITE_REG+STATUS,sta); //清除TX_DS或MAX_RT中断标志
 	if(sta&MAX_TX)//达到最大重发次数
@@ -229,4 +231,49 @@ void NRF24L01_TX_Mode(void)
 	
 }
 
+#define NRF_THREAD_PRIORITY         (RT_THREAD_PRIORITY_MAX - 1)
+#define NRF_THREAD_STACK_SIZE       512
+#define NRF_THREAD_TIMESLICE        20
+
+ALIGN(RT_ALIGN_SIZE)
+static char thd_nrf_stack[NRF_THREAD_STACK_SIZE];
+static struct rt_thread thd_nrf;
+
+static void NRF_scan_entey(void *parameter)
+{
+	while(1)
+  {
+		rt_thread_mdelay(100);
+		//通过nrf24l01调试
+		if(INIT_ERROR==0)
+		{
+			if(NRF24L01_RxPacket(NRF_RX_BUF)==0)
+			{
+				NRF_RX_BUF[RX_PLOAD_WIDTH]=0;
+				db_dev.scan(NRF_RX_BUF);
+			}
+		}
+	}
+}
+int thread_nrf_init(void)
+{
+	
+	NRF24L01_Init();
+	
+	if(INIT_ERROR==0)
+	{	
+		 rt_thread_init(&thd_nrf,
+										 "thd_nrf",
+										 NRF_scan_entey,
+										 RT_NULL,
+										 &thd_nrf_stack[0],
+										 sizeof(thd_nrf_stack),
+										 NRF_THREAD_PRIORITY - 1, NRF_THREAD_TIMESLICE);
+										 
+		 rt_thread_startup(&thd_nrf);
+	}
+    return 0;
+}
+
+//MSH_CMD_EXPORT(thread_nrf_init, thread nrf debug);
 

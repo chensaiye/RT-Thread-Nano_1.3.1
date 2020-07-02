@@ -66,8 +66,8 @@
 #define CSN_NRF_Pin GPIO_PIN_5		//SPI片选信号	
 #define CSN_NRF_GPIO_Port GPIOC
 
-#define IRQ_NRF_Pin GPIO_PIN_4		//IRQ主机数据输入 
-#define IRQ_NRF_GPIO_Port GPIOA
+#define IRQ_NRF_Pin GPIO_PIN_0		//IRQ主机数据输入 
+#define IRQ_NRF_GPIO_Port GPIOB
 
 
 //24L01发送接收数据宽度定义
@@ -91,6 +91,7 @@ uint8_t NRF24L01_Check(void);//检查24L01是否存在
 uint8_t NRF24L01_TxPacket(uint8_t *txbuf);//发送一个包的数据
 uint8_t NRF24L01_RxPacket(uint8_t *rxbuf);//接收一个包的数据
 
+int thread_nrf_init(void);
 
 #endif
 

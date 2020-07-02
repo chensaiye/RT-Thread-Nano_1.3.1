@@ -149,7 +149,7 @@ static int MX_USART2_UART_Init(void)
   /* USER CODE END USART2_Init 2 */
 	return 0;
 }
-INIT_BOARD_EXPORT(MX_USART2_UART_Init);
+//INIT_BOARD_EXPORT(MX_USART2_UART_Init);
 
 /**
 * @brief UART MSP Initialization

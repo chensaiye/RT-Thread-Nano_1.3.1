@@ -78,24 +78,21 @@ int MX_TIM3_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 1000;
+  sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
   {
     Error_Handler();
   }
-  sConfigOC.Pulse = 1800;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
   {
     Error_Handler();
   }
-  sConfigOC.Pulse = 2400;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
   {
     Error_Handler();
   }
-  sConfigOC.Pulse = 3200;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
   {
     Error_Handler();
@@ -103,13 +100,13 @@ int MX_TIM3_Init(void)
   /* USER CODE BEGIN TIM3_Init 2 */
 	
 	/* Peripheral clock enable */
-    __HAL_RCC_TIM3_CLK_ENABLE();
-	
-	HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
-	HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
-	HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_3);
-	HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_4);
-	HAL_TIM_Base_Start(&htim3);
+//    __HAL_RCC_TIM3_CLK_ENABLE();
+//	
+//	HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
+//	HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_2);
+//	HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_3);
+//	HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_4);
+//	HAL_TIM_Base_Start(&htim3);
   /* USER CODE END TIM3_Init 2 */
   HAL_TIM_MspPostInit(&htim3);
 
@@ -117,7 +114,6 @@ int MX_TIM3_Init(void)
 }
 
 INIT_BOARD_EXPORT(MX_TIM3_Init);
-
 
 
 
