@@ -262,6 +262,7 @@ int thread_nrf_init(void)
 	
 	if(INIT_ERROR==0)
 	{	
+			rt_kprintf("NRF24L01 INIT OK!\r\n");
 		 rt_thread_init(&thd_nrf,
 										 "thd_nrf",
 										 NRF_scan_entey,

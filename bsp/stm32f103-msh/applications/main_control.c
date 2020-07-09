@@ -28,7 +28,7 @@ const uint16_t LED_table[MAX_LEVEL] ={0x0001,0x0003,0x0007,0x000F,0x001F,0x003F,
 extern sMenuItemValue MenuIVS[];
 
 extern uint8_t get_165_data(void);
-
+extern void pwm_output_clear(void);//
 //根据curr_status 刷新显示
 void led_manual_updata(void)
 {
@@ -116,10 +116,9 @@ void Event_Updata_Set(void)
 	
 	if(curr_status.value.pow_fg == ON)
 	{
+		tp_lum_p = &Mode_GP[curr_status.value.mode];//取得当前模式下的最大最小参数
 		if(curr_status.value.mode < MODE_QJ )
 		{
-			//
-			tp_lum_p = &Mode_GP[curr_status.value.mode];//取得当前模式下的最大最小参数
 			if(curr_status.value.lum_grade == 0){//照度最低档处理
 				temp_p.value.ch1 = tp_lum_p->value.ch1_min;
 				temp_p.value.ch2 = tp_lum_p->value.ch2_min;
@@ -158,18 +157,27 @@ void Event_Updata_Set(void)
 			//影阴补偿处理
 			if(curr_status.value.mode == MODE_YYCTL)
 			{
+				
 					//算法2：加指定的百分比 	140klx*1.15=161klx
 				tp_pwm = temp_p.value.ch1*SYS_PARA.value.gain_step*curr_status.value.rir/100;
 				temp_p.value.ch1 += tp_pwm;
-				if(temp_p.value.ch1 > PWM_MAX_VALUE)
-					temp_p.value.ch1 = PWM_MAX_VALUE;//小于最大值
-				temp_p.value.ch2 = temp_p.value.ch1;
-				temp_p.value.ch3 = temp_p.value.ch1;
+				if(temp_p.value.ch1 > MenuIVS[8+1].MaxValue)//PWM_MAX_VALUE)
+					temp_p.value.ch1 = MenuIVS[8+1].MaxValue;//小于最大值
 				
+				tp_pwm = temp_p.value.ch2*SYS_PARA.value.gain_step*curr_status.value.rir/100;
+				temp_p.value.ch2 += tp_pwm;
+				if(temp_p.value.ch2 > MenuIVS[8+3].MaxValue)//PWM_MAX_VALUE)
+					temp_p.value.ch2 = MenuIVS[8+3].MaxValue;//小于最大值
+				
+				tp_pwm = temp_p.value.ch3*SYS_PARA.value.gain_step*curr_status.value.rir/100;
+				temp_p.value.ch3 += tp_pwm;
+				if(temp_p.value.ch3 > MenuIVS[8+5].MaxValue)//PWM_MAX_VALUE)
+					temp_p.value.ch3 = MenuIVS[8+5].MaxValue;//小于最大值
+								
 				tp_pwm = temp_p.value.ch4*SYS_PARA.value.gain_step*curr_status.value.rir/100;
 				temp_p.value.ch4 += tp_pwm;
-				if(temp_p.value.ch4 > PWM_MAX_VALUE)//小于最大值
-					temp_p.value.ch4 = PWM_MAX_VALUE;
+				if(temp_p.value.ch4 > MenuIVS[8+7].MaxValue)//小于最大值
+					temp_p.value.ch4 = MenuIVS[8+7].MaxValue;
 			}
 		}
 		else
@@ -183,7 +191,7 @@ void Event_Updata_Set(void)
 			else
 			{
 				if(tp_lum_p->value.ch4_max > tp_lum_p->value.ch4_min)
-					temp_p.value.ch4 = tp_lum_p->value.ch4_min + curr_status.value.lum_grade*(tp_lum_p->value.ch4_max - tp_lum_p->value.ch4_min)/(LUM_GRADE_NUMB-1);
+					temp_p.value.ch4 = tp_lum_p->value.ch4_min + curr_status.value.qj_grade*(tp_lum_p->value.ch4_max - tp_lum_p->value.ch4_min)/(LUM_GRADE_NUMB-1);
 				else
 					temp_p.value.ch4 = tp_lum_p->value.ch4_min;
 			}
@@ -194,6 +202,7 @@ void Event_Updata_Set(void)
 	{
 		for(i=0;i<4;i++)
 			temp_p.buf[i] = 0;
+		pwm_output_clear();
 	}
 	
 	//刷新目标值
@@ -284,8 +293,10 @@ void Event_Mode(void)
 		return;
 	curr_status.value.mode++;
 	if(curr_status.value.mode > MODE_QJ )
+	{	
 		curr_status.value.mode = MODE_LUM;
-	
+		HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_SET);
+	}
 	Event_Updata_Set();
 }
 
@@ -331,6 +342,10 @@ void Event_Minus(void)
 	Event_Updata_Set();
 }
 
+MSH_CMD_EXPORT(Event_Power, power pressed);
+MSH_CMD_EXPORT(Event_Mode, mode pressed);
+MSH_CMD_EXPORT(Event_Minus, minus pressed);
+MSH_CMD_EXPORT(Event_Add, add pressed);
 
 //阴影补偿处理
 void RIR_CTL(short int rir_c)
@@ -393,6 +408,8 @@ void recover_data(void)
 	Flash_Eeprom_Read_HalfWord(FLASH_EEPROM_ADDR1,flash_eeprom_buffer,MENUITEMVALUE_NO+10);
 	
 	pbuf = &flash_eeprom_buffer[1];
+	MenuItems_Value_Write(&flash_eeprom_buffer[1],0,MENUITEMVALUE_NO);
+	
 	for(i=0;i<8;i++)
 		Mode_GP[0].buf16[i] = pbuf[i];
 	
@@ -411,49 +428,18 @@ void recover_data(void)
 	SYS_PARA.value.gain_step = pbuf[i];
 	SYS_PARA.value.gain_max  = pbuf[i+1];
 	
-//	Mode_GP[MODE_LUM].value.ch4_min = pbuf[0];
-//	Mode_GP[MODE_LUM].value.ch4_max = pbuf[1];
-//	Mode_GP[MODE_LUM].value.ch1_min = pbuf[2];
-//	Mode_GP[MODE_LUM].value.ch1_max = pbuf[3];
-//	Mode_GP[MODE_LUM].value.ch2_min = pbuf[2];
-//	Mode_GP[MODE_LUM].value.ch2_max = pbuf[3];
-//	Mode_GP[MODE_LUM].value.ch3_min = pbuf[2];
-//	Mode_GP[MODE_LUM].value.ch3_max = pbuf[3];
-//	
-//	Mode_GP[MODE_YYCTL].value.ch4_min = pbuf[4];
-//	Mode_GP[MODE_YYCTL].value.ch4_max = pbuf[5];
-//	Mode_GP[MODE_YYCTL].value.ch1_min = pbuf[6];
-//	Mode_GP[MODE_YYCTL].value.ch1_max = pbuf[7];
-//	Mode_GP[MODE_YYCTL].value.ch2_min = pbuf[6];
-//	Mode_GP[MODE_YYCTL].value.ch2_max = pbuf[7];
-//	Mode_GP[MODE_YYCTL].value.ch3_min = pbuf[6];
-//	Mode_GP[MODE_YYCTL].value.ch3_max = pbuf[7];
-//	
-//	Mode_GP[MODE_DEPTH].value.ch4_min = pbuf[8];
-//	Mode_GP[MODE_DEPTH].value.ch4_max = pbuf[9];
-//	Mode_GP[MODE_DEPTH].value.ch1_min = pbuf[10];
-//	Mode_GP[MODE_DEPTH].value.ch1_max = pbuf[11];
-//	Mode_GP[MODE_DEPTH].value.ch2_min = pbuf[10];
-//	Mode_GP[MODE_DEPTH].value.ch2_max = pbuf[11];
-//	Mode_GP[MODE_DEPTH].value.ch3_min = pbuf[10];
-//	Mode_GP[MODE_DEPTH].value.ch3_max = pbuf[11];
-//	
-//	Mode_GP[MODE_QJ].value.ch4_min = pbuf[12];
-//	Mode_GP[MODE_QJ].value.ch4_max = pbuf[13];
-//	Mode_GP[MODE_QJ].value.ch1_min = 0;//flash_eeprom_buffer[14];
-//	Mode_GP[MODE_QJ].value.ch1_max = 0;//flash_eeprom_buffer[15];
-//	Mode_GP[MODE_QJ].value.ch2_min = 0;//flash_eeprom_buffer[14];
-//	Mode_GP[MODE_QJ].value.ch2_max = 0;//flash_eeprom_buffer[15];
-//	Mode_GP[MODE_QJ].value.ch3_min = 0;//flash_eeprom_buffer[14];
-//	Mode_GP[MODE_QJ].value.ch3_max = 0;//flash_eeprom_buffer[15];
-	
-//	SYS_PARA.value.gain_step = pbuf[16];
-//	SYS_PARA.value.gain_max  = pbuf[17];
-	
 	pbuf = &flash_eeprom_buffer[1+MENUITEMVALUE_NO];
+	
 	for(i=0;i<sizeof(curr_status)/2;i++)
 		curr_status.buf16[i] = pbuf[i];
-		
+	curr_status.value.rir = 0;	
+	
+	if(curr_status.value.lum_grade > LUM_GRADE_NUMB -1)
+		curr_status.value.lum_grade  = 0;
+	if(curr_status.value.qj_grade > QJ_GP_NUMB -1)
+		curr_status.value.qj_grade  = 0;
+	if(curr_status.value.mode > MODE_QJ)
+		curr_status.value.mode  = 0;
 }
 
 void Reset_To_Factory( void )

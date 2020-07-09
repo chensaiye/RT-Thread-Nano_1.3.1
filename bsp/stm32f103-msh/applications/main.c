@@ -18,6 +18,8 @@
 #include "24cxx.h" 
 #include "button.h"
 #include "pwm_tim3.h"
+#include "oled.h"
+#include "main_control.h"
 
 #define RUN_GPIO_PORT  GPIOB
 #define RUN_PIN        GPIO_PIN_12
@@ -96,15 +98,13 @@ static void times_init(void)
 
 int main(void)
 {
-//		uint8_t str[8]={0x11,0x22,0x33,0x44,0x55,0x66,6,7};
-//		uint8_t test=0,i;
-	
     MX_GPIO_Init();
 		Panel_Init();
 			
 		thread_button_init();
 		thread_pwm_start();
 		thread_nrf_init();
+		oled_thd_start();
 		//thread_usart3_init();
 		
 		rt_thread_mdelay(200);
@@ -114,7 +114,6 @@ int main(void)
 		
 		while (1)
     {
-        //rt_kprintf("dis:%d mm\r\n", TOF10120_Read_Scan()); 
 				HAL_GPIO_TogglePin(RUN_GPIO_PORT, RUN_PIN);
 				rt_thread_mdelay(500);
 		}
@@ -144,7 +143,7 @@ static void MX_GPIO_Init(void)
 		GPIO_InitStruct.Pin 	= LED1_Pin;
 		HAL_GPIO_Init(LED1_GPIO_Port, &GPIO_InitStruct);
 		
-		HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
 }
 
@@ -180,6 +179,8 @@ void EXTI2_IRQHandler(void)
 	
   /* USER CODE BEGIN EXTI2_IRQn 0 */
 	rt_enter_critical();//µ÷¶ÈÆ÷ÉÏËø
+	HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(QJ_POW_GPIO_Port, QJ_POW_Pin, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
   /* USER CODE END EXTI2_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
@@ -208,4 +209,4 @@ void Led_Set_Test(int argc, char** argv)
 		Led_Set_16Bit(0xFFFE);
 	rt_kprintf("order:%s para1:%s\r\n",argv[0],argv[1]);
 }
-MSH_CMD_EXPORT(Led_Set_Test, Led_595_set test);
+//MSH_CMD_EXPORT(Led_Set_Test, Led_595_set test);

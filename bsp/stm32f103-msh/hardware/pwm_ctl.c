@@ -53,6 +53,19 @@ void pwm_output(void)
 	TIM3_PWM_Set_Channel(3,curr_val.value.ch3);
 	TIM3_PWM_Set_Channel(4,curr_val.value.ch4);
 }
+
+//pwm值输出清零
+void pwm_output_clear(void)
+{
+	uint16_t i;
+	for(i=0;i<4;i++)
+		curr_val.buf[i]=0;
+	TIM3_PWM_Set_Channel(1,curr_val.value.ch1);
+	TIM3_PWM_Set_Channel(2,curr_val.value.ch2);
+	TIM3_PWM_Set_Channel(3,curr_val.value.ch3);
+	TIM3_PWM_Set_Channel(4,curr_val.value.ch4);
+}
+
 //通道值缓冲变化
 void pwm_buffer(void)
 {
