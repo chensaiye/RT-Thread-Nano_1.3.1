@@ -19,7 +19,7 @@ static int AT24CXX_Init(void)
 	MX_I2C2_Init();//IIC初始化
 	return 0;
 }
-INIT_BOARD_EXPORT(AT24CXX_Init);
+//INIT_BOARD_EXPORT(AT24CXX_Init);
 
 //在AT24CXX指定地址写入一个数据
 //WriteAddr  :写入数据的目的地址    

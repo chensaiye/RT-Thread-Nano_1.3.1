@@ -55,6 +55,46 @@ void Error_Handler(void)
 
   /* USER CODE END Error_Handler_Debug */
 }
+void PowDown_Test_Init(void)
+{
+
+	PWR_PVDTypeDef PWR_PVD_INIT_Struct={0};
+	/* Enable PWR and BKP clock */
+	__HAL_RCC_BKP_CLK_ENABLE();
+	__HAL_RCC_PWR_CLK_ENABLE();
+	
+	/* Configure EXTI Line to generate an interrupt on falling edge */
+		
+	/* NVIC configuration */
+	/* PVD_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(PVD_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(PVD_IRQn);
+	
+	PWR_PVD_INIT_Struct.Mode = PWR_PVD_MODE_IT_RISING;//why is rising???
+	PWR_PVD_INIT_Struct.PVDLevel =  PWR_PVDLEVEL_7;
+	HAL_PWR_ConfigPVD(&PWR_PVD_INIT_Struct);
+	HAL_PWR_EnablePVD();
+				 
+}
+
+/**
+  * @brief This function handles PVD interrupt through EXTI line 16.
+  */
+void PVD_IRQHandler(void)
+{
+  /* USER CODE BEGIN PVD_IRQn 0 */
+	HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(QJ_POW_GPIO_Port, QJ_POW_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_SET);
+	rt_enter_critical();//调度器上锁
+	backup_data();
+  /* USER CODE END PVD_IRQn 0 */
+  HAL_PWR_PVD_IRQHandler();
+  /* USER CODE BEGIN PVD_IRQn 1 */
+	HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_RESET);
+	rt_exit_critical();//调度器解锁	
+  /* USER CODE END PVD_IRQn 1 */
+}
 
 
 /* 定时器1超时函数 */
@@ -109,7 +149,8 @@ int main(void)
 		
 		rt_thread_mdelay(200);
 		MX_EXTI_GPIO_Init();
-		
+		//PowDown_Test_Init();
+	
 		times_init();
 		
 		while (1)
@@ -143,7 +184,7 @@ static void MX_GPIO_Init(void)
 		GPIO_InitStruct.Pin 	= LED1_Pin;
 		HAL_GPIO_Init(LED1_GPIO_Port, &GPIO_InitStruct);
 		
-		HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_SET);
 		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
 }
 

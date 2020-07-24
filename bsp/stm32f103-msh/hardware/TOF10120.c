@@ -77,7 +77,7 @@ uint16_t TOF10120_Read_Distence(void)
 //		return 0;//error
 //	return ((buf[0]<<8) + buf[1]);
 	
-	if(HAL_I2C_Mem_Read(&hi2c1,TOF_ADDRESS1,FILTERED_DIS_REG,I2C_MEMADD_SIZE_8BIT,buf,0x02,10000)==HAL_OK)
+	if(HAL_I2C_Mem_Read(&hi2c1,TOF_ADDRESS1,FILTERED_DIS_REG,I2C_MEMADD_SIZE_8BIT,buf,0x02,10)==HAL_OK)
 		return ((buf[0]<<8) + buf[1]);
 	else
 		return 0;

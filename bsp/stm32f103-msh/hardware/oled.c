@@ -39,6 +39,7 @@ extern pwm_value_union set_val;//设定值
 extern union_status curr_status;//当前状态
 extern union_para SYS_PARA;	//系统参数
 extern uint16_t TOF_Value;
+extern uint8_t NRF_ERROR;
 //更新显存到LCD		 
 void OLED_Refresh_Gram(void)
 {
@@ -373,16 +374,27 @@ void OLED_Init(void)
 void OLED_Test(void)
 {
 	char str[25];
-	OLED_ShowString(32,0,"Run Info",CHARSIZE_8X6);
+//	OLED_ShowString(32,0,"Run Info",CHARSIZE_8X6);
+//	
+//	sprintf(str,"Mode:    RIR:    ");
+//	OLED_ShowString(0,2*8, (uint8_t *)str,CHARSIZE_8X6);
+//	sprintf(str,"Mode:%d   RIR:%d",curr_status.value.mode,curr_status.value.rir);
+//	OLED_ShowString(0,1*8, (uint8_t *)str,CHARSIZE_8X6);	
 	
-	sprintf(str,"Mode:    RIR:    ");
-	OLED_ShowString(0,2*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"Mode:%d   RIR:%d",curr_status.value.mode,curr_status.value.rir);
+	sprintf(str,"Run Info   NRF:   ");
+	OLED_ShowString(0,0, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"Run Info   NRF:%d  ",NRF_ERROR);
+	OLED_ShowString(0,0, (uint8_t *)str,CHARSIZE_8X6);
+	
+	sprintf(str,"Mode:  RIR:  Dis:    ");
+	OLED_ShowString(0,1*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"Mode:%d RIR:%d Dis:%d",curr_status.value.mode,curr_status.value.rir,TOF_Value);
 	OLED_ShowString(0,1*8, (uint8_t *)str,CHARSIZE_8X6);	
 	
-	sprintf(str,"Current Levl:     ");
+	
+	sprintf(str,"Levl:     ");
 	OLED_ShowString(0,2*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"Current Levl:%d",curr_status.value.lum_grade);
+	sprintf(str,"Levl:%d",curr_status.value.lum_grade);
 	OLED_ShowString(0,2*8, (uint8_t *)str,CHARSIZE_8X6);	
 	
 	sprintf(str,"Current Set1:     ");
@@ -405,10 +417,10 @@ void OLED_Test(void)
 	sprintf(str,"Current Set4:%d",set_val.value.ch4);
 	OLED_ShowString(0,6*8, (uint8_t *)str,CHARSIZE_8X6);
 	
-	sprintf(str,"Distence:   ");
-	OLED_ShowString(0,7*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"Distence:%d",TOF_Value);
-	OLED_ShowString(0,7*8, (uint8_t *)str,CHARSIZE_8X6);
+//	sprintf(str,"Distence:   ");
+//	OLED_ShowString(0,7*8, (uint8_t *)str,CHARSIZE_8X6);
+//	sprintf(str,"Distence:%d",TOF_Value);
+//	OLED_ShowString(0,7*8, (uint8_t *)str,CHARSIZE_8X6);
 		
 	OLED_Refresh_Gram();
 }

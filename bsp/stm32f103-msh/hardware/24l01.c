@@ -11,7 +11,7 @@ uint8_t RX1_ADDRESS[RX_ADR_WIDTH]={0x10,'-','Y','C','C'}; //接受地址  "YCC-"
 uint8_t NRF_RX_BUF[RX_PLOAD_WIDTH+1];
 
 uint8_t MYADDR;
-uint8_t INIT_ERROR=0;
+uint8_t NRF_ERROR=0;
 
 extern SPI_HandleTypeDef hspi1;
 extern void rt_hw_us_delay(rt_uint32_t us);
@@ -44,7 +44,7 @@ void NRF24L01_Init(void)
 	HAL_SPI_Transmit(&hspi1,&MYADDR,1,10000);//未知原因，SPI初始化完成后必须启动发送一次，后续Check才能通过
 	
 	if( NRF24L01_Check())
-		INIT_ERROR = 1; //HAL_UART_Transmit(&huart2,"nrf240l01 error\r\n",17,10000);
+		NRF_ERROR = 1; //HAL_UART_Transmit(&huart2,"nrf240l01 error\r\n",17,10000);
 	else
 	{
 		NRF24L01_ModeInt();
@@ -245,7 +245,7 @@ static void NRF_scan_entey(void *parameter)
   {
 		rt_thread_mdelay(100);
 		//通过nrf24l01调试
-		if(INIT_ERROR==0)
+		if(NRF_ERROR==0)
 		{
 			if(NRF24L01_RxPacket(NRF_RX_BUF)==0)
 			{
@@ -260,7 +260,7 @@ int thread_nrf_init(void)
 	
 	NRF24L01_Init();
 	
-	if(INIT_ERROR==0)
+	if(NRF_ERROR==0)
 	{	
 			rt_kprintf("NRF24L01 INIT OK!\r\n");
 		 rt_thread_init(&thd_nrf,
