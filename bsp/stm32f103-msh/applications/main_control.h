@@ -104,9 +104,11 @@ typedef union
 	uint8_t pow_fg;		//开关标志
 	uint8_t bk_fg;			//背光标记
 	uint8_t rir;			//阴影传感器触发个数
+	uint8_t sys_set;		//系统设置
+	uint8_t unused;			//
 	}value;
-	uint8_t buf[8];
-	uint16_t buf16[4];
+	uint8_t buf[10];
+	uint16_t buf16[5];
 }union_status;
 
 #define MODE_LUM 			0

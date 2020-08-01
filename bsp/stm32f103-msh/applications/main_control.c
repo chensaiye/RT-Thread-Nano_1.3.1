@@ -11,6 +11,7 @@
 #include "button.h"
 #include "menu.h"
 #include "flash_eeprom.h"
+#include "sm4.h"
 
 const uint16_t QJ_Min=100,QJ_Max=1000;
 
@@ -21,7 +22,7 @@ union_ch_value Mode_GP[MODE_NUMBER];	//设定的各模式下参数
 union_para SYS_PARA;	//系统参数
 
 uint8_t SET_FACTORY_FLAG;	//回复出厂设置标志
-
+uint8_t MY_BUS_ADDR;
 const uint16_t LED_table[MAX_LEVEL] ={0x0001,0x0003,0x0007,0x000F,0x001F,0x003F,0x007F,0x00FF,0x01FF,0x03FF};
 //const uint16_t PWM_table[MAX_LEVEL] ={100,300,600,800,1000,1200,1400,1600,1800,2000};
 //uint8_t SOFT_VERSION[] = "V1.1.0";
@@ -29,6 +30,8 @@ extern sMenuItemValue MenuIVS[];
 
 extern uint8_t get_165_data(void);
 extern void pwm_output_clear(void);//
+extern int SM4_Init(void);//初始化
+extern uint8_t SM4_Get_Date(void);
 //根据curr_status 刷新显示
 void led_manual_updata(void)
 {
@@ -155,7 +158,7 @@ void Event_Updata_Set(void)
 			}
 						
 			//影阴补偿处理
-			if(curr_status.value.mode == MODE_YYCTL)
+			if((curr_status.value.mode == MODE_YYCTL)&&(curr_status.value.sys_set & 0x08))
 			{
 				
 					//算法2：加指定的百分比 	140klx*1.15=161klx
@@ -484,7 +487,13 @@ void Panel_Init(void)
 	
 	//数据恢复
 	recover_data();//
-		
+	
+	SM4_Init();//system set init
+	curr_status.value.sys_set = SM4_Get_Date();
+	if(curr_status.value.sys_set&0x01)
+		MY_BUS_ADDR = 0x10;	//母灯
+	else
+		MY_BUS_ADDR = 0x20;	//子灯
 	//刷新目标输出
 	Event_Updata();
 	

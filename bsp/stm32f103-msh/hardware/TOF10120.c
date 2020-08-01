@@ -106,8 +106,8 @@ uint16_t Get_Buf_Average(uint16_t len,uint16_t* buf)
 
 uint16_t TOF10120_Read_Scan(void)
 {	
-//	if(TOF_Error)
-//		return 1000;
+	if(TOF_Error)
+		return 1000;
 	TOF_Value_Buf[TOF_Buf_Set] = TOF10120_Read_Distence();
 	TOF_Buf_Set++;
 	if(TOF_Buf_Set > TOF_BUF_SIZE-1)
