@@ -437,7 +437,7 @@ static struct rt_thread thd_oled;
 
 static void oled_display_entey(void *parameter)
 {
-	OLED_Init();
+	//OLED_Init();
 	while(1)
   {
 		rt_thread_mdelay(1000);
@@ -448,6 +448,9 @@ static void oled_display_entey(void *parameter)
 
 int oled_thd_start(void)
 {
+		OLED_Init();
+		if(oled_error )
+			return 1;
 		 rt_thread_init(&thd_oled,
 										 "oled_dis",
 										 oled_display_entey,

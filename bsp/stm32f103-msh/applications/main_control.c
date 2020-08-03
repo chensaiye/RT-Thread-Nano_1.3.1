@@ -69,10 +69,9 @@ void Led_Blink(void)
 		return;
 	if(curr_status.value.mode != MODE_YYCTL) 
 		return;
-	
-	
-	//if((SYSTEM_SET == IS_FALSE)&&(POWER_FLAG == ON)&&(CURRENT_MODE == MODE_SHADOW))
-	
+		
+	if(curr_status.value.sys_set & 0x08)
+	{
 		if(curr_status.value.rir)
 		{//
 			led_blink =1;
@@ -105,7 +104,7 @@ void Led_Blink(void)
 				led_manual_updata();
 			}
 		}
-	
+	}
 }
 
 

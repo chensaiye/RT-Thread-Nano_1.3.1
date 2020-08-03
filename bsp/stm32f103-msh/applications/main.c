@@ -138,9 +138,11 @@ static void times_init(void)
 
 int main(void)
 {
+		TOF10120_Init();
     MX_GPIO_Init();
 		Panel_Init();
-			
+		
+	
 		thread_button_init();
 		thread_pwm_start();
 		thread_nrf_init();
@@ -219,18 +221,23 @@ void EXTI2_IRQHandler(void)
 {
 	
   /* USER CODE BEGIN EXTI2_IRQn 0 */
-	rt_enter_critical();//调度器上锁
-	HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(QJ_POW_GPIO_Port, QJ_POW_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
-  /* USER CODE END EXTI2_IRQn 0 */
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
-  /* USER CODE BEGIN EXTI2_IRQn 1 */
-	//rt_thread_mdelay(10);
-	backup_data();
-	HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
-	rt_exit_critical();//调度器解锁
-  /* USER CODE END EXTI2_IRQn 1 */
+	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_2)==GPIO_PIN_SET)
+	{
+		rt_enter_critical();//调度器上锁
+		HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(QJ_POW_GPIO_Port, QJ_POW_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
+		/* USER CODE END EXTI2_IRQn 0 */
+		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
+		/* USER CODE BEGIN EXTI2_IRQn 1 */
+		//rt_thread_mdelay(10);
+		backup_data();
+		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
+		rt_exit_critical();//调度器解锁
+		/* USER CODE END EXTI2_IRQn 1 */
+	}
+	else
+		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_2);
 }
 
 /**

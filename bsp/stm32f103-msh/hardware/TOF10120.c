@@ -33,6 +33,7 @@ int TOF10120_Init(void)
 	for(i=0;i<TOF_BUF_SIZE;i++)
 		TOF_Value_Buf[i]=TOF_MAX_DIS;
 	TOF_Value = TOF_MAX_DIS;
+	rt_thread_mdelay(500);
 	if(TOF10120_Read_Distence() == 0)
 	{
 		TOF_Error = 1;
@@ -41,7 +42,7 @@ int TOF10120_Init(void)
 	return 0;
 }
 
-INIT_BOARD_EXPORT(TOF10120_Init);
+//INIT_BOARD_EXPORT(TOF10120_Init);
 
 //在TOF10120_Write指定地址写入一个数据
 //WriteAddr  :写入数据的目的地址    
@@ -107,8 +108,9 @@ uint16_t Get_Buf_Average(uint16_t len,uint16_t* buf)
 uint16_t TOF10120_Read_Scan(void)
 {	
 	if(TOF_Error)
-		return 1000;
-	TOF_Value_Buf[TOF_Buf_Set] = TOF10120_Read_Distence();
+		TOF_Value_Buf[TOF_Buf_Set] = 1000;
+	else
+		TOF_Value_Buf[TOF_Buf_Set] = TOF10120_Read_Distence();
 	TOF_Buf_Set++;
 	if(TOF_Buf_Set > TOF_BUF_SIZE-1)
 		TOF_Buf_Set=0;
