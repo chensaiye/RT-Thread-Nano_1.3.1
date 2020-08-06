@@ -301,9 +301,11 @@ __weak void HAL_IncTick(void)
   *       implementations in user file.
   * @retval tick value
   */
+#include <rtthread.h>
 __weak uint32_t HAL_GetTick(void)
 {
-  return uwTick;
+  //return uwTick;
+	return rt_tick_get();
 }
 
 /**

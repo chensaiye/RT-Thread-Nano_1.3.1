@@ -70,7 +70,7 @@ void Led_Blink(void)
 	if(curr_status.value.mode != MODE_YYCTL) 
 		return;
 		
-	if(curr_status.value.sys_set & 0x08)
+	//if(curr_status.value.sys_set & 0x08)
 	{
 		if(curr_status.value.rir)
 		{//
@@ -157,7 +157,7 @@ void Event_Updata_Set(void)
 			}
 						
 			//影阴补偿处理
-			if((curr_status.value.mode == MODE_YYCTL)&&(curr_status.value.sys_set & 0x08))
+			if(curr_status.value.mode == MODE_YYCTL)//&&(curr_status.value.sys_set & 0x08))
 			{
 				
 					//算法2：加指定的百分比 	140klx*1.15=161klx
@@ -294,6 +294,11 @@ void Event_Mode(void)
 	if(curr_status.value.pow_fg==OFF)
 		return;
 	curr_status.value.mode++;
+	if(curr_status.value.mode == MODE_YYCTL)
+	{
+		if((curr_status.value.sys_set & 0x08)==0x00)
+			curr_status.value.mode++;
+	}
 	if(curr_status.value.mode > MODE_QJ )
 	{	
 		curr_status.value.mode = MODE_LUM;
@@ -474,9 +479,12 @@ static void POW_GPIO_Init(void)
 void Panel_Init(void)
 {
 	POW_GPIO_Init();
+	SM4_Init();//system set init
 	//第一次上电判断
 	Flash_Eeprom_Read_HalfWord(FLASH_EEPROM_ADDR1,flash_eeprom_buffer,1);
 	if(flash_eeprom_buffer[0]!=0x5555)
+		SET_FACTORY_FLAG = ON;
+	if((SM4_Get_Date()&0x02)==0x00)
 		SET_FACTORY_FLAG = ON;
 	if(SET_FACTORY_FLAG == ON)
 	{//恢复出厂设置
@@ -487,7 +495,6 @@ void Panel_Init(void)
 	//数据恢复
 	recover_data();//
 	
-	SM4_Init();//system set init
 	curr_status.value.sys_set = SM4_Get_Date();
 	if(curr_status.value.sys_set&0x01)
 		MY_BUS_ADDR = 0x10;	//母灯

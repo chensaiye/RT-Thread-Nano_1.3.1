@@ -763,7 +763,7 @@ int thread_button_init(void)
 		buttons[i].count = BUTTON_LONG_TIMER;
 	}
 	old_button_status = 0xFF & get_165_data();//get_button();////0xFF & get_165_data();
-	old_button_status = ((0xFF & get_165_data_gp2())<<8) + old_button_status;
+	old_button_status = 0xFF00+old_button_status;//((0xFF & get_165_data_gp2())<<8) + old_button_status;
 	button_check_on_flag = 0;
 	
     rt_thread_init(&thd_btn,

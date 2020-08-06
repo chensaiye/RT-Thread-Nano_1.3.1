@@ -1,5 +1,7 @@
 #include "tof10120.h" 
-#include "iic_bus.h" 			 
+#include "iic_bus.h" 
+#include "button.h"
+#include "main_control.h"
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //ALIENTEK STM32F407开发板
@@ -20,12 +22,12 @@ extern void Error_Handler(void);
   * @retval None
   */
 extern I2C_HandleTypeDef hi2c1;
-
-
+extern uint8_t Channels_RIR[CHANNEL_RIR_MAX];
+extern union_status curr_status;//当前状态
 //初始化IIC接口
 int TOF10120_Init(void)
 {
-	uint16_t i;
+	uint8_t i;
 	//io init
 	MX_I2C1_Init();
 	
@@ -34,7 +36,9 @@ int TOF10120_Init(void)
 		TOF_Value_Buf[i]=TOF_MAX_DIS;
 	TOF_Value = TOF_MAX_DIS;
 	rt_thread_mdelay(500);
-	if(TOF10120_Read_Distence() == 0)
+	//i=TOF_ADDRESS1;
+	if(TOF10120_Read(TOF_ADDRESS_REG,&i,1)!= HAL_OK)
+	//if(TOF10120_Read_Distence() == 0)
 	{
 		TOF_Error = 1;
 		rt_kprintf("TOF Error!\r\n");
@@ -50,26 +54,36 @@ int TOF10120_Init(void)
 void TOF10120_WriteOneByte(uint16_t WriteAddr,uint8_t DataToWrite)
 {				   	  	    																 
 	//I2C_Master_BufferWrite(I2C1,&DataToWrite,0x01,TOF_ADDRESS1,WriteAddr);
+	//HAL_I2C_Master_Transmit
 }
 
 //在TOF10120_Write里面的指定地址开始写入指定个数的数据
 //WriteAddr :开始写入的地址 对24c02为0~255
 //pBuffer   :数据数组首地址
 //NumToWrite:要写入数据的个数
-void TOF10120_Write(uint16_t WriteAddr,uint8_t *pBuffer,uint16_t NumToWrite)
+HAL_StatusTypeDef TOF10120_Write(uint16_t WriteAddr,uint8_t *pBuffer,uint16_t NumToWrite)
 {
-
+	HAL_StatusTypeDef tperror = HAL_OK;
+	tperror =	HAL_I2C_Mem_Write(&hi2c1,TOF_ADDRESS1,WriteAddr,I2C_MEMADD_SIZE_8BIT,pBuffer,NumToWrite,100);
+	return tperror;
 }
 
 //在TOF10120_Write里面的指定地址开始读出指定个数的数据
 //ReadAddr :开始读出的地址 对24c02为0~255
 //pBuffer  :数据数组首地址
 //NumToRead:要读出数据的个数
-void TOF10120_Read(uint16_t ReadAddr,uint8_t *pBuffer,uint16_t NumToRead)
+HAL_StatusTypeDef TOF10120_Read(uint16_t ReadAddr,uint8_t *pBuffer,uint16_t NumToRead)
 {
+	HAL_StatusTypeDef tperror = HAL_OK;
 	//I2C_Master_BufferRead(I2C1,pBuffer,NumToRead,TOF_ADDRESS1,ReadAddr);
-	HAL_I2C_Mem_Read(&hi2c1,TOF_ADDRESS1,ReadAddr,I2C_MEMADD_SIZE_8BIT,pBuffer,NumToRead,10000);
+	tperror = HAL_I2C_Mem_Read(&hi2c1,TOF_ADDRESS1,ReadAddr,I2C_MEMADD_SIZE_8BIT,pBuffer,NumToRead,100);
+	return tperror;
 } 
+
+uint32_t HAL_GetTick(void)
+{
+  return rt_tick_get();
+}
 
 uint16_t TOF10120_Read_Distence(void)
 {
@@ -130,25 +144,37 @@ static struct rt_thread thd_tofread;
 
 static void Tofread_scan_entey(void *parameter)
 {
+	uint16_t distance;
 	while(1)
   {
-		rt_thread_mdelay(1000);
-		if(TOF_Error == 0)
-			rt_kprintf("dis:%d mm\r\n", TOF10120_Read_Scan()); 
+		distance = TOF10120_Read_Scan();
+		if((distance>450) && Channels_RIR[6])
+			bt_rir_7(BUTTON_LONG_RELEASE);
+		if((distance<=450) && Channels_RIR[6]==0)
+			bt_rir_7(BUTTON_LONG_PRESSED);
+		
+		rt_thread_mdelay(20);
+		//if(TOF_Error == 0)
+			//rt_kprintf("dis:%d mm\r\n", distance);//TOF10120_Read_Scan()); 
 	}
 }
 
 int tof_read_start(void)
 {
-		 rt_thread_init(&thd_tofread,
-										 "tof_read",
-										 Tofread_scan_entey,
-										 RT_NULL,
-										 &thd_tofread_stack[0],
-										 sizeof(thd_tofread_stack),
-										 TOFREAD_THREAD_PRIORITY-1, TOFREAD_THREAD_TIMESLICE);
-										 
-		 rt_thread_startup(&thd_tofread);
+	if((curr_status.value.sys_set & 0x08)==0x00)
+		return 1;
+	 TOF10120_Init();
+	if(TOF_Error==1)
+		return 1;
+	 rt_thread_init(&thd_tofread,
+									 "tof_read",
+									 Tofread_scan_entey,
+									 RT_NULL,
+									 &thd_tofread_stack[0],
+									 sizeof(thd_tofread_stack),
+									 TOFREAD_THREAD_PRIORITY-1, TOFREAD_THREAD_TIMESLICE);
+									 
+	 rt_thread_startup(&thd_tofread);
 	
     return 0;
 }

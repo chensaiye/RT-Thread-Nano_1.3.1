@@ -30,7 +30,7 @@
 
 /* 定时器的控制块 */
 static rt_timer_t timer1;
-static rt_timer_t timer2;
+//static rt_timer_t timer2;
 
 extern uint8_t Channels_RIR[CHANNEL_RIR_MAX];
 
@@ -104,16 +104,16 @@ static void time1_out(void *parameter)
 	Led_Blink();
 }
 
-/* 定时器1超时函数 */
-static void time2_out(void *parameter)
-{
-		uint16_t distance;
-		distance = TOF10120_Read_Scan();
-		if((distance>450) && Channels_RIR[6])
-			bt_rir_7(BUTTON_LONG_RELEASE);
-		if((distance<=450) && Channels_RIR[6]==0)
-			bt_rir_7(BUTTON_LONG_PRESSED);
-}
+///* 定时器1超时函数 */
+//static void time2_out(void *parameter)
+//{
+//		uint16_t distance;
+//		distance = TOF10120_Read_Scan();
+//		if((distance>450) && Channels_RIR[6])
+//			bt_rir_7(BUTTON_LONG_RELEASE);
+//		if((distance<=450) && Channels_RIR[6]==0)
+//			bt_rir_7(BUTTON_LONG_PRESSED);
+//}
 
 static void times_init(void)
 {
@@ -125,25 +125,25 @@ static void times_init(void)
     if (timer1 != RT_NULL)
         rt_timer_start(timer1);
 		
-		/* 创建定时器2  周期定时器 */
-    timer2 = rt_timer_create("timer2", time2_out,
-                             RT_NULL, 200,
-                             RT_TIMER_FLAG_PERIODIC);
-    /* 启动定时器1 */
-    if (timer2 != RT_NULL)
-        rt_timer_start(timer2);
+//		/* 创建定时器2  周期定时器 */
+//    timer2 = rt_timer_create("timer2", time2_out,
+//                             RT_NULL, 200,
+//                             RT_TIMER_FLAG_PERIODIC);
+//    /* 启动定时器1 */
+//    if (timer2 != RT_NULL)
+//        rt_timer_start(timer2);
 		
 }
 	
 
 int main(void)
 {
-		TOF10120_Init();
-    MX_GPIO_Init();
-		Panel_Init();
 		
-	
+    MX_GPIO_Init();
 		thread_button_init();
+		Panel_Init();
+		tof_read_start();//TOF10120_Init();
+	
 		thread_pwm_start();
 		thread_nrf_init();
 		oled_thd_start();
