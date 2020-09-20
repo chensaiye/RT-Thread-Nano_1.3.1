@@ -95,7 +95,7 @@ uint16_t TOF10120_Read_Distence(void)
 	if(HAL_I2C_Mem_Read(&hi2c1,TOF_ADDRESS1,FILTERED_DIS_REG,I2C_MEMADD_SIZE_8BIT,buf,0x02,10)==HAL_OK)
 		return ((buf[0]<<8) + buf[1]);
 	else
-		return 0;
+		return 1000;
 }
  
 //Æ½¾ùÖµÂË²¨
@@ -148,12 +148,12 @@ static void Tofread_scan_entey(void *parameter)
 	while(1)
   {
 		distance = TOF10120_Read_Scan();
-		if((distance>450) && Channels_RIR[6])
+		if((distance>425) && Channels_RIR[6])
 			bt_rir_7(BUTTON_LONG_RELEASE);
-		if((distance<=450) && Channels_RIR[6]==0)
+		if((distance<=425) && Channels_RIR[6]==0)
 			bt_rir_7(BUTTON_LONG_PRESSED);
 		
-		rt_thread_mdelay(20);
+		rt_thread_mdelay(200);
 		//if(TOF_Error == 0)
 			//rt_kprintf("dis:%d mm\r\n", distance);//TOF10120_Read_Scan()); 
 	}
