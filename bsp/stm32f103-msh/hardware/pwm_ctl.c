@@ -70,21 +70,31 @@ void pwm_output_clear(void)
 void pwm_buffer(void)
 {
 	uint16_t i;
+	uint16_t deff;
 	for(i=0;i<6;i++)
 	{
 		if(set_val.buf[i]!= curr_val.buf[i])
 		{
 			if(curr_val.buf[i]>set_val.buf[i])
 			{
-				//curr_val.buf[i]--;
-				curr_val.buf[i]-=10;
+				deff = curr_val.buf[i]-set_val.buf[i];
+				if(deff>64)
+					deff = deff>>6;
+				else
+					deff = 1;
+				curr_val.buf[i]-=deff;//10;
 				if((curr_val.buf[i]<set_val.buf[i])||(curr_val.buf[i] >PWM_MAX_VALUE))
 					curr_val.buf[i]=set_val.buf[i];
 			}
 			else
 			{
-				//curr_val.buf[i]++;
-				curr_val.buf[i]+=10;
+				deff = set_val.buf[i]-curr_val.buf[i];
+				if(deff>64)
+					deff = deff>>6;
+				else
+					deff = 1;
+				curr_val.buf[i]+=deff;//10;
+				
 				if(curr_val.buf[i]>set_val.buf[i])
 					curr_val.buf[i]=set_val.buf[i];
 			}
@@ -108,7 +118,7 @@ static void pwm_scan_entey(void *parameter)
 		while(1)
 		{
 			pwm_buffer();
-			rt_thread_mdelay(10);
+			rt_thread_mdelay(20);
 		}
 }
 

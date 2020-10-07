@@ -44,13 +44,18 @@ uint32_t Menu_View_Flag; //菜单预览标志
 //	{0x001B,0x001B,0x0001,0x002D,1},
 //};
 
-//604Plus para 2020.8.1
+//604Plus para 2020.9.20
+//mode 0: 630*4  --- 1670*4		41kLx - 155kLx
+//mode 1: 630*4  --- 1670*4		41kLx - 155kLx
+//mode 2: 550*3+900  --- 1300*3+2300		42kLx - 149kLx
+//mode 3: 0*3+50  --- 0*3+2200		0kLx - 22kLx
+//gain :20
 
 sMenuItemValue MenuIVS[MENUITEMVALUE_NO] = {
-	{700,700,0x0046,PARA_MAX,1},// 当前值， 默认值， 最小值， 最大值 ，放大倍数
-	{1500,1500,0x0046,PARA_MAX,1},	
-	{700,700,0x0046,PARA_MAX,1},
-	{1500,1500,0x0046,PARA_MAX,1},
+	{630,630,0x0046,PARA_MAX,1},// 当前值， 默认值， 最小值， 最大值 ，放大倍数
+	{1670,1670,0x0046,PARA_MAX,1},	
+	{630,630,0x0046,PARA_MAX,1},
+	{1670,1670,0x0046,PARA_MAX,1},
 	{700,700,0x0046,PARA_MAX,1},
 	{1500,1500,0x0046,PARA_MAX,1},
 	{525,525,0x0046,PARA_MAX-300,1},
@@ -80,19 +85,12 @@ sMenuItemValue MenuIVS[MENUITEMVALUE_NO] = {
 	{0x0000,0x0000,0x0000,PARA_MAX,1},
 	{0x0000,0x0000,0x0000,PARA_MAX,1},
 	{0x0000,0x0000,0x0000,PARA_MAX,1},
-	{30,30,0x0046,PARA_MAX-300,1},
+	{50,50,0x0046,PARA_MAX-300,1},
 	{2200,2200,0x0046,PARA_MAX-300,1},
 	
 	{0x0014,0x0014,0x0001,0x002D,1},
 	{0x001B,0x001B,0x0001,0x002D,1},
 };
-
-//704Plus para 2020.9.6	//测试工具：OPTIMUM  SRI-MD-3000
-//mode 0: 320*4  --- 960*4		41kLx - 155kLx
-//mode 1: 320*4  --- 960*4		41kLx - 155kLx
-//mode 2: 280*3+560  --- 800*3+1600		42kLx - 149kLx
-//mode 3: 0*3+50  --- 0*3+800		0kLx - 22kLx
-//gain :20
 
 //704Plus para 2020.8.5 //测试工具：TENMARS TM-720
 //mode 0: 400*4  --- 1200*4		41kLx - 155kLx
@@ -101,33 +99,53 @@ sMenuItemValue MenuIVS[MENUITEMVALUE_NO] = {
 //mode 3: 0*3+30  --- 0*3+2200		0kLx - 22kLx
 //gain :20
 
-/*
-sMenuItemValue MenuIVS[MENUITEMVALUE_NO] = {
-	{320,320,0x0046,PARA_MAX,1},// 当前值， 默认值， 最小值， 最大值 ，放大倍数
-	{960,960,0x0046,PARA_MAX,1},	
-	{320,320,0x0046,PARA_MAX,1},
-	{960,960,0x0046,PARA_MAX,1},
-	{320,320,0x0046,PARA_MAX,1},
-	{960,960,0x0046,PARA_MAX,1},
-	{320,320,0x0046,PARA_MAX,1},
-	{960,960,0x0046,PARA_MAX,1},
-	// 当前值， 默认值， 最小值， 最大值 ，放大倍数	
-	{320,320,0x0046,PARA_MAX,1},
-	{960,960,0x0046,PARA_MAX,1},	
-	{320,320,0x0046,PARA_MAX,1},
-	{960,960,0x0046,PARA_MAX,1},
-	{320,320,0x0046,PARA_MAX,1},
-	{960,960,0x0046,PARA_MAX,1},
-	{320,320,0x0046,PARA_MAX,1},
-	{960,960,0x0046,PARA_MAX,1},
+//704Plus para 2020.9.6	//测试工具：OPTIMUM  SRI-MD-3000
+//mode 0: 320*4  --- 960*4		41kLx - 155kLx
+//mode 1: 320*4  --- 960*4		41kLx - 155kLx
+//mode 2: 280*3+560  --- 800*3+1600		42kLx - 149kLx
+//mode 3: 0*3+50  --- 0*3+800		0kLx - 22kLx
+//gain :20
+
+//704Plus para 2020.9.20	//测试工具：OPTIMUM  SRI-MD-3000
+//mode 0: 370*4  --- 1060*4		41kLx - 155kLx
+//mode 1: 370*4  --- 1060*4		41kLx - 155kLx
+//mode 2: 300*3+600  --- 800*3+1600		42kLx - 149kLx
+//mode 3: 0*3+50  --- 0*3+800		0kLx - 22kLx
+//gain :20
+
+//704Plus para 2020.9.20	//测试工具：OPTIMUM  SRI-MD-3000
+//mode 0: 350*4  --- 990*4		41kLx - 155kLx
+//mode 1: 350*4  --- 990*4		41kLx - 155kLx
+//mode 2: 300*3+600  --- 800*3+1600		42kLx - 149kLx
+//mode 3: 0*3+50  --- 0*3+800		0kLx - 22kLx
+//gain :20
+/*sMenuItemValue MenuIVS[MENUITEMVALUE_NO] = {
+	{350,350,0x0046,PARA_MAX,1},// 当前值， 默认值， 最小值， 最大值 ，放大倍数
+	{990,990,0x0046,PARA_MAX,1},	
+	{350,350,0x0046,PARA_MAX,1},
+	{990,990,0x0046,PARA_MAX,1},
+	{350,350,0x0046,PARA_MAX,1},
+	{990,990,0x0046,PARA_MAX,1},
+	{350,350,0x0046,PARA_MAX,1},
+	{990,990,0x0046,PARA_MAX,1},
 	// 当前值， 默认值， 最小值， 最大值 ，放大倍数
-	{250,250,0x0046,PARA_MAX,1},
-	{500,500,0x0046,PARA_MAX,1},	
-	{250,250,0x0046,PARA_MAX,1},
-	{500,500,0x0046,PARA_MAX,1},
-	{250,250,0x0046,PARA_MAX,1},
-	{500,500,0x0046,PARA_MAX,1},
+	{350,350,0x0046,PARA_MAX,1},
+	{990,990,0x0046,PARA_MAX,1},	
+	{350,350,0x0046,PARA_MAX,1},
+	{990,990,0x0046,PARA_MAX,1},
+	{350,350,0x0046,PARA_MAX,1},
+	{990,990,0x0046,PARA_MAX,1},
+	{350,350,0x0046,PARA_MAX,1},
+	{990,990,0x0046,PARA_MAX,1},
+	
+	// 当前值， 默认值， 最小值， 最大值 ，放大倍数
+	{300,300,0x0046,PARA_MAX,1},
+	{800,800,0x0046,PARA_MAX,1},	
+	{300,300,0x0046,PARA_MAX,1},
 	{800,800,0x0046,PARA_MAX,1},
+	{300,300,0x0046,PARA_MAX,1},
+	{800,800,0x0046,PARA_MAX,1},
+	{600,600,0x0046,PARA_MAX,1},
 	{1600,1600,0x0046,PARA_MAX,1},
 	
 	{0x0000,0x0000,0x0000,PARA_MAX,1},// 当前值， 默认值， 最小值， 最大值 ，放大倍数
