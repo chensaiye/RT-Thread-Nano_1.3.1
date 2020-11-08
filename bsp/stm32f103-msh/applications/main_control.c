@@ -67,7 +67,7 @@ void Led_Blink(void)
 	led_status = 0;
 	if(curr_status.value.pow_fg == OFF) 
 		return;
-	if(curr_status.value.mode > MODE_LUM) 
+	if(curr_status.value.mode != MODE_YYCTL) 
 		return;
 		
 	//if(curr_status.value.sys_set & 0x08)
@@ -368,7 +368,7 @@ void RIR_CTL(short int rir_c)
 		tp_rir = 4;	
 	curr_status.value.rir = (uint8_t)tp_rir;
 	
-	if(curr_status.value.mode != MODE_LUM)
+	if(curr_status.value.mode != MODE_YYCTL)//MODE_LUM)
 		return;
 	
 	Event_Updata_Set();
