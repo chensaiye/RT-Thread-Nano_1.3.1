@@ -5,7 +5,7 @@
 // Constant Definitions
 //-----------------------------------------------------------------------------
 #define  MAX_MENU_LEVELS 	4			//菜单层数
-#define  MENUITEMVALUE_NO	34          //菜单项总数目
+#define  MENUITEMVALUE_NO	26          //菜单项总数目
 //菜单项参数结构
 typedef struct _sMenuItemValue
 {

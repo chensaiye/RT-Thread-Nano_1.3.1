@@ -45,8 +45,8 @@ void led_manual_updata(void)
 		//level led
 		if(curr_status.value.mode == MODE_LUM)
 			led_status |=  LED_table[curr_status.value.lum_grade];
-		else if(curr_status.value.mode == MODE_YYCTL)
-			led_status |=  LED_table[curr_status.value.lum_grade];
+//		else if(curr_status.value.mode == MODE_YYCTL)
+//			led_status |=  LED_table[curr_status.value.lum_grade];
 		else if(curr_status.value.mode == MODE_DEPTH)
 			led_status |=  LED_table[curr_status.value.lum_grade];
 		else if(curr_status.value.mode == MODE_QJ)
@@ -67,10 +67,10 @@ void Led_Blink(void)
 	led_status = 0;
 	if(curr_status.value.pow_fg == OFF) 
 		return;
-	if(curr_status.value.mode != MODE_YYCTL) 
+	if(curr_status.value.mode != MODE_LUM) 
 		return;
 		
-	//if(curr_status.value.sys_set & 0x08)
+	if(curr_status.value.sys_set & 0x08)
 	{
 		if(curr_status.value.rir)
 		{//
@@ -157,7 +157,7 @@ void Event_Updata_Set(void)
 			}
 						
 			//影阴补偿处理
-			if((curr_status.value.mode == MODE_YYCTL))//&&(curr_status.value.sys_set & 0x08))
+			if((curr_status.value.mode == MODE_LUM)&&(curr_status.value.sys_set & 0x08))
 			{
 				
 					//算法2：加指定的百分比 	140klx*1.15=161klx
@@ -294,11 +294,11 @@ void Event_Mode(void)
 	if(curr_status.value.pow_fg==OFF)
 		return;
 	curr_status.value.mode++;
-	if(curr_status.value.mode == MODE_YYCTL)
-	{
-		if((curr_status.value.sys_set & 0x08)==0x00)
-			curr_status.value.mode++;
-	}
+//	if(curr_status.value.mode == MODE_YYCTL)
+//	{
+//		if((curr_status.value.sys_set & 0x08)==0x00)
+//			curr_status.value.mode++;
+//	}
 	if(curr_status.value.mode > MODE_QJ )
 	{	
 		curr_status.value.mode = MODE_LUM;
@@ -368,7 +368,7 @@ void RIR_CTL(short int rir_c)
 		tp_rir = 4;	
 	curr_status.value.rir = (uint8_t)tp_rir;
 	
-	if(curr_status.value.mode != MODE_YYCTL)//MODE_LUM)
+	if(curr_status.value.mode != MODE_LUM)
 		return;
 	
 	Event_Updata_Set();
@@ -427,10 +427,10 @@ void recover_data(void)
 	pbuf = &flash_eeprom_buffer[1+16];
 	for(i=0;i<8;i++)
 		Mode_GP[2].buf16[i] = pbuf[i];
-	
-	pbuf = &flash_eeprom_buffer[1+24];
-	for(i=0;i<8;i++)
-		Mode_GP[3].buf16[i] = pbuf[i];
+//	
+//	pbuf = &flash_eeprom_buffer[1+24];
+//	for(i=0;i<8;i++)
+//		Mode_GP[3].buf16[i] = pbuf[i];
 	
 	SYS_PARA.value.gain_step = pbuf[i];
 	SYS_PARA.value.gain_max  = pbuf[i+1];

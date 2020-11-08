@@ -112,10 +112,10 @@ typedef union
 }union_status;
 
 #define MODE_LUM 			0
-#define MODE_YYCTL	 	1
-#define MODE_DEPTH	 	2
-#define MODE_QJ			 	3
-#define MODE_NUMBER		4
+//#define MODE_YYCTL	 	1
+#define MODE_DEPTH	 	1
+#define MODE_QJ			 	2
+#define MODE_NUMBER		3
 
 //#define MODE_LUM 			0
 //#define MODE_FACULA 	1

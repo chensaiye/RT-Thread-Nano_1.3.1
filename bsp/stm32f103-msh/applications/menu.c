@@ -121,14 +121,14 @@ sMenuItemValue MenuIVS[MENUITEMVALUE_NO] = {
 //gain :20
 #if 1
 sMenuItemValue MenuIVS[MENUITEMVALUE_NO] = {
-	{350,350,0x0046,PARA_MAX,1},// 当前值， 默认值， 最小值， 最大值 ，放大倍数
-	{990,990,0x0046,PARA_MAX,1},	
-	{350,350,0x0046,PARA_MAX,1},
-	{990,990,0x0046,PARA_MAX,1},
-	{350,350,0x0046,PARA_MAX,1},
-	{990,990,0x0046,PARA_MAX,1},
-	{350,350,0x0046,PARA_MAX,1},
-	{990,990,0x0046,PARA_MAX,1},
+//	{350,350,0x0046,PARA_MAX,1},// 当前值， 默认值， 最小值， 最大值 ，放大倍数
+//	{990,990,0x0046,PARA_MAX,1},	
+//	{350,350,0x0046,PARA_MAX,1},
+//	{990,990,0x0046,PARA_MAX,1},
+//	{350,350,0x0046,PARA_MAX,1},
+//	{990,990,0x0046,PARA_MAX,1},
+//	{350,350,0x0046,PARA_MAX,1},
+//	{990,990,0x0046,PARA_MAX,1},
 	// 当前值， 默认值， 最小值， 最大值 ，放大倍数
 	{350,350,0x0046,PARA_MAX,1},
 	{990,990,0x0046,PARA_MAX,1},	
@@ -301,20 +301,20 @@ sMenuItem MainMenu[] = {
 	{"M3-4-MIN", NULL, NULL , NULL,0,&MenuIVS[10]},
 	{"M3-4-MAX", NULL, NULL , NULL,0,&MenuIVS[11]},
 	
-	{"M4-1-MIN", NULL, NULL , NULL,0,&MenuIVS[12]},
-	{"M4-1-MAX", NULL, NULL , NULL,0,&MenuIVS[13]},
-	{"M4-2-MIN", NULL, NULL , NULL,0,&MenuIVS[14]},
-	{"M4-2-MAX", NULL, NULL , NULL,0,&MenuIVS[15]},
-	{"M4-3-MIN", NULL, NULL , NULL,0,&MenuIVS[12]},
-	{"M4-3-MAX", NULL, NULL , NULL,0,&MenuIVS[13]},
-	{"M4-4-MIN", NULL, NULL , NULL,0,&MenuIVS[14]},
-	{"M4-4-MAX", NULL, NULL , NULL,0,&MenuIVS[15]},
+//	{"M4-1-MIN", NULL, NULL , NULL,0,&MenuIVS[12]},
+//	{"M4-1-MAX", NULL, NULL , NULL,0,&MenuIVS[13]},
+//	{"M4-2-MIN", NULL, NULL , NULL,0,&MenuIVS[14]},
+//	{"M4-2-MAX", NULL, NULL , NULL,0,&MenuIVS[15]},
+//	{"M4-3-MIN", NULL, NULL , NULL,0,&MenuIVS[12]},
+//	{"M4-3-MAX", NULL, NULL , NULL,0,&MenuIVS[13]},
+//	{"M4-4-MIN", NULL, NULL , NULL,0,&MenuIVS[14]},
+//	{"M4-4-MAX", NULL, NULL , NULL,0,&MenuIVS[15]},
+//	
+//	{"GAIN_MIN", NULL, NULL , NULL,0,&MenuIVS[32]},
+//	{"GAIN_MAX", NULL, NULL , NULL,0,&MenuIVS[33]},
 	
-	{"GAIN_MIN", NULL, NULL , NULL,0,&MenuIVS[32]},
-	{"GAIN_MAX", NULL, NULL , NULL,0,&MenuIVS[33]},
-	
-//	{"GAIN_MIN", NULL, NULL , NULL,0,&MenuIVS[24]},
-//	{"GAIN_MAX", NULL, NULL , NULL,0,&MenuIVS[25]},
+	{"GAIN_MIN", NULL, NULL , NULL,0,&MenuIVS[24]},
+	{"GAIN_MAX", NULL, NULL , NULL,0,&MenuIVS[25]},
 	{"Reset VL", NULL, NULL , Menu_IVS_Reset_To_Factory,0,NULL},
 	{"Version ", NULL, NULL , Show_Version,0,NULL},
 	{"Return  ", NULL, NULL , MenuReturnFunc,0,NULL}};
