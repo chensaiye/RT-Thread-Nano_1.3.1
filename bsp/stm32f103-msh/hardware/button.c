@@ -454,16 +454,16 @@ void bt_rir_1( unsigned char flag )
 	}
 	else if(flag == BUTTON_LONG_RELEASE)
 	{//long release
+		
+	}
+	#endif
+	else
+	{
 		if(Channels_RIR[0])
 		{
 			Channels_RIR[0]=0;
 			RIR_CTL(-1);
 		}
-	}
-	#endif
-	else
-	{
-		
 	}	
 }
 void bt_rir_2( unsigned char flag )
@@ -484,16 +484,16 @@ void bt_rir_2( unsigned char flag )
 	}
 	else if(flag == BUTTON_LONG_RELEASE)
 	{//long release
+		
+	}
+	#endif
+	else
+	{
 		if(Channels_RIR[1])
 		{
 			Channels_RIR[1] =0;
 			RIR_CTL(-1);
 		}
-	}
-	#endif
-	else
-	{
-		
 	}
 }
 
@@ -515,16 +515,16 @@ void bt_rir_3( unsigned char flag )
 	}
 	else if(flag == BUTTON_LONG_RELEASE)
 	{//long release
+		
+	}
+	#endif
+	else
+	{
 		if(Channels_RIR[2])
 		{
 			Channels_RIR[2]=0;
 			RIR_CTL(-1);
 		}
-	}
-	#endif
-	else
-	{
-		
 	}
 }
 
@@ -546,16 +546,16 @@ void bt_rir_4( unsigned char flag )
 	}
 	else if(flag == BUTTON_LONG_RELEASE)
 	{//long release
+		
+	}
+	#endif
+	else
+	{
 		if(Channels_RIR[3])
 		{
 			Channels_RIR[3]=0;
 			RIR_CTL(-1);
 		}
-	}
-	#endif
-	else
-	{
-		
 	}
 }
 
@@ -577,16 +577,16 @@ void bt_rir_5( unsigned char flag )
 	}
 	else if(flag == BUTTON_LONG_RELEASE)
 	{//long release
+		
+	}
+	#endif
+	else
+	{
 		if(Channels_RIR[4])
 		{
 			Channels_RIR[4]=0;
 			RIR_CTL(-1);
 		}
-	}
-	#endif
-	else
-	{
-		
 	}
 }
 
@@ -608,16 +608,16 @@ void bt_rir_6( unsigned char flag )
 	}
 	else if(flag == BUTTON_LONG_RELEASE)
 	{//long release
+		
+	}
+	#endif
+	else
+	{
 		if(Channels_RIR[5])
 		{
 			Channels_RIR[5]=0;
 			RIR_CTL(-1);
 		}
-	}
-	#endif
-	else
-	{
-		
 	}
 }
 
@@ -731,19 +731,19 @@ static void button_scan_entey(void *parameter)
 						buttons[i].count++;
 						if(buttons[i].count == BUTTON_LONG_TIMER)
 						{	process[button_table[i]](BUTTON_LONG_PRESSED);
-							buttons[i].count--;
+							buttons[i].count=0;//--;
 						}
 					}
 				}
-				else
-				{
-					if(buttons[i].count < BUTTON_LONG_TIMER )	//10*50ms = 500ms
-					{	
-						buttons[i].count++;
-						if(buttons[i].count == BUTTON_LONG_TIMER)
-							process[button_table[i]](BUTTON_LONG_RELEASE);
-					}
-				}
+//				else
+//				{
+//					if(buttons[i].count < BUTTON_LONG_TIMER )	//10*50ms = 500ms
+//					{	
+//						buttons[i].count++;
+//						if(buttons[i].count == BUTTON_LONG_TIMER)
+//							process[button_table[i]](BUTTON_LONG_RELEASE);
+//					}
+//				}
 			}
 		}
 		#endif

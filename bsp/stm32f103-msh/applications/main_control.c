@@ -67,7 +67,7 @@ void Led_Blink(void)
 	led_status = 0;
 	if(curr_status.value.pow_fg == OFF) 
 		return;
-	if(curr_status.value.mode != MODE_YYCTL) 
+	if(curr_status.value.mode > MODE_LUM) 
 		return;
 		
 	//if(curr_status.value.sys_set & 0x08)
@@ -157,7 +157,7 @@ void Event_Updata_Set(void)
 			}
 						
 			//影阴补偿处理
-			if(curr_status.value.mode == MODE_YYCTL)//&&(curr_status.value.sys_set & 0x08))
+			if((curr_status.value.mode == MODE_YYCTL))//&&(curr_status.value.sys_set & 0x08))
 			{
 				
 					//算法2：加指定的百分比 	140klx*1.15=161klx
@@ -364,11 +364,11 @@ void RIR_CTL(short int rir_c)
 	tp_rir += rir_c;
 	if(tp_rir < 0)
 		tp_rir = 0;
-		
-	curr_status.value.rir = (uint8_t)tp_rir;
 	if(tp_rir>4)
-		tp_rir = 4;
-	if(curr_status.value.mode != MODE_YYCTL)
+		tp_rir = 4;	
+	curr_status.value.rir = (uint8_t)tp_rir;
+	
+	if(curr_status.value.mode != MODE_LUM)
 		return;
 	
 	Event_Updata_Set();
