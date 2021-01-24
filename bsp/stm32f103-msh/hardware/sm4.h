@@ -1,5 +1,5 @@
-#ifndef __LED_595_H
-#define __LED_595_H	 
+#ifndef __SM4_H
+#define __SM4_H	 
 #include "stm32f1xx_hal.h"
 #include <rtthread.h>
 #include <rtdef.h>

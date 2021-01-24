@@ -6,6 +6,9 @@
 #include <rtdef.h>
 #include <rthw.h>
 
+#define TOF1010_EN GPIO_PIN_12
+#define TOF1010_EN_Port GPIOA
+
 #define TOF_ADDRESS_REG	0X0F	
 #define TOF_ADDRESS1	0XA4	
 

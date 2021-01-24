@@ -24,10 +24,26 @@ extern void Error_Handler(void);
 extern I2C_HandleTypeDef hi2c1;
 extern uint8_t Channels_RIR[CHANNEL_RIR_MAX];
 extern union_status curr_status;//当前状态
+
+void TOF10120_EN_Init(void)
+{
+   GPIO_InitTypeDef  GPIO_InitStructure;
+	//EN端口设置
+	 __HAL_RCC_GPIOA_CLK_ENABLE();
+	  GPIO_InitStructure.Pin   = TOF1010_EN;
+    GPIO_InitStructure.Mode  = GPIO_MODE_OUTPUT_PP;//推挽输出
+    GPIO_InitStructure.Pull  = GPIO_NOPULL;
+    GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_LOW;
+	 HAL_GPIO_Init(TOF1010_EN_Port, &GPIO_InitStructure);					 //根据设定参数初始化GPIOC
+	 HAL_GPIO_WritePin(TOF1010_EN_Port,TOF1010_EN,GPIO_PIN_SET);
+}
 //初始化IIC接口
 int TOF10120_Init(void)
 {
 	uint8_t i;
+	TOF10120_EN_Init();
+	rt_thread_mdelay(50);
+	HAL_GPIO_WritePin(TOF1010_EN_Port,TOF1010_EN,GPIO_PIN_RESET);
 	//io init
 	MX_I2C1_Init();
 	

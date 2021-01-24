@@ -23,8 +23,8 @@
 
 #define RUN_GPIO_PORT  GPIOB
 #define RUN_PIN        GPIO_PIN_12
-#define LED0_Pin GPIO_PIN_4
-#define LED0_GPIO_Port GPIOA
+//#define LED0_Pin GPIO_PIN_4
+//#define LED0_GPIO_Port GPIOA
 #define LED1_Pin GPIO_PIN_1
 #define LED1_GPIO_Port GPIOB
 
@@ -85,13 +85,13 @@ void PVD_IRQHandler(void)
   /* USER CODE BEGIN PVD_IRQn 0 */
 	HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(QJ_POW_GPIO_Port, QJ_POW_Pin, GPIO_PIN_RESET);
-	HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_SET);
+	//HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_SET);
 	rt_enter_critical();//调度器上锁
 	backup_data();
   /* USER CODE END PVD_IRQn 0 */
   HAL_PWR_PVD_IRQHandler();
   /* USER CODE BEGIN PVD_IRQn 1 */
-	HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_RESET);
+	//HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_RESET);
 	rt_exit_critical();//调度器解锁	
   /* USER CODE END PVD_IRQn 1 */
 }
@@ -181,12 +181,12 @@ static void MX_GPIO_Init(void)
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     HAL_GPIO_Init(RUN_GPIO_PORT, &GPIO_InitStruct);
 		
-		GPIO_InitStruct.Pin 	= LED0_Pin;
-		HAL_GPIO_Init(LED0_GPIO_Port, &GPIO_InitStruct);
+//		GPIO_InitStruct.Pin 	= LED0_Pin;
+//		HAL_GPIO_Init(LED0_GPIO_Port, &GPIO_InitStruct);
 		GPIO_InitStruct.Pin 	= LED1_Pin;
 		HAL_GPIO_Init(LED1_GPIO_Port, &GPIO_InitStruct);
 		
-		HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_SET);
+		//HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_SET);
 		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
 }
 
