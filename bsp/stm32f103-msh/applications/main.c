@@ -115,8 +115,8 @@ static void time2_out(void *parameter)
 			rt_enter_critical();//调度器上锁
 			HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(QJ_POW_GPIO_Port, QJ_POW_Pin, GPIO_PIN_RESET);
-			HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
 			backup_data();
+			HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
 			rt_exit_critical();//调度器解锁
 			rt_timer_stop(timer2);
 		}
@@ -146,12 +146,11 @@ static void times_init(void)
 		
 //		/* 创建定时器2  周期定时器 */
     timer2 = rt_timer_create("timer2", time2_out,
-                             RT_NULL, 50,
+                             RT_NULL, 10,
                              RT_TIMER_FLAG_PERIODIC);
     /* 启动定时器2 */
     if (timer2 != RT_NULL)
         rt_timer_start(timer2);
-		
 }
 	
 
@@ -164,6 +163,7 @@ int main(void)
 		tof_read_start();//TOF10120_Init();
 	
 		thread_pwm_start();
+	  thread_adc_init();
 		thread_nrf_init();
 		oled_thd_start();
 		//thread_usart3_init();

@@ -53,8 +53,8 @@ int TOF10120_Init(void)
 	TOF_Value = TOF_MAX_DIS;
 	rt_thread_mdelay(500);
 	//i=TOF_ADDRESS1;
-	if(TOF10120_Read(TOF_ADDRESS_REG,&i,1)!= HAL_OK)
-	//if(TOF10120_Read_Distence() == 0)
+	//if(TOF10120_Read(TOF_ADDRESS_REG,&i,1)!= HAL_OK)
+	if(TOF10120_Read_Distence() == 1000)
 	{
 		TOF_Error = 1;
 		rt_kprintf("TOF Error!\r\n");
@@ -166,7 +166,8 @@ static void Tofread_scan_entey(void *parameter)
 		TOF10120_Init();
 		if(TOF_Error==1)
 		{
-			rt_thread_mdelay(200);
+			HAL_GPIO_WritePin(TOF1010_EN_Port,TOF1010_EN,GPIO_PIN_SET);
+			rt_thread_mdelay(1000);
 		}
 		else
 		{

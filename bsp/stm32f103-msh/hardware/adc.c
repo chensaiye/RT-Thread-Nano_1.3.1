@@ -80,13 +80,18 @@ static char thd_adc_stack[ADC_THREAD_STACK_SIZE];
 static struct rt_thread thd_adc;
 
 #include "cd4051.h"
+uint16_t ch = 0;
+uint16_t ad_value[8];
 static void ADCread_scan_entey(void *parameter)
 {
-	uint16_t distance;
 	while(1)
 	{
-		
-		rt_thread_mdelay(200);
+		CD4051_Ch_Select(ch);
+		rt_thread_mdelay(20);
+		ad_value[ch] = Get_Adc();
+		if(++ch>7)
+			ch = 0;
+		rt_thread_mdelay(2000);
 	}
 }
 

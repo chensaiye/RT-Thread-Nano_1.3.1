@@ -158,27 +158,22 @@
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>MenuIVS,0x0A</ItemText>
+          <ItemText>curr_status</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>curr_status</ItemText>
+          <ItemText>TOF_Error</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>i</ItemText>
+          <ItemText>TOF_Value_Buf,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>TOF_Error</ItemText>
-        </Ww>
-        <Ww>
-          <count>4</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>TOF_Value_Buf,0x0A</ItemText>
+          <ItemText>ad_value</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>
