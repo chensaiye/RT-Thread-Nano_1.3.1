@@ -163,15 +163,25 @@ static void Tofread_scan_entey(void *parameter)
 	uint16_t distance;
 	while(1)
   {
-		distance = TOF10120_Read_Scan();
-		if((distance>425) && Channels_RIR[6])
-			bt_rir_7(BUTTON_LONG_RELEASE);
-		if((distance<=425) && Channels_RIR[6]==0)
-			bt_rir_7(BUTTON_LONG_PRESSED);
-		
-		rt_thread_mdelay(200);
-		//if(TOF_Error == 0)
-			//rt_kprintf("dis:%d mm\r\n", distance);//TOF10120_Read_Scan()); 
+		TOF10120_Init();
+		if(TOF_Error==1)
+		{
+			rt_thread_mdelay(200);
+		}
+		else
+		{
+			while(1)
+			{
+				distance = TOF10120_Read_Scan();
+				if(distance == 1000)
+					break;
+				if((distance>425) && Channels_RIR[6])
+					bt_rir_7(BUTTON_LONG_RELEASE);
+				if((distance<=425) && Channels_RIR[6]==0)
+					bt_rir_7(BUTTON_LONG_PRESSED);
+				rt_thread_mdelay(200);
+			}
+		}
 	}
 }
 
@@ -179,9 +189,9 @@ int tof_read_start(void)
 {
 	if((curr_status.value.sys_set & 0x08)==0x00)
 		return 1;
-	 TOF10120_Init();
-	if(TOF_Error==1)
-		return 1;
+//	 TOF10120_Init();
+//	if(TOF_Error==1)
+//		return 1;
 	 rt_thread_init(&thd_tofread,
 									 "tof_read",
 									 Tofread_scan_entey,

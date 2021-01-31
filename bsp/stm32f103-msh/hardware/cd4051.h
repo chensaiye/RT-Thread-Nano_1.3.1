@@ -22,8 +22,8 @@
 #define CD4051_Port GPIOB
 
 void CD4051_Init(void);//初始化
-void CD4051_Ch_Set(uint8_t ch, uint8_t endis);//4051输出 ,ch通道 ，endis
 void CD4051_Ch_Select(uint16_t ch);//通道选择
+
 #endif
 
 
