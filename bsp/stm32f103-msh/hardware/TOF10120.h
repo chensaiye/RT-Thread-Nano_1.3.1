@@ -19,7 +19,8 @@
 int TOF10120_Init(void);
 HAL_StatusTypeDef TOF10120_Write(uint16_t WriteAddr,uint8_t *pBuffer,uint16_t NumToWrite);
 HAL_StatusTypeDef TOF10120_Read(uint16_t ReadAddr,uint8_t *pBuffer,uint16_t NumToRead);
-uint16_t TOF10120_Read_Distence(void);
+//uint16_t TOF10120_Read_Distence(void);
+HAL_StatusTypeDef TOF10120_Read_Distence(uint16_t *dis);
 uint16_t TOF10120_Read_Scan(void);
 int tof_read_start(void);
 #endif

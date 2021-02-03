@@ -18,11 +18,12 @@ static int MX_ADC1_Init(void)
 {
 
   /* USER CODE BEGIN ADC1_Init 0 */
+	
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 	
 	GPIO_InitStruct.Pin = GPIO_PIN_4;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
   /* USER CODE END ADC1_Init 0 */
@@ -30,7 +31,8 @@ static int MX_ADC1_Init(void)
   ADC_ChannelConfTypeDef sConfig = {0};
 
   /* USER CODE BEGIN ADC1_Init 1 */
-
+  //HAL_ADC_DeInit(&hadc1);
+	__HAL_RCC_ADC1_CLK_ENABLE();
   /* USER CODE END ADC1_Init 1 */
   /** Common config 
   */
@@ -60,14 +62,16 @@ static int MX_ADC1_Init(void)
 }
 INIT_BOARD_EXPORT(MX_ADC1_Init);
 
+uint16_t temp_adv;
 //»ñµÃADCÖµ
 uint16_t Get_Adc(void)
 {
-	uint16_t temp_adv;
-	HAL_ADC_Start(&hadc1);
-	HAL_ADC_PollForConversion(&hadc1,1000);
+	HAL_StatusTypeDef error;
+	
+	error = HAL_ADC_Start(&hadc1);
+	error = HAL_ADC_PollForConversion(&hadc1,1000);
 	temp_adv = HAL_ADC_GetValue(&hadc1);
-	HAL_ADC_Stop(&hadc1);
+	//HAL_ADC_Stop(&hadc1);
 	return temp_adv;
 }
 
@@ -91,7 +95,7 @@ static void ADCread_scan_entey(void *parameter)
 		ad_value[ch] = Get_Adc();
 		if(++ch>7)
 			ch = 0;
-		rt_thread_mdelay(2000);
+		rt_thread_mdelay(500);
 	}
 }
 

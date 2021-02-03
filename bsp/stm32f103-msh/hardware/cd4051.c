@@ -34,6 +34,7 @@ void CD4051_Init(void)
 	 HAL_GPIO_Init(CD4051_Port, &GPIO_InitStructure);					 //根据设定参数初始化GPIOC
 	 
 }
+INIT_BOARD_EXPORT(CD4051_Init);
 
 //4051输出 ,ch通道 ，endis
 //void CD4051_Ch_Set(uint8_t ch, uint8_t endis)

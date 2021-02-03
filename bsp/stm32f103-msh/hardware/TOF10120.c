@@ -52,14 +52,13 @@ int TOF10120_Init(void)
 		TOF_Value_Buf[i]=TOF_MAX_DIS;
 	TOF_Value = TOF_MAX_DIS;
 	rt_thread_mdelay(500);
-	//i=TOF_ADDRESS1;
-	//if(TOF10120_Read(TOF_ADDRESS_REG,&i,1)!= HAL_OK)
-	if(TOF10120_Read_Distence() == 1000)
+	if(TOF10120_Read_Distence(&(TOF_Value_Buf[0]))!= HAL_OK)
 	{
-		TOF_Error = 1;
+		//TOF_Error = 1;
 		rt_kprintf("TOF Error!\r\n");
+		return HAL_ERROR;
 	}
-	return 0;
+	return HAL_OK;
 }
 
 //INIT_BOARD_EXPORT(TOF10120_Init);
@@ -101,17 +100,19 @@ uint32_t HAL_GetTick(void)
   return rt_tick_get();
 }
 
-uint16_t TOF10120_Read_Distence(void)
+
+HAL_StatusTypeDef TOF10120_Read_Distence(uint16_t *dis)
 {
 	uint8_t buf[2];
-//	if(I2C_Master_BufferRead(I2C1,buf,0x02,TOF_ADDRESS1,FILTERED_DIS_REG))
-//		return 0;//error
-//	return ((buf[0]<<8) + buf[1]);
-	
-	if(HAL_I2C_Mem_Read(&hi2c1,TOF_ADDRESS1,FILTERED_DIS_REG,I2C_MEMADD_SIZE_8BIT,buf,0x02,10)==HAL_OK)
-		return ((buf[0]<<8) + buf[1]);
+	HAL_StatusTypeDef error;
+	error = HAL_I2C_Mem_Read(&hi2c1,TOF_ADDRESS1,FILTERED_DIS_REG,I2C_MEMADD_SIZE_8BIT,buf,0x02,10);
+	if(error==HAL_OK)
+	{	
+		*dis = (buf[0]<<8) + buf[1];
+		return HAL_OK;
+	}
 	else
-		return 1000;
+		return error;
 }
  
 //Æ½¾ùÖµÂË²¨
@@ -137,15 +138,20 @@ uint16_t Get_Buf_Average(uint16_t len,uint16_t* buf)
 
 uint16_t TOF10120_Read_Scan(void)
 {	
-	if(TOF_Error)
-		TOF_Value_Buf[TOF_Buf_Set] = 1000;
+	HAL_StatusTypeDef error;
+	error = TOF10120_Read_Distence(&(TOF_Value_Buf[TOF_Buf_Set]));
+	if(error == HAL_OK)
+	{
+		if(TOF_Value_Buf[TOF_Buf_Set]> 1000)
+			TOF_Value_Buf[TOF_Buf_Set] = 800;
+		TOF_Buf_Set++;
+		if(TOF_Buf_Set > TOF_BUF_SIZE-1)
+			TOF_Buf_Set=0;
+		TOF_Value = Get_Buf_Average(TOF_BUF_SIZE,TOF_Value_Buf);
+		return TOF_Value;
+  }
 	else
-		TOF_Value_Buf[TOF_Buf_Set] = TOF10120_Read_Distence();
-	TOF_Buf_Set++;
-	if(TOF_Buf_Set > TOF_BUF_SIZE-1)
-		TOF_Buf_Set=0;
-	TOF_Value = Get_Buf_Average(TOF_BUF_SIZE,TOF_Value_Buf);
-	return TOF_Value;
+		return 1000;
 }
 
 
@@ -163,26 +169,21 @@ static void Tofread_scan_entey(void *parameter)
 	uint16_t distance;
 	while(1)
   {
-		TOF10120_Init();
-		if(TOF_Error==1)
+		while(1)
 		{
-			HAL_GPIO_WritePin(TOF1010_EN_Port,TOF1010_EN,GPIO_PIN_SET);
-			rt_thread_mdelay(1000);
+			distance = TOF10120_Read_Scan();
+			if(distance == 1000)
+				break;
+			if((distance>425) && Channels_RIR[6])
+				bt_rir_7(BUTTON_LONG_RELEASE);
+			if((distance<=425) && Channels_RIR[6]==0)
+				bt_rir_7(BUTTON_LONG_PRESSED);
+			rt_thread_mdelay(200);
 		}
-		else
-		{
-			while(1)
-			{
-				distance = TOF10120_Read_Scan();
-				if(distance == 1000)
-					break;
-				if((distance>425) && Channels_RIR[6])
-					bt_rir_7(BUTTON_LONG_RELEASE);
-				if((distance<=425) && Channels_RIR[6]==0)
-					bt_rir_7(BUTTON_LONG_PRESSED);
-				rt_thread_mdelay(200);
-			}
-		}
+		HAL_GPIO_WritePin(TOF1010_EN_Port,TOF1010_EN,GPIO_PIN_SET);
+		rt_thread_mdelay(1000);
+		HAL_GPIO_WritePin(TOF1010_EN_Port,TOF1010_EN,GPIO_PIN_RESET);
+		rt_thread_mdelay(500);
 	}
 }
 
@@ -190,9 +191,8 @@ int tof_read_start(void)
 {
 	if((curr_status.value.sys_set & 0x08)==0x00)
 		return 1;
-//	 TOF10120_Init();
-//	if(TOF_Error==1)
-//		return 1;
+	 if(TOF10120_Init()!=HAL_OK)
+		 return 1;
 	 rt_thread_init(&thd_tofread,
 									 "tof_read",
 									 Tofread_scan_entey,
