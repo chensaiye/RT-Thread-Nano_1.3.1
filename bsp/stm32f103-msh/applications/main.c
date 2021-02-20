@@ -20,7 +20,8 @@
 #include "pwm_tim3.h"
 #include "oled.h"
 #include "main_control.h"
-
+#include "adc.h"
+ 
 #define RUN_GPIO_PORT  GPIOB
 #define RUN_PIN        GPIO_PIN_12
 //#define LED0_Pin GPIO_PIN_4
@@ -31,6 +32,8 @@
 /* 定时器的控制块 */
 static rt_timer_t timer1;
 static rt_timer_t timer2;
+
+extern rt_sem_t  sem_warning;
 
 extern uint8_t Channels_RIR[CHANNEL_RIR_MAX];
 
@@ -154,8 +157,13 @@ static void times_init(void)
 }
 	
 
+
 int main(void)
 {
+		//创建二值信号量
+		sem_warning = rt_sem_create("sem_warning", 1 ,RT_IPC_FLAG_FIFO);
+		if(sem_warning == RT_NULL)
+			rt_kprintf("creat sem error\r\n");
 		
     MX_GPIO_Init();
 		thread_button_init();
@@ -173,6 +181,8 @@ int main(void)
 		//PowDown_Test_Init();
 	
 		times_init();
+	
+		
 		
 		while (1)
     {

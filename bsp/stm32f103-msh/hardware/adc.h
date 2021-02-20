@@ -8,6 +8,8 @@
 
 void Adc_Init(void);
 uint16_t Get_Adc(void);
+int thread_adc_init(void);
+
 //u16 Get_Adc_Average(u8 ch,u8 times); 
 //u16 Get_Adc_Value(void);
 #endif 

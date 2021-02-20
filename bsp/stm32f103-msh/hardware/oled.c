@@ -371,6 +371,7 @@ void OLED_Init(void)
 	OLED_Clear();
 }  
 extern pwm_value_union curr_val;
+extern uint16_t ad_value[8];
 void OLED_Test(void)
 {
 	char str[25];
@@ -397,24 +398,24 @@ void OLED_Test(void)
 	sprintf(str,"Levl:%d",curr_status.value.lum_grade);
 	OLED_ShowString(0,2*8, (uint8_t *)str,CHARSIZE_8X6);	
 	
-	sprintf(str,"Current Set1:     ");
+	sprintf(str,"CSet1:      I1:    ");
 	OLED_ShowString(0,3*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"Current Set1:%d",curr_val.value.ch1);
+	sprintf(str,"CSet1:%d   I1:%d",curr_val.value.ch1,ad_value[0]);
 	OLED_ShowString(0,3*8, (uint8_t *)str,CHARSIZE_8X6);
 	
-	sprintf(str,"Current Set2:     ");
+	sprintf(str,"CSet2:      I2:    ");
 	OLED_ShowString(0,4*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"Current Set2:%d",curr_val.value.ch2);
+	sprintf(str,"CSet2:%d   I2:%d",curr_val.value.ch2,ad_value[1]);
 	OLED_ShowString(0,4*8, (uint8_t *)str,CHARSIZE_8X6);
 	
-	sprintf(str,"Current Set3:     ");
+	sprintf(str,"CSet3:      I3:    ");
 	OLED_ShowString(0,5*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"Current Set3:%d",curr_val.value.ch3);
+	sprintf(str,"CSet3:%d   I3:%d",curr_val.value.ch3,ad_value[2]);
 	OLED_ShowString(0,5*8, (uint8_t *)str,CHARSIZE_8X6);
 	
-	sprintf(str,"Current Set4:     ");
+	sprintf(str,"CSet4:      I7:    ");
 	OLED_ShowString(0,6*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"Current Set4:%d",curr_val.value.ch4);
+	sprintf(str,"CSet4:%d   I7:%d",curr_val.value.ch4,ad_value[6]);
 	OLED_ShowString(0,6*8, (uint8_t *)str,CHARSIZE_8X6);
 	
 //	sprintf(str,"Distence:   ");

@@ -24,7 +24,7 @@ extern void Error_Handler(void);
 extern I2C_HandleTypeDef hi2c1;
 extern uint8_t Channels_RIR[CHANNEL_RIR_MAX];
 extern union_status curr_status;//当前状态
-
+extern rt_sem_t sem_warning;
 void TOF10120_EN_Init(void)
 {
    GPIO_InitTypeDef  GPIO_InitStructure;
@@ -54,7 +54,6 @@ int TOF10120_Init(void)
 	rt_thread_mdelay(500);
 	if(TOF10120_Read_Distence(&(TOF_Value_Buf[0]))!= HAL_OK)
 	{
-		//TOF_Error = 1;
 		rt_kprintf("TOF Error!\r\n");
 		return HAL_ERROR;
 	}
@@ -117,7 +116,7 @@ HAL_StatusTypeDef TOF10120_Read_Distence(uint16_t *dis)
  
 //平均值滤波
 //len > 2 
-uint16_t Get_Buf_Average(uint16_t len,uint16_t* buf)
+static uint16_t Get_Buf_Average(uint16_t len,uint16_t* buf)
 {
 	uint16_t min=5000,max=0,i;
 	uint32_t temp32=0;
@@ -163,10 +162,10 @@ ALIGN(RT_ALIGN_SIZE)
 static char thd_tofread_stack[TOFREAD_THREAD_STACK_SIZE];
 static struct rt_thread thd_tofread;
 
-
 static void Tofread_scan_entey(void *parameter)
 {
 	uint16_t distance;
+	
 	while(1)
   {
 		while(1)
@@ -178,12 +177,43 @@ static void Tofread_scan_entey(void *parameter)
 				bt_rir_7(BUTTON_LONG_RELEASE);
 			if((distance<=425) && Channels_RIR[6]==0)
 				bt_rir_7(BUTTON_LONG_PRESSED);
+			
+			if(curr_status.value.error_Flag & 0x80)
+			{
+				TOF_Error = 0;
+				rt_sem_take(sem_warning,RT_WAITING_FOREVER);
+				curr_status.value.error_Flag &= 0x7F; 
+				rt_sem_release(sem_warning);
+				led_manual_updata();
+			}
 			rt_thread_mdelay(200);
 		}
+		
 		HAL_GPIO_WritePin(TOF1010_EN_Port,TOF1010_EN,GPIO_PIN_SET);
-		rt_thread_mdelay(1000);
-		HAL_GPIO_WritePin(TOF1010_EN_Port,TOF1010_EN,GPIO_PIN_RESET);
+		//GPIOB->CRH &= 0xFFFFFF00;
+		//GPIOB->CRH |= 0x00000055;
+		GPIOB->ODR &= 0xFCFF;
 		rt_thread_mdelay(500);
+		
+		GPIOB->ODR |= 0x0100;
+		__NOP();
+		__NOP();
+		GPIOB->ODR |= 0x0200;
+		I2C1->SR1 = 0;		
+		HAL_GPIO_WritePin(TOF1010_EN_Port,TOF1010_EN,GPIO_PIN_RESET);
+		rt_thread_mdelay(1000);
+		
+		if(++TOF_Error > 5)
+		{
+			TOF_Error = 0;
+			if((curr_status.value.error_Flag & 0x80)==0)
+			{
+				rt_sem_take(sem_warning,RT_WAITING_FOREVER);
+				curr_status.value.error_Flag |= 0x80; 
+				rt_sem_release(sem_warning);
+			  led_manual_updata();
+			}
+		}	
 	}
 }
 

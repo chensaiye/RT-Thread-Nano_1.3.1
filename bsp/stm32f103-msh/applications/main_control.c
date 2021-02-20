@@ -15,6 +15,8 @@
 
 const uint16_t QJ_Min=100,QJ_Max=1000;
 
+rt_sem_t  sem_warning = RT_NULL;
+
 pwm_value_union set_val;//设定值
 union_status curr_status;//当前状态
 
@@ -41,6 +43,8 @@ void led_manual_updata(void)
 	{
 		led_status |= (0x01 << 10);	//power led
 		led_status |= (0x01 << (curr_status.value.mode + 11));	//mode led
+		if(curr_status.value.error_Flag)
+			led_status |= (0x01 << 15);	//warning flag
 		
 		//level led
 		if(curr_status.value.mode == MODE_LUM)

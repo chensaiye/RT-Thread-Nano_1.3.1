@@ -105,7 +105,7 @@ typedef union
 	uint8_t bk_fg;			//背光标记
 	uint8_t rir;			//阴影传感器触发个数
 	uint8_t sys_set;		//系统设置
-	uint8_t unused;			//
+	uint8_t error_Flag;	//
 	}value;
 	uint8_t buf[10];
 	uint16_t buf16[5];
@@ -136,6 +136,8 @@ typedef union
 	uint8_t buf[5];
 }union_sys_count;
 
+extern rt_sem_t  sem_warning;
+	
 //All rights reserved									  
 ////////////////////////////////////////////////////////////////////////////////// 
 void Show_Version(void);
@@ -146,6 +148,7 @@ void Panel_Init(void);//初始化
 void Led_Blink(void);
 void pwm_buffer(void);
 
+void led_manual_updata(void);
 
 void Event_Updata_Set(void);
 void Event_Power(void);
