@@ -111,7 +111,7 @@ uint16_t ch = 0;
 uint16_t numb = 0;
 uint16_t ad_value[8];
 uint16_t ad_group[8][5];
-#define ADC_I_MIN  100
+#define ADC_I_MIN  150
 #define ADC_I_MAX  3000
 
 //错误检测逻辑 --
@@ -128,6 +128,8 @@ static void Error_Check(uint16_t avg,uint16_t diff,uint16_t ch)
 		else
 			curr_status.value.error_Flag &= ~(0x01<<ch);
   }
+	else
+		curr_status.value.error_Flag &= ~(0x01<<ch);
 	rt_sem_release(sem_warning);
 }
 
@@ -196,6 +198,7 @@ static void ADCread_scan_entey(void *parameter)
 						ad_group[ch][numb] = Get_Adc();
 					}
 				}
+				CD4051_Ch_Select(7);
 				//取平均值
 				for(ch=0;ch<7;ch++)
 					ad_value[ch] = Get_ADC_Buf_Average(5,&(ad_group[ch][0]));
@@ -206,9 +209,12 @@ static void ADCread_scan_entey(void *parameter)
 				curr_status.value.error_Flag &= 0x80;//clear all ch error
 		}
 		else
+		{	
 			curr_status.value.error_Flag &= 0x80;//clear all ch error
-		
-		rt_thread_mdelay(200);
+			for(ch=0;ch<7;ch++)
+				ad_value[ch] = 0;
+		}
+		rt_thread_mdelay(250);
 	}
 }
 

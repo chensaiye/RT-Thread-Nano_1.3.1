@@ -981,6 +981,11 @@
               <FileType>1</FileType>
               <FilePath>.\hardware\adc.c</FilePath>
             </File>
+            <File>
+              <FileName>myiic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hardware\myiic.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

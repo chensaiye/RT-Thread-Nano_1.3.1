@@ -398,25 +398,72 @@ void OLED_Test(void)
 	sprintf(str,"Levl:%d",curr_status.value.lum_grade);
 	OLED_ShowString(0,2*8, (uint8_t *)str,CHARSIZE_8X6);	
 	
-	sprintf(str,"CSet1:      I1:    ");
+	sprintf(str,"CS1:     ");
 	OLED_ShowString(0,3*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"CSet1:%d   I1:%d",curr_val.value.ch1,ad_value[0]);
+	sprintf(str,"CS1:%d ",curr_val.value.ch1);
 	OLED_ShowString(0,3*8, (uint8_t *)str,CHARSIZE_8X6);
-	
-	sprintf(str,"CSet2:      I2:    ");
+	sprintf(str,"CS2:     ");
 	OLED_ShowString(0,4*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"CSet2:%d   I2:%d",curr_val.value.ch2,ad_value[1]);
+	sprintf(str,"CS2:%d ",curr_val.value.ch2);
 	OLED_ShowString(0,4*8, (uint8_t *)str,CHARSIZE_8X6);
-	
-	sprintf(str,"CSet3:      I3:    ");
+	sprintf(str,"CS3:     ");
 	OLED_ShowString(0,5*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"CSet3:%d   I3:%d",curr_val.value.ch3,ad_value[2]);
+	sprintf(str,"CS3:%d ",curr_val.value.ch3);
 	OLED_ShowString(0,5*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"CS4:     ");
+	OLED_ShowString(0,6*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"CS4:%d ",curr_val.value.ch4);
+	OLED_ShowString(0,6*8, (uint8_t *)str,CHARSIZE_8X6);
 	
-	sprintf(str,"CSet4:      I7:    ");
-	OLED_ShowString(0,6*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"CSet4:%d   I7:%d",curr_val.value.ch4,ad_value[6]);
-	OLED_ShowString(0,6*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I1:     ");
+	OLED_ShowString(54,3*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I1:%d ",ad_value[0]);
+	OLED_ShowString(54,3*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I2:     ");
+	OLED_ShowString(54,4*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I2:%d ",ad_value[1]);
+	OLED_ShowString(54,4*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I3:     ");
+	OLED_ShowString(54,5*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I3:%d ",ad_value[2]);
+	OLED_ShowString(54,5*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I7:     ");
+	OLED_ShowString(54,6*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I7:%d ",ad_value[6]);
+	OLED_ShowString(54,6*8, (uint8_t *)str,CHARSIZE_8X6);
+	
+	sprintf(str,"I4:    ");
+	OLED_ShowString(0,7*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I4:%d ",ad_value[3]);
+	OLED_ShowString(0,7*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I5:    ");
+	OLED_ShowString(42,7*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I5:%d ",ad_value[4]);
+	OLED_ShowString(42,7*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I6:    ");
+	OLED_ShowString(84,7*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I6:%d ",ad_value[5]);
+	OLED_ShowString(84,7*8, (uint8_t *)str,CHARSIZE_8X6);
+	
+//	sprintf(str,"CSet1:      I1:    ");
+//	OLED_ShowString(0,3*8, (uint8_t *)str,CHARSIZE_8X6);
+//	sprintf(str,"CSet1:%d   I1:%d",curr_val.value.ch1,ad_value[0]);
+//	OLED_ShowString(0,3*8, (uint8_t *)str,CHARSIZE_8X6);
+//	
+//	sprintf(str,"CSet2:      I2:    ");
+//	OLED_ShowString(0,4*8, (uint8_t *)str,CHARSIZE_8X6);
+//	sprintf(str,"CSet2:%d   I2:%d",curr_val.value.ch2,ad_value[1]);
+//	OLED_ShowString(0,4*8, (uint8_t *)str,CHARSIZE_8X6);
+//	
+//	sprintf(str,"CSet3:      I3:    ");
+//	OLED_ShowString(0,5*8, (uint8_t *)str,CHARSIZE_8X6);
+//	sprintf(str,"CSet3:%d   I3:%d",curr_val.value.ch3,ad_value[2]);
+//	OLED_ShowString(0,5*8, (uint8_t *)str,CHARSIZE_8X6);
+//	
+//	sprintf(str,"CSet4:      I7:    ");
+//	OLED_ShowString(0,6*8, (uint8_t *)str,CHARSIZE_8X6);
+//	sprintf(str,"CSet4:%d   I7:%d",curr_val.value.ch4,ad_value[6]);
+//	OLED_ShowString(0,6*8, (uint8_t *)str,CHARSIZE_8X6);
 	
 //	sprintf(str,"Distence:   ");
 //	OLED_ShowString(0,7*8, (uint8_t *)str,CHARSIZE_8X6);
