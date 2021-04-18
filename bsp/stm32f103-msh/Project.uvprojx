@@ -986,6 +986,11 @@
               <FileType>1</FileType>
               <FilePath>.\hardware\myiic.c</FilePath>
             </File>
+            <File>
+              <FileName>LM75A.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hardware\LM75A.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

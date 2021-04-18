@@ -294,11 +294,11 @@ void OLED_IIC_Init(void)
 	MX_I2C2_Init();//IIC≥ı ºªØ
 }
 
-void OLED_Read(uint16_t ReadAddr,uint8_t *pBuffer,uint16_t NumToRead)
-{
-	//I2C_Master_BufferRead(I2C1,pBuffer,NumToRead,0XA0,ReadAddr);
-	HAL_I2C_Mem_Read(&hi2c2,OLED_SLAVE_ADDRESS,ReadAddr,I2C_MEMADD_SIZE_8BIT,pBuffer,NumToRead,10000);
-}
+//void OLED_Read(uint16_t ReadAddr,uint8_t *pBuffer,uint16_t NumToRead)
+//{
+//	//I2C_Master_BufferRead(I2C1,pBuffer,NumToRead,0XA0,ReadAddr);
+//	HAL_I2C_Mem_Read(&hi2c2,OLED_SLAVE_ADDRESS,ReadAddr,I2C_MEMADD_SIZE_8BIT,pBuffer,NumToRead,10000);
+//}
 
 /**********************************************
 // IIC Write Data
@@ -372,6 +372,7 @@ void OLED_Init(void)
 }  
 extern pwm_value_union curr_val;
 extern uint16_t ad_value[8];
+uint16_t temperature_display;
 void OLED_Test(void)
 {
 	char str[25];
@@ -396,7 +397,12 @@ void OLED_Test(void)
 	sprintf(str,"Levl:     ");
 	OLED_ShowString(0,2*8, (uint8_t *)str,CHARSIZE_8X6);
 	sprintf(str,"Levl:%d",curr_status.value.lum_grade);
-	OLED_ShowString(0,2*8, (uint8_t *)str,CHARSIZE_8X6);	
+	OLED_ShowString(0,2*8, (uint8_t *)str,CHARSIZE_8X6);
+		
+	sprintf(str,"TEMP:     ");
+	OLED_ShowString(54,2*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"TEMP:%d",temperature_display);
+	OLED_ShowString(54,2*8, (uint8_t *)str,CHARSIZE_8X6);	
 	
 	sprintf(str,"CS1:     ");
 	OLED_ShowString(0,3*8, (uint8_t *)str,CHARSIZE_8X6);
@@ -482,15 +488,18 @@ ALIGN(RT_ALIGN_SIZE)
 static char thd_oled_stack[OLED_THREAD_STACK_SIZE];
 static struct rt_thread thd_oled;
 
-
+#include "LM75A.h"
 static void oled_display_entey(void *parameter)
 {
 	//OLED_Init();
 	while(1)
   {
 		rt_thread_mdelay(1000);
+		temperature_display = LM75A_Read_Test();
 		if(oled_error == 0)
 			OLED_Test();
+		
+		
 	}
 }
 

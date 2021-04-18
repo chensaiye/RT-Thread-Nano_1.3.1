@@ -132,7 +132,7 @@ static void Error_Check(uint16_t avg,uint16_t diff,uint16_t ch)
 		curr_status.value.error_Flag &= ~(0x01<<ch);
 	rt_sem_release(sem_warning);
 }
-
+//LED驱动电压反馈值 异常判断
 static void CH_Error_Test(void)
 {
 	uint16_t tp_value=0, diff_val=0;
@@ -194,16 +194,19 @@ static void ADCread_scan_entey(void *parameter)
 					for(ch=0;ch<7;ch++)
 					{
 						CD4051_Ch_Select(ch);
-						rt_thread_mdelay(10);
+						rt_thread_mdelay(100);
 						ad_group[ch][numb] = Get_Adc();
 					}
 				}
 				CD4051_Ch_Select(7);
 				//取平均值
 				for(ch=0;ch<7;ch++)
+				{	
 					ad_value[ch] = Get_ADC_Buf_Average(5,&(ad_group[ch][0]));
-				
-				CH_Error_Test();
+					if(ad_value[ch]>4095)
+						ad_value[ch] = 4095;
+				}
+				CH_Error_Test();//LED驱动电压反馈值 异常判断
 			}
 			else
 				curr_status.value.error_Flag &= 0x80;//clear all ch error

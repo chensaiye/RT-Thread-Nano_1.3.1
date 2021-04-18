@@ -12,7 +12,7 @@ void UserI2c_DelayuS(unsigned int nCount);
 *******************************************************************************/
 void UserI2c_DelayuS(unsigned int nCount)
 {
-	unsigned int i;
+	//unsigned int i;
 	
   for(; nCount != 0; nCount--)
 	{
