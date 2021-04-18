@@ -297,17 +297,17 @@ void Event_Mode(void)
 {
 	if(curr_status.value.pow_fg==OFF)
 		return;
-	curr_status.value.mode++;
-//	if(curr_status.value.mode == MODE_YYCTL)
-//	{
-//		if((curr_status.value.sys_set & 0x08)==0x00)
-//			curr_status.value.mode++;
+//	curr_status.value.mode++;
+////	if(curr_status.value.mode == MODE_YYCTL)
+////	{
+////		if((curr_status.value.sys_set & 0x08)==0x00)
+////			curr_status.value.mode++;
+////	}
+//	if(curr_status.value.mode > MODE_QJ )
+//	{	
+//		curr_status.value.mode = MODE_LUM;
+//		HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_SET);
 //	}
-	if(curr_status.value.mode > MODE_QJ )
-	{	
-		curr_status.value.mode = MODE_LUM;
-		HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_SET);
-	}
 	Event_Updata_Set();
 }
 

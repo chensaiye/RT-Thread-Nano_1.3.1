@@ -51,8 +51,8 @@ const unsigned char button_table[BUTTON_NUMBER] =
 	BUTTON_2,				// 1		mode
 	BUTTON_3,				// 2		minus
 	BUTTON_4,					// 3		add
-	BUTTON_DUMMY,				// 4		sewen
-	BUTTON_DUMMY,				// 5		camera pow
+	BUTTON_5,				// 4		mode2
+	BUTTON_6,				// 5		mode3
 	BUTTON_DUMMY,					// 6
 	BUTTON_DUMMY,				//7
 	
@@ -73,8 +73,8 @@ void (*process[BUTTON_NUMBER])( unsigned char flag ) =
 	button_2,		
 	button_3,		
 	button_4,		
-	button_dummy,			
-	button_dummy,			
+	button_5,			
+	button_6,			
 	button_dummy,			
 	button_dummy,						/* dummy button */
 	
@@ -267,13 +267,18 @@ void button_1( unsigned char flag )
 	}
 		
 }//---------------------------------
+extern union_status curr_status;//µ±Ç°×´Ì¬
 //---------------------------------button_2
 void button_2( unsigned char flag )
 {
 	RT_DEBUG_LOG(BUTTON_DEBUG,("button_2 %d!\r\n",flag));
 	if( flag == BUTTON_DOWN )
 	{
-		Event_Mode();
+		if(curr_status.value.pow_fg==ON)
+		{
+			curr_status.value.mode = MODE_LUM;
+			Event_Mode();
+		}
 	}
 	#ifdef BUTTON_LONG_PRESS
 	else if(flag == BUTTON_LONG_PRESSED)
@@ -343,7 +348,11 @@ void button_5( unsigned char flag )
 	RT_DEBUG_LOG(BUTTON_DEBUG,("button_5 %d!\r\n",flag));
 	if( flag == BUTTON_DOWN )
 	{
-	
+		if(curr_status.value.pow_fg==ON)
+		{
+			curr_status.value.mode = MODE_DEPTH;
+			Event_Mode();
+		}
 	}
 	#ifdef BUTTON_LONG_PRESS
 	else if(flag == BUTTON_LONG_PRESSED)
@@ -366,7 +375,11 @@ void button_6( unsigned char flag )
   RT_DEBUG_LOG(BUTTON_DEBUG,("button_6 %d!\r\n",flag));
 	if( flag == BUTTON_DOWN )
 	{
-	
+		if(curr_status.value.pow_fg==ON)
+		{
+			curr_status.value.mode = MODE_QJ;
+			Event_Mode();
+		}
 	}
 	#ifdef BUTTON_LONG_PRESS
 	else if(flag == BUTTON_LONG_PRESSED)
