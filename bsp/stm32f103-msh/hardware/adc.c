@@ -132,11 +132,13 @@ static void Error_Check(uint16_t avg,uint16_t diff,uint16_t ch)
 		curr_status.value.error_Flag &= ~(0x01<<ch);
 	rt_sem_release(sem_warning);
 }
+
+uint8_t old_error_flag=0;
 //LED驱动电压反馈值 异常判断
 static void CH_Error_Test(void)
 {
 	uint16_t tp_value=0, diff_val=0;
-	uint8_t old_error_flag=0;
+	
 	old_error_flag = curr_status.value.error_Flag;
 	//通道1
 	tp_value = (ad_value[1]+ad_value[2])>>1;//平均值

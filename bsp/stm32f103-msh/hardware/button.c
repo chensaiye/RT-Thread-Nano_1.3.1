@@ -243,18 +243,21 @@ void button_trigger( unsigned char button_name, unsigned char flag )
 		/* do the button's individual process */
 		process[button_name]( flag );
 }
+
+extern union_status curr_status;//µ±Ç°×´Ì¬
 //--------------------------------- button_1
 void button_1( unsigned char flag )
 {
 	RT_DEBUG_LOG(BUTTON_DEBUG,("button_1 %d!\r\n",flag));
 	if( flag == BUTTON_DOWN )
 	{
-			Event_Power();
+			if(curr_status.value.pow_fg==OFF)
+				Event_Power();
 	}
 	#ifdef BUTTON_LONG_PRESS
 	else if(flag == BUTTON_LONG_PRESSED)
 	{
-
+			Event_Power();
 	}
 	else if(flag == BUTTON_LONG_RELEASE)
 	{
@@ -350,7 +353,7 @@ void button_5( unsigned char flag )
 	{
 		if(curr_status.value.pow_fg==ON)
 		{
-			curr_status.value.mode = MODE_DEPTH;
+			curr_status.value.mode = MODE_QJ ;
 			Event_Mode();
 		}
 	}
@@ -377,7 +380,7 @@ void button_6( unsigned char flag )
 	{
 		if(curr_status.value.pow_fg==ON)
 		{
-			curr_status.value.mode = MODE_QJ;
+			curr_status.value.mode = MODE_DEPTH;
 			Event_Mode();
 		}
 	}
@@ -757,6 +760,19 @@ static void button_scan_entey(void *parameter)
 //							process[button_table[i]](BUTTON_LONG_RELEASE);
 //					}
 //				}
+			}
+			
+			if( (buttons[BUTTON_1].status & BUTTON_PRESSED) && (curr_status.value.pow_fg==ON) )
+			{
+					if(buttons[BUTTON_1].count < 150 )	//3000ms
+					{	
+						buttons[BUTTON_1].count++;
+						if(buttons[BUTTON_1].count >= 150)
+						{
+							process[BUTTON_1](BUTTON_LONG_PRESSED);
+							buttons[BUTTON_1].count=0;//--;
+						}
+					}
 			}
 		}
 		#endif

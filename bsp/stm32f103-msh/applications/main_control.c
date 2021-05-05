@@ -42,7 +42,15 @@ void led_manual_updata(void)
 	if(curr_status.value.pow_fg==ON)
 	{
 		led_status |= (0x01 << 10);	//power led
-		led_status |= (0x01 << (curr_status.value.mode + 11));	//mode led
+		//由于更换了模式按键位置，故模式2、3的指示灯需对调
+		if(curr_status.value.mode == MODE_LUM)
+			led_status |= (0x01 <<  11);	//mode led
+		else if(curr_status.value.mode == MODE_DEPTH)
+			led_status |= (0x01 <<  13);	//mode led
+		else
+			led_status |= (0x01 <<  12);	//mode led
+		//led_status |= (0x01 << (curr_status.value.mode + 11));	//mode led
+		
 		if(curr_status.value.error_Flag)
 			led_status |= (0x01 << 15);	//warning flag
 		
@@ -71,12 +79,12 @@ void Led_Blink(void)
 	led_status = 0;
 	if(curr_status.value.pow_fg == OFF) 
 		return;
-	if(curr_status.value.mode != MODE_LUM) 
-		return;
+//	if(curr_status.value.mode != MODE_LUM) 
+//		return;
 		
-	if(curr_status.value.sys_set & 0x08)
+	if(curr_status.value.sys_set & 0x08)//使能了阴影管理
 	{
-		if(curr_status.value.rir)
+		if((curr_status.value.rir)&&(curr_status.value.mode == MODE_LUM))
 		{//
 			led_blink =1;
 			if(curr_status.value.rir > 4)
@@ -109,6 +117,8 @@ void Led_Blink(void)
 			}
 		}
 	}
+	else
+		led_manual_updata();//定时更新显示
 }
 
 
@@ -308,6 +318,8 @@ void Event_Mode(void)
 //		curr_status.value.mode = MODE_LUM;
 //		HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_SET);
 //	}
+	if(curr_status.value.mode != MODE_QJ)
+			HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_SET);
 	Event_Updata_Set();
 }
 
