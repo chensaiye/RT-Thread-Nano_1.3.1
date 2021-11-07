@@ -168,4 +168,10 @@ void Save_To_MAX(uint16_t mode_no);
 void Set_Gain(uint16_t data);
 void Save_Gain(void);
 
+void Add_V4(void);
+void Add_CH4(void);
+void Minus_V4(void);
+void Minus_CH4(void);
+void Recover_To_MIN(uint16_t mode_no);
+void Recover_To_MAX(uint16_t mode_no);
 #endif

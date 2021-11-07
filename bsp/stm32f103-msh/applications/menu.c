@@ -23,7 +23,7 @@
 // Includes
 //-----------------------------------------------------------------------------
 #include "menu.h"
-#define PARA_MAX 2800
+
 //#include "port.h"
 //extern USHORT  usRegHoldingBuf[REG_HOLDING_NREGS]; //±£³Ö¼Ä´æÆ÷
 

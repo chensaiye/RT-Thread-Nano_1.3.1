@@ -70,7 +70,7 @@ uint16_t Get_Adc(void)
 	HAL_ADC_PollForConversion(&hadc1,1000);
 	temp_adv = HAL_ADC_GetValue(&hadc1);
 	//HAL_ADC_Stop(&hadc1);
-	return temp_adv;
+	return (temp_adv&0x0FFF);
 }
 
 static uint16_t Get_ADC_Buf_Average(uint16_t len,uint16_t* buf)
@@ -111,7 +111,7 @@ uint16_t ch = 0;
 uint16_t numb = 0;
 uint16_t ad_value[8];
 uint16_t ad_group[8][5];
-#define ADC_I_MIN  150
+#define ADC_I_MIN  200
 #define ADC_I_MAX  3000
 
 //´íÎó¼ì²âÂß¼­ --
@@ -196,7 +196,7 @@ static void ADCread_scan_entey(void *parameter)
 					for(ch=0;ch<7;ch++)
 					{
 						CD4051_Ch_Select(ch);
-						rt_thread_mdelay(100);
+						rt_thread_mdelay(200);
 						ad_group[ch][numb] = Get_Adc();
 					}
 				}

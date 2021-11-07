@@ -440,15 +440,15 @@ void OLED_Test(void)
 	
 	sprintf(str,"I4:    ");
 	OLED_ShowString(0,7*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"I4:%d ",ad_value[3]);
+	sprintf(str,"I4:%d",ad_value[3]);
 	OLED_ShowString(0,7*8, (uint8_t *)str,CHARSIZE_8X6);
 	sprintf(str,"I5:    ");
 	OLED_ShowString(42,7*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"I5:%d ",ad_value[4]);
+	sprintf(str,"I5:%d",ad_value[4]);
 	OLED_ShowString(42,7*8, (uint8_t *)str,CHARSIZE_8X6);
 	sprintf(str,"I6:    ");
 	OLED_ShowString(84,7*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"I6:%d ",ad_value[5]);
+	sprintf(str,"I6:%d",ad_value[5]);
 	OLED_ShowString(84,7*8, (uint8_t *)str,CHARSIZE_8X6);
 	
 //	sprintf(str,"CSet1:      I1:    ");

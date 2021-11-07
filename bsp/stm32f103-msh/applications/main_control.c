@@ -239,6 +239,40 @@ void Set_V4(uint16_t ch1,uint16_t ch2,uint16_t ch3,uint16_t ch4)
 	set_val.value.ch3 = ch3;
 	set_val.value.ch4 = ch4;
 }
+//各通道当前的设定值加5
+void Add_V4(void)
+{
+	if(set_val.value.ch1 < PARA_MAX)
+		set_val.value.ch1 += 5;
+	if(set_val.value.ch2 < PARA_MAX)
+		set_val.value.ch2 += 5;
+	if(set_val.value.ch3 < PARA_MAX)
+		set_val.value.ch3 += 5;
+	if(set_val.value.ch4 < PARA_MAX)
+		set_val.value.ch4 += 5;
+}
+void Add_CH4(void)
+{
+	if(set_val.value.ch4 < PARA_MAX)
+		set_val.value.ch4 += 5;
+}
+//各通道当前的设定值加5
+void Minus_V4(void)
+{
+	if(set_val.value.ch1>5)
+		set_val.value.ch1 -= 5;
+	if(set_val.value.ch2>5)
+		set_val.value.ch2 -= 5;
+	if(set_val.value.ch3>5)
+		set_val.value.ch3 -= 5;
+	if(set_val.value.ch4>5)
+		set_val.value.ch4 -= 5;
+}
+void Minus_CH4(void)
+{
+	if(set_val.value.ch4>5)
+		set_val.value.ch4 -= 5;
+}
 //保存当前的设定值到指定模式下的min值
 void Save_To_MIN(uint16_t mode_no)
 {
@@ -259,6 +293,22 @@ void Save_To_MAX(uint16_t mode_no)
 		MenuIVS[pos+i*2+1].ItemValue = set_val.buf[i];
 	backup_data();
 	recover_data();
+}
+//恢复当前模式的最低档数据
+void Recover_To_MIN(uint16_t mode_no)
+{
+	uint16_t pos,i;
+	pos = mode_no*8;
+	for(i=0;i<4;i++)
+		set_val.buf[i] = MenuIVS[pos+i*2].ItemValue;
+}
+//恢复当前模式的最高档数据
+void Recover_To_MAX(uint16_t mode_no)
+{
+	uint16_t pos,i;
+	pos = mode_no*8;
+	for(i=0;i<4;i++)
+		set_val.buf[i] = MenuIVS[pos+i*2+1].ItemValue;
 }
 
 void Set_Gain(uint16_t data)
@@ -375,6 +425,8 @@ void RIR_CTL(short int rir_c)
 {
 	//uint16_t tpch,tp_dacvalue;
 	short int tp_rir;
+	if(curr_status.value.sys_set&0x80)//设置中
+		return;
 	
 	tp_rir = curr_status.value.rir;
 	tp_rir += rir_c;
@@ -456,6 +508,7 @@ void recover_data(void)
 	for(i=0;i<sizeof(curr_status)/2;i++)
 		curr_status.buf16[i] = pbuf[i];
 	curr_status.value.rir = 0;	
+	curr_status.value.error_Flag = 0;
 	
 	if(curr_status.value.lum_grade > LUM_GRADE_NUMB -1)
 		curr_status.value.lum_grade  = 0;

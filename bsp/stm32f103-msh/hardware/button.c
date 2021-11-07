@@ -253,6 +253,59 @@ void button_1( unsigned char flag )
 	{
 			if(curr_status.value.pow_fg==OFF)
 				Event_Power();
+			else
+			{	
+				if((buttons[BUTTON_3].status & BUTTON_PRESSED) && (buttons[BUTTON_4].status & BUTTON_PRESSED))
+				{
+					if(curr_status.value.sys_set&0x80)
+					{//save data
+						if(curr_status.value.mode == MODE_LUM)
+						{
+								if(curr_status.value.lum_grade==(LUM_GRADE_NUMB-1))//max level
+									Save_To_MAX(MODE_LUM);
+								else
+									Save_To_MIN(MODE_LUM);
+						}
+						else if(curr_status.value.mode == MODE_QJ)//模式2
+						{
+								if(curr_status.value.qj_grade==(QJ_GP_NUMB-1))//max level
+									Save_To_MAX(MODE_QJ);
+								else
+									Save_To_MIN(MODE_QJ);
+						}
+						curr_status.value.sys_set &= 0x7F;//退出设置
+					}
+					else
+					{	
+						if(curr_status.value.mode == MODE_LUM)//模式0
+						{
+							if(curr_status.value.lum_grade==(LUM_GRADE_NUMB-1))//max level
+							{
+								Recover_To_MAX(MODE_LUM);//恢复照度，去除补偿影响
+								curr_status.value.sys_set |= 0x80;//使能设置
+							}
+							if(curr_status.value.lum_grade==0)//min level	
+							{
+								Recover_To_MIN(MODE_LUM);//恢复照度，去除补偿影响
+								curr_status.value.sys_set |= 0x80;//使能设置
+							}
+						}
+						else if(curr_status.value.mode == MODE_QJ)//模式0
+						{
+							if(curr_status.value.qj_grade ==(QJ_GP_NUMB-1))//max level
+							{
+								Recover_To_MAX(MODE_QJ);//恢复照度，去除补偿影响
+								curr_status.value.sys_set |= 0x80;//使能设置
+							}
+							if(curr_status.value.qj_grade==0)//min level	
+							{
+								Recover_To_MIN(MODE_QJ);//恢复照度，去除补偿影响
+								curr_status.value.sys_set |= 0x80;//使能设置
+							}
+						}
+					}
+				}
+			}
 	}
 	#ifdef BUTTON_LONG_PRESS
 	else if(flag == BUTTON_LONG_PRESSED)
@@ -279,8 +332,11 @@ void button_2( unsigned char flag )
 	{
 		if(curr_status.value.pow_fg==ON)
 		{
-			curr_status.value.mode = MODE_LUM;
-			Event_Mode();
+			if((curr_status.value.sys_set&0x80)==0)
+			{//非设置状态
+				curr_status.value.mode = MODE_LUM;
+				Event_Mode();
+			}
 		}
 	}
 	#ifdef BUTTON_LONG_PRESS
@@ -304,7 +360,15 @@ void button_3( unsigned char flag )
 	RT_DEBUG_LOG(BUTTON_DEBUG,("button_3 %d!\r\n",flag));
 	if( flag == BUTTON_DOWN )
 	{
-		Event_Minus();
+		if(curr_status.value.sys_set&0x80)
+		{//设置状态
+			if(curr_status.value.mode == MODE_LUM)
+				Minus_V4();
+			else
+				Minus_CH4();
+		}
+		else
+			Event_Minus();
 	}
 	#ifdef BUTTON_LONG_PRESS
 	else if(flag == BUTTON_LONG_PRESSED)
@@ -328,7 +392,15 @@ void button_4( unsigned char flag )
 	RT_DEBUG_LOG(BUTTON_DEBUG,("button_4 %d!\r\n",flag));
 	if( flag == BUTTON_DOWN )
 	{
-		Event_Add();
+		if(curr_status.value.sys_set&0x80)
+		{//设置状态
+				if(curr_status.value.mode == MODE_LUM)
+					Add_V4();
+				else
+					Add_CH4();
+		}
+		else
+			Event_Add();
 	}
 	#ifdef BUTTON_LONG_PRESS
 	else if(flag == BUTTON_LONG_PRESSED)
@@ -353,8 +425,11 @@ void button_5( unsigned char flag )
 	{
 		if(curr_status.value.pow_fg==ON)
 		{
-			curr_status.value.mode = MODE_QJ ;
-			Event_Mode();
+			if((curr_status.value.sys_set&0x80)==0)
+			{//非设置状态
+				curr_status.value.mode = MODE_QJ ;
+				Event_Mode();
+			}
 		}
 	}
 	#ifdef BUTTON_LONG_PRESS
@@ -380,8 +455,11 @@ void button_6( unsigned char flag )
 	{
 		if(curr_status.value.pow_fg==ON)
 		{
-			curr_status.value.mode = MODE_DEPTH;
-			Event_Mode();
+			if((curr_status.value.sys_set&0x80)==0)
+			{//非设置状态
+				curr_status.value.mode = MODE_DEPTH;
+				Event_Mode();
+			}
 		}
 	}
 	#ifdef BUTTON_LONG_PRESS
@@ -767,7 +845,7 @@ static void button_scan_entey(void *parameter)
 					if(buttons[BUTTON_1].count < 150 )	//3000ms
 					{	
 						buttons[BUTTON_1].count++;
-						if(buttons[BUTTON_1].count >= 150)
+						if(buttons[BUTTON_1].count >= 75)
 						{
 							process[BUTTON_1](BUTTON_LONG_PRESSED);
 							buttons[BUTTON_1].count=0;//--;
