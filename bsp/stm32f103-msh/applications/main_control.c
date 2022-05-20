@@ -82,7 +82,7 @@ void Led_Blink(void)
 //	if(curr_status.value.mode != MODE_LUM) 
 //		return;
 		
-	if(curr_status.value.sys_set & 0x08)//使能了阴影管理
+	if(curr_status.value.sys_set & 0x0C)//使能了阴影管理
 	{
 		if((curr_status.value.rir)&&(curr_status.value.mode == MODE_LUM))
 		{//
@@ -171,7 +171,7 @@ void Event_Updata_Set(void)
 			}
 						
 			//影阴补偿处理
-			if((curr_status.value.mode == MODE_LUM)&&(curr_status.value.sys_set & 0x08))
+			if((curr_status.value.mode == MODE_LUM)&&(curr_status.value.sys_set & 0x0C))
 			{
 				
 					//算法2：加指定的百分比 	140klx*1.15=161klx
