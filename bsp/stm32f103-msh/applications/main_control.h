@@ -44,6 +44,8 @@ typedef enum
 #define GP1_POW_GPIO_Port GPIOA
 #define QJ_POW_Pin GPIO_PIN_1
 #define QJ_POW_GPIO_Port GPIOA
+#define CAM_POW_Pin GPIO_PIN_11
+#define CAM_POW_GPIO_Port GPIOA
 
 typedef union
 {

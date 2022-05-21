@@ -331,6 +331,7 @@ void Event_Power(void)
 		curr_status.value.pow_fg = OFF;
 		HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(QJ_POW_GPIO_Port, QJ_POW_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(CAM_POW_GPIO_Port, CAM_POW_Pin, GPIO_PIN_RESET);
 	}
 	else{
 		curr_status.value.pow_fg = ON;
@@ -339,6 +340,7 @@ void Event_Power(void)
 		else
 			HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_SET);
 		HAL_GPIO_WritePin(QJ_POW_GPIO_Port, QJ_POW_Pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(CAM_POW_GPIO_Port, CAM_POW_Pin, GPIO_PIN_SET);
 	}
 	Event_Updata_Set();
 }
@@ -535,7 +537,7 @@ static void POW_GPIO_Init(void)
     HAL_GPIO_WritePin(GPIOA, GP1_POW_Pin, GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(GPIOA, QJ_POW_Pin, GPIO_PIN_RESET);
 		
-    GPIO_InitStruct.Pin   = QJ_POW_Pin|GP1_POW_Pin;
+    GPIO_InitStruct.Pin   = QJ_POW_Pin|GP1_POW_Pin|CAM_POW_Pin;
     GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
     GPIO_InitStruct.Pull  = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -543,6 +545,7 @@ static void POW_GPIO_Init(void)
 		
 		HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(QJ_POW_GPIO_Port, QJ_POW_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(CAM_POW_GPIO_Port, CAM_POW_Pin, GPIO_PIN_RESET);
 }
 
 void Panel_Init(void)
