@@ -190,16 +190,15 @@ static void ADCread_scan_entey(void *parameter)
 		{
 			if((set_val.buf[0]== curr_val.buf[0]) && (set_val.buf[1]== curr_val.buf[1]) && (set_val.buf[2]== curr_val.buf[2]))
 			{
-				//每通道采样5次
-				for(numb=0;numb<5;numb++)
-				{
 					for(ch=0;ch<7;ch++)
 					{
 						CD4051_Ch_Select(ch);
-						rt_thread_mdelay(200);
-						ad_group[ch][numb] = Get_Adc();
+						rt_thread_mdelay(100);
+						//每通道采样5次
+						for(numb=0;numb<5;numb++)
+							ad_group[ch][numb] = Get_Adc();
 					}
-				}
+				
 				CD4051_Ch_Select(7);
 				//取平均值
 				for(ch=0;ch<7;ch++)

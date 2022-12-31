@@ -171,7 +171,7 @@ int main(void)
 		tof_read_start();//TOF10120_Init();
 	
 		thread_pwm_start();
-	  thread_adc_init();
+	  //thread_adc_init();
 		thread_nrf_init();
 		oled_thd_start();
 		//thread_usart3_init();
