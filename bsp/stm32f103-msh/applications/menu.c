@@ -121,14 +121,7 @@ sMenuItemValue MenuIVS[MENUITEMVALUE_NO] = {
 //gain :20
 #if 1
 sMenuItemValue MenuIVS[MENUITEMVALUE_NO] = {
-//	{350,350,0x0046,PARA_MAX,1},// 当前值， 默认值， 最小值， 最大值 ，放大倍数
-//	{990,990,0x0046,PARA_MAX,1},	
-//	{350,350,0x0046,PARA_MAX,1},
-//	{990,990,0x0046,PARA_MAX,1},
-//	{350,350,0x0046,PARA_MAX,1},
-//	{990,990,0x0046,PARA_MAX,1},
-//	{350,350,0x0046,PARA_MAX,1},
-//	{990,990,0x0046,PARA_MAX,1},
+
 	// 当前值， 默认值， 最小值， 最大值 ，放大倍数
 	{350,350,0x0046,PARA_MAX,1},
 	{990,990,0x0046,PARA_MAX,1},	
@@ -158,8 +151,8 @@ sMenuItemValue MenuIVS[MENUITEMVALUE_NO] = {
 	{150,150,0x0046,PARA_MAX-300,1},
 	{800,800,0x0046,PARA_MAX-300,1},
 	
-	{0x0014,0x0014,0x0001,0x002D,1},
-	{0x001B,0x001B,0x0001,0x002D,1},
+	{0x0032,0x0032,0x0001,0x0064,1},
+	{0x0064,0x0064,0x0001,0x0064,1},
 };
 #endif
 

@@ -20,7 +20,7 @@ rt_sem_t  sem_warning = RT_NULL;
 pwm_value_union set_val;//设定值
 union_status curr_status;//当前状态
 
-union_ch_value Mode_GP[MODE_NUMBER];	//设定的各模式下参数
+union_ch_value Mode_GP[MODE_NUMBER];	//设定的各模式下参数 普通模式，光深模式，腔镜模式
 union_para SYS_PARA;	//系统参数
 
 uint8_t SET_FACTORY_FLAG;	//回复出厂设置标志
@@ -136,18 +136,18 @@ void Event_Updata_Set(void)
 		if(curr_status.value.mode < MODE_QJ )
 		{
 			if(curr_status.value.lum_grade == 0){//照度最低档处理
-				temp_p.value.ch1 = tp_lum_p->value.ch1_min;
-				temp_p.value.ch2 = tp_lum_p->value.ch2_min;
-				temp_p.value.ch3 = tp_lum_p->value.ch3_min;
-				temp_p.value.ch4 = tp_lum_p->value.ch4_min;
+				temp_p.value.ch1 = tp_lum_p->value.ch1_min;	//fudeng1
+				temp_p.value.ch2 = tp_lum_p->value.ch1_min;	//fudeng2
+				temp_p.value.ch3 = tp_lum_p->value.ch1_min;	//fudeng3
+				temp_p.value.ch4 = tp_lum_p->value.ch4_min;	//zhudeng
+				temp_p.value.ch5 = tp_lum_p->value.ch2_min; //red
 			}	
 			else if(curr_status.value.lum_grade == (LUM_GRADE_NUMB-1)){//if(curr_status.lum_grade == (LUM_GRADE_NUMB-1))//照度最高档处理
 				temp_p.value.ch1 = tp_lum_p->value.ch1_max;
-				temp_p.value.ch2 = tp_lum_p->value.ch2_max;
-				temp_p.value.ch3 = tp_lum_p->value.ch3_max;
+				temp_p.value.ch2 = tp_lum_p->value.ch1_max;
+				temp_p.value.ch3 = tp_lum_p->value.ch1_max;
 				temp_p.value.ch4 = tp_lum_p->value.ch4_max;
-	//			temp_p.value.ch6 = tp_facula_p->value.ch6_max;
-	//			temp_p.value.ch7 = tp_facula_p->value.ch7_max;
+				temp_p.value.ch5 = tp_lum_p->value.ch2_max;
 			}
 			else{// if(curr_status.value.lum_grade < (LUM_GRADE_NUMB-1)){//照度中间档处理
 				//当前照度计算公式； 照度= 最小值+ 照度等级*（最大值-最小值）/总等级数
@@ -155,7 +155,11 @@ void Event_Updata_Set(void)
 					temp_p.value.ch1 = tp_lum_p->value.ch1_min + curr_status.value.lum_grade*(tp_lum_p->value.ch1_max - tp_lum_p->value.ch1_min)/(LUM_GRADE_NUMB-1);
 				else
 					temp_p.value.ch1 = tp_lum_p->value.ch1_min;
-				if(tp_lum_p->value.ch2_max > tp_lum_p->value.ch2_min)
+				
+				temp_p.value.ch2 = temp_p.value.ch1;
+				temp_p.value.ch3 = temp_p.value.ch1;
+				
+				/*if(tp_lum_p->value.ch2_max > tp_lum_p->value.ch2_min)
 					temp_p.value.ch2 = tp_lum_p->value.ch2_min + curr_status.value.lum_grade*(tp_lum_p->value.ch2_max - tp_lum_p->value.ch2_min)/(LUM_GRADE_NUMB-1);
 				else
 					temp_p.value.ch2 = tp_lum_p->value.ch2_min;
@@ -163,42 +167,76 @@ void Event_Updata_Set(void)
 					temp_p.value.ch3 = tp_lum_p->value.ch3_min + curr_status.value.lum_grade*(tp_lum_p->value.ch3_max - tp_lum_p->value.ch3_min)/(LUM_GRADE_NUMB-1);
 				else
 					temp_p.value.ch3 = tp_lum_p->value.ch3_min;
-				
+				*/
 				if(tp_lum_p->value.ch4_max > tp_lum_p->value.ch4_min)
 					temp_p.value.ch4 = tp_lum_p->value.ch4_min + curr_status.value.lum_grade*(tp_lum_p->value.ch4_max - tp_lum_p->value.ch4_min)/(LUM_GRADE_NUMB-1);
 				else
 					temp_p.value.ch4 = tp_lum_p->value.ch4_min;
+				
+				if(tp_lum_p->value.ch2_max > tp_lum_p->value.ch2_min)
+					temp_p.value.ch5 = tp_lum_p->value.ch2_min + curr_status.value.lum_grade*(tp_lum_p->value.ch2_max - tp_lum_p->value.ch2_min)/(LUM_GRADE_NUMB-1);
+				else
+					temp_p.value.ch5 = tp_lum_p->value.ch2_min;
 			}
 						
 			//影阴补偿处理
 			if((curr_status.value.mode == MODE_LUM)&&(curr_status.value.sys_set & 0x0C))
 			{
+				//算法3：加固定的百分比 	140klx*1.15=161klx
+				if(curr_status.value.rir > 0)
+				{
+					 tp_pwm = temp_p.value.ch1*SYS_PARA.value.gain_step/100;
+					 temp_p.value.ch1 += tp_pwm;
+					 if(temp_p.value.ch1 > MenuIVS[8+1].MaxValue)//PWM_MAX_VALUE)
+					     temp_p.value.ch1 = MenuIVS[8+1].MaxValue;//小于最大值
+					 temp_p.value.ch2 = temp_p.value.ch1;
+				   temp_p.value.ch3 = temp_p.value.ch1;
+					 
+					 tp_pwm = temp_p.value.ch4*SYS_PARA.value.gain_step/100;
+					 temp_p.value.ch4 += tp_pwm;
+					 if(temp_p.value.ch4 > MenuIVS[8+7].MaxValue)//小于最大值
+						 temp_p.value.ch4 = MenuIVS[8+7].MaxValue;
+					
+					 tp_pwm = temp_p.value.ch5*SYS_PARA.value.gain_step/100;
+					 temp_p.value.ch5 += tp_pwm;
+					 if(temp_p.value.ch5 > MenuIVS[8+3].MaxValue)//小于最大值
+						 temp_p.value.ch5 = MenuIVS[8+3].MaxValue;
+				}
 				
-					//算法2：加指定的百分比 	140klx*1.15=161klx
-				tp_pwm = temp_p.value.ch1*SYS_PARA.value.gain_step*curr_status.value.rir/100;
-				temp_p.value.ch1 += tp_pwm;
-				if(temp_p.value.ch1 > MenuIVS[8+1].MaxValue)//PWM_MAX_VALUE)
-					temp_p.value.ch1 = MenuIVS[8+1].MaxValue;//小于最大值
-				
-				tp_pwm = temp_p.value.ch2*SYS_PARA.value.gain_step*curr_status.value.rir/100;
-				temp_p.value.ch2 += tp_pwm;
-				if(temp_p.value.ch2 > MenuIVS[8+3].MaxValue)//PWM_MAX_VALUE)
-					temp_p.value.ch2 = MenuIVS[8+3].MaxValue;//小于最大值
-				
-				tp_pwm = temp_p.value.ch3*SYS_PARA.value.gain_step*curr_status.value.rir/100;
-				temp_p.value.ch3 += tp_pwm;
-				if(temp_p.value.ch3 > MenuIVS[8+5].MaxValue)//PWM_MAX_VALUE)
-					temp_p.value.ch3 = MenuIVS[8+5].MaxValue;//小于最大值
-								
-				tp_pwm = temp_p.value.ch4*SYS_PARA.value.gain_step*curr_status.value.rir/100;
-				temp_p.value.ch4 += tp_pwm;
-				if(temp_p.value.ch4 > MenuIVS[8+7].MaxValue)//小于最大值
-					temp_p.value.ch4 = MenuIVS[8+7].MaxValue;
+//					//算法2：加指定的百分比 	140klx*1.15=161klx
+//				tp_pwm = temp_p.value.ch1*SYS_PARA.value.gain_step*curr_status.value.rir/100;
+//				temp_p.value.ch1 += tp_pwm;
+//				if(temp_p.value.ch1 > MenuIVS[8+1].MaxValue)//PWM_MAX_VALUE)
+//					temp_p.value.ch1 = MenuIVS[8+1].MaxValue;//小于最大值
+//				
+//				temp_p.value.ch2 = temp_p.value.ch1;
+//				temp_p.value.ch3 = temp_p.value.ch1;
+//				
+//				/*tp_pwm = temp_p.value.ch2*SYS_PARA.value.gain_step*curr_status.value.rir/100;
+//				temp_p.value.ch2 += tp_pwm;
+//				if(temp_p.value.ch2 > MenuIVS[8+3].MaxValue)//PWM_MAX_VALUE)
+//					temp_p.value.ch2 = MenuIVS[8+3].MaxValue;//小于最大值
+//				
+//				tp_pwm = temp_p.value.ch3*SYS_PARA.value.gain_step*curr_status.value.rir/100;
+//				temp_p.value.ch3 += tp_pwm;
+//				if(temp_p.value.ch3 > MenuIVS[8+5].MaxValue)//PWM_MAX_VALUE)
+//					temp_p.value.ch3 = MenuIVS[8+5].MaxValue;//小于最大值
+//				*/
+//				
+//				tp_pwm = temp_p.value.ch4*SYS_PARA.value.gain_step*curr_status.value.rir/100;
+//				temp_p.value.ch4 += tp_pwm;
+//				if(temp_p.value.ch4 > MenuIVS[8+7].MaxValue)//小于最大值
+//					temp_p.value.ch4 = MenuIVS[8+7].MaxValue;
+//				
+//				tp_pwm = temp_p.value.ch5*SYS_PARA.value.gain_step*curr_status.value.rir/100;
+//				temp_p.value.ch5 += tp_pwm;
+//				if(temp_p.value.ch5 > MenuIVS[8+3].MaxValue)//小于最大值
+//					temp_p.value.ch5 = MenuIVS[8+3].MaxValue;
 			}
 		}
 		else
 		{//重新计算腔镜模式下的设定值
-			for(i=0;i<4;i++)
+			for(i=0;i<6;i++)
 				temp_p.buf[i] = 0;
 			if(curr_status.value.qj_grade == 0)//照度最低档处理
 				temp_p.value.ch4 = tp_lum_p->value.ch4_min;
@@ -216,13 +254,13 @@ void Event_Updata_Set(void)
 	}
 	else //(curr_status.value.pow_fg == OFF)
 	{
-		for(i=0;i<4;i++)
+		for(i=0;i<6;i++)
 			temp_p.buf[i] = 0;
 		pwm_output_clear();
 	}
 	
 	//刷新目标值
-	for(i=0;i<4;i++)
+	for(i=0;i<6;i++)
 		set_val.buf[i] = temp_p.buf[i];
 	
 	//刷新手柄状态指示
@@ -239,6 +277,12 @@ void Set_V4(uint16_t ch1,uint16_t ch2,uint16_t ch3,uint16_t ch4)
 	set_val.value.ch3 = ch3;
 	set_val.value.ch4 = ch4;
 }
+void Set_Red(uint16_t ch5)
+{
+	set_val.value.ch5 = ch5;
+}
+	
+	
 //各通道当前的设定值加5
 void Add_V4(void)
 {
@@ -278,8 +322,11 @@ void Save_To_MIN(uint16_t mode_no)
 {
 	uint16_t pos,i;
 	pos = mode_no*8;
-	for(i=0;i<4;i++)
-		MenuIVS[pos+i*2].ItemValue = set_val.buf[i];
+	//for(i=0;i<4;i++)
+		//MenuIVS[pos+i*2].ItemValue = set_val.buf[i];
+	MenuIVS[pos].ItemValue = set_val.buf[0];//副灯
+	MenuIVS[pos+6].ItemValue = set_val.buf[3];//主灯
+	MenuIVS[pos+2].ItemValue = set_val.buf[4];//红色灯
 	
 	backup_data();
 	recover_data();
@@ -289,8 +336,12 @@ void Save_To_MAX(uint16_t mode_no)
 {
 	uint16_t pos,i;
 	pos = mode_no*8;
-	for(i=0;i<4;i++)
-		MenuIVS[pos+i*2+1].ItemValue = set_val.buf[i];
+	//for(i=0;i<4;i++)
+		//MenuIVS[pos+i*2+1].ItemValue = set_val.buf[i];
+	MenuIVS[pos+1].ItemValue = set_val.buf[0];//副灯
+	MenuIVS[pos+7].ItemValue = set_val.buf[3];//主灯
+	MenuIVS[pos+3].ItemValue = set_val.buf[4];//红色灯
+	
 	backup_data();
 	recover_data();
 }
@@ -299,16 +350,27 @@ void Recover_To_MIN(uint16_t mode_no)
 {
 	uint16_t pos,i;
 	pos = mode_no*8;
-	for(i=0;i<4;i++)
-		set_val.buf[i] = MenuIVS[pos+i*2].ItemValue;
+	//for(i=0;i<4;i++)
+		//set_val.buf[i] = MenuIVS[pos+i*2].ItemValue;
+	set_val.buf[0] = MenuIVS[pos].ItemValue;//副灯1
+	set_val.buf[1] = MenuIVS[pos].ItemValue;//副灯2
+	set_val.buf[2] = MenuIVS[pos].ItemValue;//副灯3
+	set_val.buf[3] = MenuIVS[pos+6].ItemValue;//主灯
+	set_val.buf[4] = MenuIVS[pos+2].ItemValue;//红色灯
+
 }
 //恢复当前模式的最高档数据
 void Recover_To_MAX(uint16_t mode_no)
 {
 	uint16_t pos,i;
 	pos = mode_no*8;
-	for(i=0;i<4;i++)
-		set_val.buf[i] = MenuIVS[pos+i*2+1].ItemValue;
+	//for(i=0;i<4;i++)
+		//set_val.buf[i] = MenuIVS[pos+i*2+1].ItemValue;
+	set_val.buf[0] = MenuIVS[pos+1].ItemValue;//副灯1
+	set_val.buf[1] = MenuIVS[pos+1].ItemValue;//副灯2
+	set_val.buf[2] = MenuIVS[pos+1].ItemValue;//副灯3
+	set_val.buf[3] = MenuIVS[pos+7].ItemValue;//主灯
+	set_val.buf[4] = MenuIVS[pos+3].ItemValue;//红色灯
 }
 
 void Set_Gain(uint16_t data)
@@ -318,7 +380,7 @@ void Set_Gain(uint16_t data)
 
 void Save_Gain(void)
 {
-	MenuIVS[32].ItemValue = SYS_PARA.value.gain_step;
+	MenuIVS[24].ItemValue = SYS_PARA.value.gain_step;
 	backup_data();
 	recover_data();
 }
@@ -504,7 +566,8 @@ void recover_data(void)
 	
 	SYS_PARA.value.gain_step = pbuf[i];
 	SYS_PARA.value.gain_max  = pbuf[i+1];
-	
+	if(SYS_PARA.value.gain_step > SYS_PARA.value.gain_max)
+		SYS_PARA.value.gain_step = SYS_PARA.value.gain_max;
 	pbuf = &flash_eeprom_buffer[1+MENUITEMVALUE_NO];
 	
 	for(i=0;i<sizeof(curr_status)/2;i++)

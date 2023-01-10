@@ -74,10 +74,10 @@ typedef union
 			uint16_t ch3_max;
 			uint16_t ch4_min;
 			uint16_t ch4_max;
-//			uint16_t ch5_min;
-//			uint16_t ch5_max;
-//			uint16_t ch6_min;
-//			uint16_t ch6_max;
+			/*uint16_t ch5_min;
+			uint16_t ch5_max;
+			uint16_t ch6_min;
+			uint16_t ch6_max;*/
 	}value;
 	uint8_t buf[16];
 	uint16_t buf16[8];
@@ -165,6 +165,7 @@ void backup_data(void);
 void recover_data(void);
 //debug function
 void Set_V4(uint16_t ch1,uint16_t ch2,uint16_t ch3,uint16_t ch4);
+void Set_Red(uint16_t ch5);
 void Save_To_MIN(uint16_t mode_no);
 void Save_To_MAX(uint16_t mode_no);
 void Set_Gain(uint16_t data);

@@ -4,6 +4,7 @@
 #include "main_control.h"
 
 extern TIM_HandleTypeDef htim3;
+extern TIM_HandleTypeDef htim4;
 extern void Error_Handler(void);
 extern pwm_value_union set_val;//设定值
 
@@ -28,7 +29,17 @@ void MX_TIM3_PWM_Start(void)
 	HAL_TIM_Base_Start(&htim3);
   /* USER CODE END TIM3_Init 2 */
 }	
-
+void MX_TIM4_PWM_Start(void)
+{
+	/* Peripheral clock enable */
+    __HAL_RCC_TIM4_CLK_ENABLE();
+	//HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_1);
+	HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_2);
+	//HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_3);
+	//HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_4);
+	HAL_TIM_Base_Start(&htim4);
+  /* USER CODE END TIM4_Init 2 */
+}
 
 //pwm各通道值设置
 uint8_t TIM3_PWM_Set_Channel(uint8_t ch,uint16_t value)
@@ -45,6 +56,20 @@ uint8_t TIM3_PWM_Set_Channel(uint8_t ch,uint16_t value)
 		return 1;
 	return 0;
 }
+uint8_t TIM4_PWM_Set_Channel(uint8_t ch,uint16_t value)
+{
+	if(ch==1)
+		TIM4->CCR1 = value;
+	else if(ch==2)
+		TIM4->CCR2 = value;
+	/*else if(ch==3)
+		TIM3->CCR3 = value;
+	else if(ch==4)
+		TIM3->CCR4 = value;*/
+	else
+		return 1;
+	return 0;
+}
 //pwm值输出
 void pwm_output(void)
 {
@@ -52,18 +77,22 @@ void pwm_output(void)
 	TIM3_PWM_Set_Channel(2,curr_val.value.ch2);
 	TIM3_PWM_Set_Channel(3,curr_val.value.ch3);
 	TIM3_PWM_Set_Channel(4,curr_val.value.ch4);
+	//TIM4_PWM_Set_Channel(1,curr_val.value.ch5);
+	TIM4_PWM_Set_Channel(2,curr_val.value.ch5);
 }
 
 //pwm值输出清零
 void pwm_output_clear(void)
 {
 	uint16_t i;
-	for(i=0;i<4;i++)
+	for(i=0;i<6;i++)
 		curr_val.buf[i]=0;
 	TIM3_PWM_Set_Channel(1,curr_val.value.ch1);
 	TIM3_PWM_Set_Channel(2,curr_val.value.ch2);
 	TIM3_PWM_Set_Channel(3,curr_val.value.ch3);
 	TIM3_PWM_Set_Channel(4,curr_val.value.ch4);
+	//TIM4_PWM_Set_Channel(1,curr_val.value.ch5);
+	TIM4_PWM_Set_Channel(2,curr_val.value.ch5);
 }
 
 //通道值缓冲变化
@@ -111,10 +140,13 @@ void pwm_buffer(void)
 static void pwm_scan_entey(void *parameter)
 {
 		MX_TIM3_PWM_Start();
+		MX_TIM4_PWM_Start();
 		curr_val.value.ch1 = 0;
 		curr_val.value.ch2 = 0;
 		curr_val.value.ch3 = 0;
 		curr_val.value.ch4 = 0;
+		curr_val.value.ch5 = 0;
+		curr_val.value.ch6 = 0;
 		while(1)
 		{
 			pwm_buffer();

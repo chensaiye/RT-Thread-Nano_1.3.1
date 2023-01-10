@@ -18,6 +18,7 @@ struct _m_db_nametab db_nametab[]=
 	(void*)Event_Minus,"void Event_Minus(void)",
 		
 	(void*)Set_V4,"Set_V4(uint16_t ch1,uint16_t ch2,uint16_t ch3,uint16_t ch4)",
+	(void*)Set_Red,"Set_Red(uint16_t ch5)",
 	(void*)Save_To_MIN,"void Save_To_MIN(uint16_t mode_no)",
 	(void*)Save_To_MAX,"void Save_To_MAX(uint16_t mode_no)",
 	(void*)Set_Gain,"void Set_Gain(uint16_t data)",
