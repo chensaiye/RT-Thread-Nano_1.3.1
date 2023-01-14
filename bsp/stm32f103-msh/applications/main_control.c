@@ -25,7 +25,7 @@ union_para SYS_PARA;	//系统参数
 
 uint8_t SET_FACTORY_FLAG;	//回复出厂设置标志
 uint8_t MY_BUS_ADDR;
-const uint16_t LED_table[MAX_LEVEL] ={0x0001,0x0003,0x0007,0x000F,0x001F,0x003F,0x007F,0x00FF,0x01FF,0x03FF};
+const uint16_t LED_table[MAX_LEVEL] ={0x0001,0x0003,0x0007,0x000F,0x001F,0x003F,0x007F,0x00FF};//,0x01FF,0x03FF};
 //const uint16_t PWM_table[MAX_LEVEL] ={100,300,600,800,1000,1200,1400,1600,1800,2000};
 //uint8_t SOFT_VERSION[] = "V1.1.0";
 extern sMenuItemValue MenuIVS[];
@@ -41,6 +41,7 @@ void led_manual_updata(void)
 	led_status = 0;
 	if(curr_status.value.pow_fg==ON)
 	{
+		#if 0 //10档触摸按键
 		led_status |= (0x01 << 10);	//power led
 		//由于更换了模式按键位置，故模式2、3的指示灯需对调
 		if(curr_status.value.mode == MODE_LUM)
@@ -53,7 +54,15 @@ void led_manual_updata(void)
 		
 		if(curr_status.value.error_Flag)
 			led_status |= (0x01 << 15);	//warning flag
+		#endif
 		
+		#if 1 //8档微动开关
+		led_status |= (0x01 << 8);	//power led
+		if(curr_status.value.mode == MODE_QJ)
+		{
+			led_status |= (0x01 << 9);	//
+		}
+	  #endif
 		//level led
 		if(curr_status.value.mode == MODE_LUM)
 			led_status |=  LED_table[curr_status.value.lum_grade];

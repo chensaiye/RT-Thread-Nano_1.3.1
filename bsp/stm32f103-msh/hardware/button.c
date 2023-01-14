@@ -334,7 +334,10 @@ void button_2( unsigned char flag )
 		{
 			if((curr_status.value.sys_set&0x80)==0)
 			{//∑«…Ë÷√◊¥Ã¨
-				curr_status.value.mode = MODE_LUM;
+				if(curr_status.value.mode == MODE_LUM)
+					curr_status.value.mode = MODE_QJ;
+				else
+					curr_status.value.mode = MODE_LUM;
 				Event_Mode();
 			}
 		}
