@@ -16,5 +16,5 @@
 
 static int Led_595_Init(void);//≥ı ºªØ
 void Led_Set_16Bit(uint16_t value);
-
+void Led_Set(uint8_t value);
 #endif

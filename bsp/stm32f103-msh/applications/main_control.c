@@ -35,6 +35,30 @@ extern void pwm_output_clear(void);//
 extern int SM4_Init(void);//初始化
 extern uint8_t SM4_Get_Date(void);
 //根据curr_status 刷新显示
+#if 1 //8 level but 6 LED
+const uint8_t LED_table6[MAX_LEVEL] ={0x04,0x0C,0x0C,0x1C,0x3C,0x7C,0x7C,0xFC};
+
+void led_manual_updata(void)
+{
+	uint8_t led_status;
+	led_status = 0;
+	if(curr_status.value.pow_fg==ON)
+	{
+		 led_status |= (0x01);	//power led
+		 if(curr_status.value.mode == MODE_QJ)
+		 {
+			 led_status |= (0x02);	//mode led
+			 led_status |= LED_table[curr_status.value.qj_grade];//level led
+		 }
+		 else
+		 {
+		   led_status |=  LED_table6[curr_status.value.lum_grade];//level led
+		 }
+	}
+	led_status ^= 0xFF;	//按位取反
+	Led_Set(led_status);
+}
+#else
 void led_manual_updata(void)
 {
 	uint16_t led_status;
@@ -79,7 +103,7 @@ void led_manual_updata(void)
 	led_status ^= 0xFFFF;	//按位取反
 	Led_Set_16Bit(led_status);
 }
-
+#endif
 void Led_Blink(void)
 {
 	static uint16_t blink_count;
@@ -443,6 +467,8 @@ void Event_Mode(void)
 //	}
 	if(curr_status.value.mode != MODE_QJ)
 			HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_SET);
+	else
+		  HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_RESET);
 	Event_Updata_Set();
 }
 

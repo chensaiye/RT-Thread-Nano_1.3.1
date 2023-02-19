@@ -45,26 +45,26 @@ static int Led_595_Init(void)
 INIT_BOARD_EXPORT(Led_595_Init);
 
 //写595数据发光二极管数据
-//void Led_Set(uint8_t value)
-//{
-//	uint8_t i;
-//	HAL_GPIO_WritePin(GPIOA,HC595_LATCH, GPIO_PIN_RESET);
-//	rt_hw_us_delay(5);
-//	for( i=0; i<8; i++ )
-//	{
-//		HAL_GPIO_WritePin(GPIOA,HC595_CLK, GPIO_PIN_RESET);
-//		rt_hw_us_delay(5);
-//   	   
-//		if( value & (0x80 >> i))
-//			HAL_GPIO_WritePin(GPIOA,HC595_DI, GPIO_PIN_SET);
-//		else
-//			HAL_GPIO_WritePin(GPIOA,HC595_DI, GPIO_PIN_RESET);
-//		rt_hw_us_delay(5);
-//		HAL_GPIO_WritePin(GPIOA,HC595_CLK, GPIO_PIN_SET);	
-//   	rt_hw_us_delay(5);
-//	}
-//	HAL_GPIO_WritePin(GPIOA,HC595_LATCH, GPIO_PIN_SET);
-//}
+void Led_Set(uint8_t value)
+{
+	uint8_t i;
+	HAL_GPIO_WritePin(LATCH_LED_GPIO_Port,LATCH_LED_Pin, GPIO_PIN_RESET);
+	rt_hw_us_delay(5);
+	for( i=0; i<8; i++ )
+	{
+		HAL_GPIO_WritePin(GPIOC,CLK_LED_Pin, GPIO_PIN_RESET);
+		rt_hw_us_delay(5);
+   	   
+		if( value & (0x80 >> i))
+			HAL_GPIO_WritePin(GPIOC,DI_LED_Pin, GPIO_PIN_SET);
+		else
+			HAL_GPIO_WritePin(GPIOC,DI_LED_Pin, GPIO_PIN_RESET);
+		rt_hw_us_delay(5);
+		HAL_GPIO_WritePin(GPIOC,CLK_LED_Pin, GPIO_PIN_SET);	
+   	rt_hw_us_delay(5);
+	}
+	HAL_GPIO_WritePin(LATCH_LED_GPIO_Port,LATCH_LED_Pin, GPIO_PIN_SET);
+}
 
 
 void Led_Set_16Bit(uint16_t value)
