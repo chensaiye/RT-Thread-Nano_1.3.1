@@ -48,7 +48,7 @@ void led_manual_updata(void)
 		 if(curr_status.value.mode == MODE_QJ)
 		 {
 			 led_status |= (0x02);	//mode led
-			 led_status |= LED_table[curr_status.value.qj_grade];//level led
+			 led_status |= LED_table6[curr_status.value.qj_grade];//level led
 		 }
 		 else
 		 {
