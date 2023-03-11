@@ -13,6 +13,7 @@
 #include "flash_eeprom.h"
 #include "sm4.h"
 
+//#define RED_COMPENSATE_ENABLE	1
 const uint16_t QJ_Min=100,QJ_Max=1000;
 
 rt_sem_t  sem_warning = RT_NULL;
@@ -173,14 +174,22 @@ void Event_Updata_Set(void)
 				temp_p.value.ch2 = tp_lum_p->value.ch1_min;	//fudeng2
 				temp_p.value.ch3 = tp_lum_p->value.ch1_min;	//fudeng3
 				temp_p.value.ch4 = tp_lum_p->value.ch4_min;	//zhudeng
-				temp_p.value.ch5 = tp_lum_p->value.ch2_min; //red
+				#ifdef RED_COMPENSATE_ENABLE
+					temp_p.value.ch5 = tp_lum_p->value.ch2_min; //red
+				#else
+					temp_p.value.ch5 = tp_lum_p->value.ch4_min; //red = zhudeng
+				#endif
 			}	
 			else if(curr_status.value.lum_grade == (LUM_GRADE_NUMB-1)){//if(curr_status.lum_grade == (LUM_GRADE_NUMB-1))//照度最高档处理
-				temp_p.value.ch1 = tp_lum_p->value.ch1_max;
-				temp_p.value.ch2 = tp_lum_p->value.ch1_max;
-				temp_p.value.ch3 = tp_lum_p->value.ch1_max;
-				temp_p.value.ch4 = tp_lum_p->value.ch4_max;
-				temp_p.value.ch5 = tp_lum_p->value.ch2_max;
+				temp_p.value.ch1 = tp_lum_p->value.ch1_max;//fudeng1
+				temp_p.value.ch2 = tp_lum_p->value.ch1_max;//fudeng2
+				temp_p.value.ch3 = tp_lum_p->value.ch1_max;//fudeng3
+				temp_p.value.ch4 = tp_lum_p->value.ch4_max;//zhudeng
+			#ifdef RED_COMPENSATE_ENABLE
+				temp_p.value.ch5 = tp_lum_p->value.ch2_max; //red
+			#else
+				temp_p.value.ch5 = tp_lum_p->value.ch4_max; //red = zhudeng
+			#endif
 			}
 			else{// if(curr_status.value.lum_grade < (LUM_GRADE_NUMB-1)){//照度中间档处理
 				//当前照度计算公式； 照度= 最小值+ 照度等级*（最大值-最小值）/总等级数
@@ -206,10 +215,15 @@ void Event_Updata_Set(void)
 				else
 					temp_p.value.ch4 = tp_lum_p->value.ch4_min;
 				
+		#ifdef RED_COMPENSATE_ENABLE
 				if(tp_lum_p->value.ch2_max > tp_lum_p->value.ch2_min)
 					temp_p.value.ch5 = tp_lum_p->value.ch2_min + curr_status.value.lum_grade*(tp_lum_p->value.ch2_max - tp_lum_p->value.ch2_min)/(LUM_GRADE_NUMB-1);
 				else
 					temp_p.value.ch5 = tp_lum_p->value.ch2_min;
+		#else
+				temp_p.value.ch5 = temp_p.value.ch4;//red = zhudeng
+		#endif
+				
 			}
 						
 			//影阴补偿处理
@@ -229,11 +243,16 @@ void Event_Updata_Set(void)
 					 temp_p.value.ch4 += tp_pwm;
 					 if(temp_p.value.ch4 > MenuIVS[8+7].MaxValue)//小于最大值
 						 temp_p.value.ch4 = MenuIVS[8+7].MaxValue;
-					
+					 
+				#ifdef RED_COMPENSATE_ENABLE
 					 tp_pwm = temp_p.value.ch5*SYS_PARA.value.gain_step/100;
 					 temp_p.value.ch5 += tp_pwm;
-					 if(temp_p.value.ch5 > MenuIVS[8+3].MaxValue)//小于最大值
+					 if(temp_p.value.ch5 > MenuIVS[8+3].MaxValue)//С??????
 						 temp_p.value.ch5 = MenuIVS[8+3].MaxValue;
+				#else
+					 temp_p.value.ch5 = temp_p.value.ch4;//red = zhudeng
+				#endif
+					 
 				}
 				
 //					//算法2：加指定的百分比 	140klx*1.15=161klx
@@ -283,6 +302,11 @@ void Event_Updata_Set(void)
 					temp_p.value.ch4 = tp_lum_p->value.ch4_min;
 			}
 			//temp_p.value.ch4 = QJ_Min + (QJ_Max-QJ_Min)*curr_status.value.qj_grade/9;
+		#ifdef RED_COMPENSATE_ENABLE
+    #else
+			temp_p.value.ch5 = temp_p.value.ch4;//red = zhudeng
+		#endif
+			
 		}
 	}
 	else //(curr_status.value.pow_fg == OFF)
@@ -309,6 +333,7 @@ void Set_V4(uint16_t ch1,uint16_t ch2,uint16_t ch3,uint16_t ch4)
 	set_val.value.ch2 = ch2;
 	set_val.value.ch3 = ch3;
 	set_val.value.ch4 = ch4;
+
 }
 void Set_Red(uint16_t ch5)
 {
@@ -327,11 +352,22 @@ void Add_V4(void)
 		set_val.value.ch3 += 5;
 	if(set_val.value.ch4 < PARA_MAX)
 		set_val.value.ch4 += 5;
+#ifdef RED_COMPENSATE_ENABLE
+	if(set_val.value.ch5 < PARA_MAX)
+		set_val.value.ch5 += 5;
+#else
+	set_val.value.ch5 = set_val.value.ch4;// red = zhudeng
+#endif
+
 }
 void Add_CH4(void)
 {
 	if(set_val.value.ch4 < PARA_MAX)
 		set_val.value.ch4 += 5;
+#ifdef RED_COMPENSATE_ENABLE
+#else
+	set_val.value.ch5 = set_val.value.ch4;// red = zhudeng
+#endif
 }
 //各通道当前的设定值加5
 void Minus_V4(void)
@@ -344,11 +380,21 @@ void Minus_V4(void)
 		set_val.value.ch3 -= 5;
 	if(set_val.value.ch4>5)
 		set_val.value.ch4 -= 5;
+#ifdef RED_COMPENSATE_ENABLE
+	if(set_val.value.ch5>5)
+		set_val.value.ch5 -= 5;
+#else
+	set_val.value.ch5 = set_val.value.ch4;// red = zhudeng
+#endif
 }
 void Minus_CH4(void)
 {
 	if(set_val.value.ch4>5)
 		set_val.value.ch4 -= 5;
+#ifdef RED_COMPENSATE_ENABLE
+#else
+	set_val.value.ch5 = set_val.value.ch4;// red = zhudeng
+#endif
 }
 //保存当前的设定值到指定模式下的min值
 void Save_To_MIN(uint16_t mode_no)
@@ -359,8 +405,10 @@ void Save_To_MIN(uint16_t mode_no)
 		//MenuIVS[pos+i*2].ItemValue = set_val.buf[i];
 	MenuIVS[pos].ItemValue = set_val.buf[0];//副灯
 	MenuIVS[pos+6].ItemValue = set_val.buf[3];//主灯
+#ifdef RED_COMPENSATE_ENABLE
 	MenuIVS[pos+2].ItemValue = set_val.buf[4];//红色灯
-	
+#else
+#endif
 	backup_data();
 	recover_data();
 }
@@ -373,8 +421,10 @@ void Save_To_MAX(uint16_t mode_no)
 		//MenuIVS[pos+i*2+1].ItemValue = set_val.buf[i];
 	MenuIVS[pos+1].ItemValue = set_val.buf[0];//副灯
 	MenuIVS[pos+7].ItemValue = set_val.buf[3];//主灯
+#ifdef RED_COMPENSATE_ENABLE
 	MenuIVS[pos+3].ItemValue = set_val.buf[4];//红色灯
-	
+#else
+#endif	
 	backup_data();
 	recover_data();
 }
@@ -389,8 +439,11 @@ void Recover_To_MIN(uint16_t mode_no)
 	set_val.buf[1] = MenuIVS[pos].ItemValue;//副灯2
 	set_val.buf[2] = MenuIVS[pos].ItemValue;//副灯3
 	set_val.buf[3] = MenuIVS[pos+6].ItemValue;//主灯
+#ifdef RED_COMPENSATE_ENABLE
 	set_val.buf[4] = MenuIVS[pos+2].ItemValue;//红色灯
-
+#else
+	set_val.buf[4] = set_val.buf[3];//红色灯 = 主灯
+#endif
 }
 //恢复当前模式的最高档数据
 void Recover_To_MAX(uint16_t mode_no)
@@ -403,7 +456,11 @@ void Recover_To_MAX(uint16_t mode_no)
 	set_val.buf[1] = MenuIVS[pos+1].ItemValue;//副灯2
 	set_val.buf[2] = MenuIVS[pos+1].ItemValue;//副灯3
 	set_val.buf[3] = MenuIVS[pos+7].ItemValue;//主灯
+#ifdef RED_COMPENSATE_ENABLE
 	set_val.buf[4] = MenuIVS[pos+3].ItemValue;//红色灯
+#else
+	set_val.buf[4] = set_val.buf[3];//红色灯 = 主灯
+#endif
 }
 
 void Set_Gain(uint16_t data)
