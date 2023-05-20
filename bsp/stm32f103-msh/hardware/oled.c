@@ -383,9 +383,9 @@ void OLED_Test(void)
 //	sprintf(str,"Mode:%d   RIR:%d",curr_status.value.mode,curr_status.value.rir);
 //	OLED_ShowString(0,1*8, (uint8_t *)str,CHARSIZE_8X6);	
 	
-	sprintf(str,"Run Info   NRF:   ");
+	sprintf(str,"6Touch 10Lvl NRF:   ");
 	OLED_ShowString(0,0, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"Run Info   NRF:%d  ",NRF_ERROR);
+	sprintf(str,"6Touch 10Lvl NRF:%d  ",NRF_ERROR);
 	OLED_ShowString(0,0, (uint8_t *)str,CHARSIZE_8X6);
 	
 	sprintf(str,"Mode:  RIR:  Dis:    ");
