@@ -104,6 +104,8 @@ void pwm_buffer(void)
 	{
 		if(set_val.buf[i]!= curr_val.buf[i])
 		{
+			curr_val.buf[i]=set_val.buf[i];
+			#if 0
 			if(curr_val.buf[i]>set_val.buf[i])
 			{
 				deff = curr_val.buf[i]-set_val.buf[i];
@@ -127,6 +129,7 @@ void pwm_buffer(void)
 				if(curr_val.buf[i]>set_val.buf[i])
 					curr_val.buf[i]=set_val.buf[i];
 			}
+			#endif
 		}
 	}
 	pwm_output();
