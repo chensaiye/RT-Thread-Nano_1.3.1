@@ -6,7 +6,7 @@
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim4;
 extern void Error_Handler(void);
-extern pwm_value_union set_val;//Éè¶¨Öµ
+extern pwm_value_union set_val;//ï¿½è¶¨Öµ
 
 #define PWM_THREAD_PRIORITY         6
 #define PWM_THREAD_STACK_SIZE       256
@@ -16,7 +16,7 @@ ALIGN(RT_ALIGN_SIZE)
 static char thd_pwm_stack[PWM_THREAD_STACK_SIZE];
 static struct rt_thread thd_pwm;
 
-pwm_value_union curr_val;//µ±Ç°Öµ
+pwm_value_union curr_val;//ï¿½ï¿½Ç°Öµ
 
 void MX_TIM3_PWM_Start(void)
 {
@@ -41,7 +41,7 @@ void MX_TIM4_PWM_Start(void)
   /* USER CODE END TIM4_Init 2 */
 }
 
-//pwm¸÷Í¨µÀÖµÉèÖÃ
+//pwmï¿½ï¿½Í¨ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½
 uint8_t TIM3_PWM_Set_Channel(uint8_t ch,uint16_t value)
 {
 	if(ch==1)
@@ -70,7 +70,7 @@ uint8_t TIM4_PWM_Set_Channel(uint8_t ch,uint16_t value)
 		return 1;
 	return 0;
 }
-//pwmÖµÊä³ö
+//pwmÖµï¿½ï¿½ï¿½
 void pwm_output(void)
 {
 	TIM3_PWM_Set_Channel(1,curr_val.value.ch1);
@@ -81,7 +81,7 @@ void pwm_output(void)
 	TIM4_PWM_Set_Channel(2,curr_val.value.ch5);
 }
 
-//pwmÖµÊä³öÇåÁã
+//pwmÖµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 void pwm_output_clear(void)
 {
 	uint16_t i;
@@ -95,8 +95,8 @@ void pwm_output_clear(void)
 	TIM4_PWM_Set_Channel(2,curr_val.value.ch5);
 }
 
-#define PWM_STARTUP_VALUE	(550u)
-//Í¨µÀÖµ»º³å±ä»¯
+#define PWM_STARTUP_VALUE	(500u)
+//Í¨ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ä»¯
 void pwm_buffer(void)
 {
 	uint16_t i;
