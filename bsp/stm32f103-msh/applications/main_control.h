@@ -13,7 +13,7 @@
 #include "pwm_tim3.h"
 
 //////////////////////////////////////////////////////////////////////////////////	 
-//È«¾ÖµÄºê¶¨Òå£¬Ô¤±àÒë 
+//È«ï¿½ÖµÄºê¶¨ï¿½å£¬Ô¤ï¿½ï¿½ï¿½ï¿½ 
 //freq = 72M/PWM_FREQ
 #define PWM_FREQ_20K	3600
 #define PWM_FREQ_30K	2400
@@ -98,15 +98,15 @@ typedef union
 {
 	struct
 	{
-	uint8_t lum_grade;	//ÕÕ¶ÈµÈ¼¶
-	uint8_t facula;		//¹â°ßµÈ¼¶
-	uint8_t sewen;			//É«ÎÂµÈ¼¶
-	uint8_t qj_grade;	//Ç»¾µµÆµÈ¼¶
-	uint8_t mode;			//Ä£Ê½¼ÇÂ¼
-	uint8_t pow_fg;		//¿ª¹Ø±êÖ¾
-	uint8_t bk_fg;			//±³¹â±ê¼Ç
-	uint8_t rir;			//ÒõÓ°´«¸ÐÆ÷´¥·¢¸öÊý
-	uint8_t sys_set;		//ÏµÍ³ÉèÖÃ
+	uint8_t lum_grade;	//ï¿½Õ¶ÈµÈ¼ï¿½
+	uint8_t facula;		//ï¿½ï¿½ßµÈ¼ï¿½
+	uint8_t sewen;			//É«ï¿½ÂµÈ¼ï¿½
+	uint8_t qj_grade;	//Ç»ï¿½ï¿½ï¿½ÆµÈ¼ï¿½
+	uint8_t mode;			//Ä£Ê½ï¿½ï¿½Â¼
+	uint8_t pow_fg;		//ï¿½ï¿½ï¿½Ø±ï¿½Ö¾
+	uint8_t bk_fg;			//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	uint8_t rir;			//ï¿½ï¿½Ó°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	uint8_t sys_set;		//ÏµÍ³ï¿½ï¿½ï¿½ï¿½
 	uint8_t error_Flag;	//
 	}value;
 	uint8_t buf[10];
@@ -118,12 +118,42 @@ typedef union
 #define MODE_DEPTH	 	1
 #define MODE_QJ			 	2
 #define MODE_NUMBER		3
-
+#define MODE_MAX		3
 //#define MODE_LUM 			0
 //#define MODE_FACULA 	1
 //#define MODE_SEWEN	 	2
 //#define MODE_QJ			 	3
 
+#define BAG_LENGTH 7
+#define UART_EVENT_BUTTON 	0x01
+//#define UART_STATE_SYNC 	0x02
+#define UART_STATE_REQUST 	0x03
+
+#define UART_ACK			0x80
+#define UART_PARA_ERROR		0x81
+
+#define UART_BUTTON_IDEL 	0
+#define UART_BUTTON_POW 	1
+#define UART_BUTTON_MODE 	2
+#define UART_BUTTON_ADD 	3
+#define UART_BUTTON_MINUS	4
+#define UART_BUTTON_C_POW	5
+
+typedef union //__UART_BAG
+{
+	struct _BAG
+	{
+		uint8_t sync1;
+		uint8_t bag_number;//sync2;
+		//u8 length;
+		uint8_t dest_addr;
+		uint8_t source_addr;
+		uint8_t order;
+		uint8_t para[BAG_LENGTH-6];
+		uint8_t crc;
+	}BAG;
+	uint8_t buf[BAG_LENGTH];
+}_UART_BAG;
 
 typedef union
 {
@@ -146,7 +176,7 @@ void Show_Version(void);
 void Run_Test_Mode( void );
 void Set_Factory_Test( void );
 
-void Panel_Init(void);//³õÊ¼»¯
+void Panel_Init(void);//ï¿½ï¿½Ê¼ï¿½ï¿½
 void Led_Blink(void);
 void pwm_buffer(void);
 
@@ -177,4 +207,6 @@ void Minus_V4(void);
 void Minus_CH4(void);
 void Recover_To_MIN(uint16_t mode_no);
 void Recover_To_MAX(uint16_t mode_no);
+
+uint16_t remote_bag_in(uint8_t *buf);
 #endif

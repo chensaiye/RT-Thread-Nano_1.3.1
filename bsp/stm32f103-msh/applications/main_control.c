@@ -24,7 +24,7 @@ union_status curr_status;//��ǰ״̬
 
 union_ch_value Mode_GP[MODE_NUMBER];	//�趨�ĸ�ģʽ�²��� ��ͨģʽ������ģʽ��ǻ��ģʽ
 union_para SYS_PARA;	//ϵͳ����
-
+static uint8_t State_Feedback;
 uint8_t SET_FACTORY_FLAG;	//�ظ��������ñ�־
 uint8_t MY_BUS_ADDR;
 const uint16_t LED_table[MAX_LEVEL] ={0x0001,0x0003,0x0007,0x000F,0x001F,0x003F,0x007F,0x00FF,0x01FF,0x03FF};
@@ -68,9 +68,24 @@ void led_manual_updata(void)
 		else
 			return;
 	}
-
+	
 	led_status ^= 0xFFFF;	//��λȡ��
 	Led_Set_16Bit(led_status);
+
+	State_Feedback = 0x00u;
+	if(curr_status.value.pow_fg==OFF)
+	{
+		State_Feedback |= 1u <<7u; 	// power flag
+		State_Feedback |= 1u << 4u;	// Level on/off flag
+	}
+	else	
+		State_Feedback |= (curr_status.value.mode) << 5u; //mode
+
+	if(curr_status.value.mode == MODE_QJ)
+		State_Feedback |= (curr_status.value.qj_grade + 1u);
+	else
+		State_Feedback |= (curr_status.value.lum_grade+ 1u);
+
 }
 
 void Led_Blink(void)
@@ -689,12 +704,112 @@ void Panel_Init(void)
 	
 	curr_status.value.sys_set = SM4_Get_Date();
 	if(curr_status.value.sys_set&0x01)
-		MY_BUS_ADDR = 0x10;	//ĸ��
+		MY_BUS_ADDR = 0x11;	//ĸ��
 	else
-		MY_BUS_ADDR = 0x20;	//�ӵ�
+		MY_BUS_ADDR = 0x21;	//�ӵ�
 	//ˢ��Ŀ�����
 	Event_Updata();
 	
 	
 }
+
+
+static uint8_t last_bag_number;
+void New_Bag_In(_UART_BAG *tmpbag)
+{
+	uint16_t i = BUTTON_DUMMY;
+	if( (tmpbag->BAG.order == UART_EVENT_BUTTON) || (tmpbag->BAG.order == UART_STATE_REQUST) )
+	{// event button or state request
+		if(last_bag_number != tmpbag->BAG.bag_number)
+		{//check whether the bag is new
+			last_bag_number = tmpbag->BAG.bag_number;
+			if(tmpbag->BAG.order == UART_EVENT_BUTTON)
+			{
+				switch(tmpbag->BAG.para[0])
+				{
+					case UART_BUTTON_POW:
+						Event_Power();
+						break;
+					case UART_BUTTON_MODE:
+						curr_status.value.mode += 1u;
+						if(curr_status.value.mode >= MODE_MAX)
+							curr_status.value.mode = MODE_LUM;
+						Event_Mode();
+						break;
+					case UART_BUTTON_ADD:
+						Event_Add();
+						break;
+					case UART_BUTTON_MINUS:
+						Event_Minus();
+						break;
+					default:
+						i = BUTTON_DUMMY;
+						break;
+					
+				}
+				//process[i](BUTTON_DOWN);
+			}
+			tmpbag->buf[4] = UART_ACK;
+		}
+	}
+	else
+	{//order error
+		tmpbag->buf[4] = UART_PARA_ERROR;
+	}
+	
+	tmpbag->buf[0] = 0xaa;
+	tmpbag->buf[1] = tmpbag->BAG.bag_number;
+	tmpbag->buf[2] = tmpbag->BAG.source_addr;
+	tmpbag->buf[3] = MY_BUS_ADDR;
+	tmpbag->buf[5] = State_Feedback;
+	tmpbag->buf[6] = 0;
+	
+	//crc add 
+	for(i=0;i<BAG_LENGTH-1;i++)
+	{//copy data
+		tmpbag->buf[6] += tmpbag->buf[i];
+	}
+}
+
+// remote bag handle
+uint16_t remote_bag_in(uint8_t *buf)
+{
+	uint8_t i,crc;
+	if(*buf == 0xAA)
+	{//Light control
+		if(*(buf+2)==MY_BUS_ADDR)
+		{
+			crc = 0;
+			//crc add
+			for(i=0;i<BAG_LENGTH-1;i++)
+			{//copy data
+				crc += buf[i];
+			}
+			if(crc==buf[6])//crc correct
+			{
+				New_Bag_In((_UART_BAG *)buf);
+				return 1;//valid bag coming
+			}
+			else //crc error
+				return 0;	//crc error
+		}
+	}
+	// else if(*buf == 0xFF)
+	// {//Camera Control
+	// 	if(*(buf+1)==MYADDR)// 
+	// 	{//send order by usart3
+	// 		New_Bag_In2(buf);
+	// 		send_data_by_uart3();
+	// 	}	
+	// 	return 0;
+	// }
+	else //string input
+	{
+			return 0;
+		//db_dev.scan(buf);	//
+	}
+	
+	return 0;
+}
+
 
