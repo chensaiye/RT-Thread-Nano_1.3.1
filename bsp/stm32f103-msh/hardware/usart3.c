@@ -5,9 +5,9 @@ extern void Error_Handler(void);
 
 UART_HandleTypeDef huart3;
 
-uint8_t USART3_RX_BUF[USART3_REC_LEN];     //½ÓÊÕ»º³å,×î´óUSART_REC_LEN¸ö×Ö½Ú.
-uint8_t USART3_TX_BUF[USART3_REC_LEN];     //½ÓÊÕ»º³å,×î´óUSART_REC_LEN¸ö×Ö½Ú.
-uint16_t USART3_RX_STA=0;       //½ÓÊÕ×´Ì¬±ê¼Ç
+uint8_t USART3_RX_BUF[USART3_REC_LEN];     //ï¿½ï¿½ï¿½Õ»ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½USART_REC_LENï¿½ï¿½ï¿½Ö½ï¿½.
+uint8_t USART3_TX_BUF[USART3_REC_LEN];     //ï¿½ï¿½ï¿½Õ»ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½USART_REC_LENï¿½ï¿½ï¿½Ö½ï¿½.
+uint16_t USART3_RX_STA=0;       //ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½
 
 #ifdef	USART3_RXOVER_WITH_TIM
 TIM_HandleTypeDef htim7;
@@ -32,7 +32,7 @@ static void MX_TIM7_Init(void)
   htim7.Instance = TIM7;
   htim7.Init.Prescaler = 719;
   htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim7.Init.Period = 100*20;
+  htim7.Init.Period = 3500000/9600;//accord to the BaudRate set the overtime,  72M/720*(10*3.5)/BaudRate=
   htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim7) != HAL_OK)
   {
@@ -60,7 +60,7 @@ void TIM7_IRQHandler(void)
   /* USER CODE END TIM7_IRQn 0 */
   HAL_TIM_IRQHandler(&htim7);
   /* USER CODE BEGIN TIM7_IRQn 1 */
-	if((USART3_RX_STA&0x8000)==0)//½ÓÊÕÎ´Íê³É
+	if((USART3_RX_STA&0x8000)==0)//ï¿½ï¿½ï¿½ï¿½Î´ï¿½ï¿½ï¿½
 	{
 		USART3_RX_STA |= 0x8000;
 		HAL_TIM_Base_Stop_IT(&htim7);
@@ -116,7 +116,7 @@ static int MX_USART3_UART_Init(void)
 {
 
   /* USER CODE BEGIN USART3_Init 0 */
-		//±ØÐëÏÈÊ¹ÄÜDMA £¬ÔÙ³õÊ¼»¯UART
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½DMA ï¿½ï¿½ï¿½Ù³ï¿½Ê¼ï¿½ï¿½UART
 		#ifdef USART3_TXSEND_WITH_DMA
 		MX_DMA_Init();
 		#endif
@@ -126,7 +126,7 @@ static int MX_USART3_UART_Init(void)
 
   /* USER CODE END USART3_Init 1 */
   huart3.Instance = USART3;
-  huart3.Init.BaudRate = 115200;
+  huart3.Init.BaudRate = 9600;
   huart3.Init.WordLength = UART_WORDLENGTH_8B;
   huart3.Init.StopBits = UART_STOPBITS_1;
   huart3.Init.Parity = UART_PARITY_NONE;
@@ -146,7 +146,7 @@ static int MX_USART3_UART_Init(void)
   /* USER CODE END USART3_Init 2 */
 
 }
-//INIT_BOARD_EXPORT(MX_USART3_UART_Init);
+INIT_BOARD_EXPORT(MX_USART3_UART_Init);
 
 /**
   * @brief This function handles USART2 global interrupt.
@@ -157,7 +157,7 @@ void USART3_IRQHandler(void)
 	#ifdef USART3_RXOVER_WITH_TIM
 	if((huart3.Instance->SR & USART_SR_RXNE) != RESET)
 	{
-		if((USART3_RX_STA&0x8000)==0)//½ÓÊÕÎ´Íê³É
+		if((USART3_RX_STA&0x8000)==0)//ï¿½ï¿½ï¿½ï¿½Î´ï¿½ï¿½ï¿½
 		{
 			USART3_RX_STA++;
 			__HAL_TIM_SET_COUNTER(&htim7,0);

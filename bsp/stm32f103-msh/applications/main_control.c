@@ -18,13 +18,13 @@ const uint16_t QJ_Min=100,QJ_Max=1000;
 
 rt_sem_t  sem_warning = RT_NULL;
 
-pwm_value_union set_val;//Éè¶¨Öµ
-union_status curr_status;//µ±Ç°×´Ì¬
+pwm_value_union set_val;//ï¿½è¶¨Öµ
+union_status curr_status;//ï¿½ï¿½Ç°×´Ì¬
 
-union_ch_value Mode_GP[MODE_NUMBER];	//Éè¶¨µÄ¸÷Ä£Ê½ÏÂ²ÎÊý ÆÕÍ¨Ä£Ê½£¬¹âÉîÄ£Ê½£¬Ç»¾µÄ£Ê½
-union_para SYS_PARA;	//ÏµÍ³²ÎÊý
-
-uint8_t SET_FACTORY_FLAG;	//»Ø¸´³ö³§ÉèÖÃ±êÖ¾
+union_ch_value Mode_GP[MODE_NUMBER];	//ï¿½è¶¨ï¿½Ä¸ï¿½Ä£Ê½ï¿½Â²ï¿½ï¿½ï¿½ ï¿½ï¿½Í¨Ä£Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£Ê½ï¿½ï¿½Ç»ï¿½ï¿½Ä£Ê½
+union_para SYS_PARA;	//ÏµÍ³ï¿½ï¿½ï¿½ï¿½
+static uint8_t State_Feedback;
+uint8_t SET_FACTORY_FLAG;	//ï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã±ï¿½Ö¾
 uint8_t MY_BUS_ADDR;
 const uint16_t LED_table[MAX_LEVEL] ={0x0001,0x0003,0x0007,0x000F,0x001F,0x003F,0x007F,0x00FF};//,0x01FF,0x03FF};
 //const uint16_t PWM_table[MAX_LEVEL] ={100,300,600,800,1000,1200,1400,1600,1800,2000};
@@ -33,9 +33,9 @@ extern sMenuItemValue MenuIVS[];
 
 extern uint8_t get_165_data(void);
 extern void pwm_output_clear(void);//
-extern int SM4_Init(void);//³õÊ¼»¯
+extern int SM4_Init(void);//ï¿½ï¿½Ê¼ï¿½ï¿½
 extern uint8_t SM4_Get_Date(void);
-//¸ù¾Ýcurr_status Ë¢ÐÂÏÔÊ¾
+//ï¿½ï¿½ï¿½ï¿½curr_status Ë¢ï¿½ï¿½ï¿½ï¿½Ê¾
 #if 1 //8 level but 6 LED
 const uint8_t LED_table6[MAX_LEVEL] ={0x04,0x0C,0x0C,0x1C,0x3C,0x7C,0x7C,0xFC};
 
@@ -56,7 +56,7 @@ void led_manual_updata(void)
 		   led_status |=  LED_table6[curr_status.value.lum_grade];//level led
 		 }
 	}
-	led_status ^= 0xFF;	//°´Î»È¡·´
+	led_status ^= 0xFF;	//ï¿½ï¿½Î»È¡ï¿½ï¿½
 	Led_Set(led_status);
 }
 #else
@@ -66,9 +66,9 @@ void led_manual_updata(void)
 	led_status = 0;
 	if(curr_status.value.pow_fg==ON)
 	{
-		#if 0 //10µµ´¥Ãþ°´¼ü
+		#if 0 //10ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		led_status |= (0x01 << 10);	//power led
-		//ÓÉÓÚ¸ü»»ÁËÄ£Ê½°´¼üÎ»ÖÃ£¬¹ÊÄ£Ê½2¡¢3µÄÖ¸Ê¾µÆÐè¶Ôµ÷
+		//ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½ï¿½ï¿½ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½Ä£Ê½2ï¿½ï¿½3ï¿½ï¿½Ö¸Ê¾ï¿½ï¿½ï¿½ï¿½Ôµï¿½
 		if(curr_status.value.mode == MODE_LUM)
 			led_status |= (0x01 <<  11);	//mode led
 		else if(curr_status.value.mode == MODE_DEPTH)
@@ -81,7 +81,7 @@ void led_manual_updata(void)
 			led_status |= (0x01 << 15);	//warning flag
 		#endif
 		
-		#if 1 //8µµÎ¢¶¯¿ª¹Ø
+		#if 1 //8ï¿½ï¿½Î¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		led_status |= (0x01 << 8);	//power led
 		if(curr_status.value.mode == MODE_QJ)
 		{
@@ -100,11 +100,11 @@ void led_manual_updata(void)
 		else
 			return;
 	}
-
-	led_status ^= 0xFFFF;	//°´Î»È¡·´
+	
+	led_status ^= 0xFFFF;	//ï¿½ï¿½Î»È¡ï¿½ï¿½
 	Led_Set_16Bit(led_status);
 }
-#endif
+
 void Led_Blink(void)
 {
 	static uint16_t blink_count;
@@ -116,7 +116,7 @@ void Led_Blink(void)
 //	if(curr_status.value.mode != MODE_LUM) 
 //		return;
 		
-	if(curr_status.value.sys_set & 0x0C)//Ê¹ÄÜÁËÒõÓ°¹ÜÀí
+	if(curr_status.value.sys_set & 0x0C)//Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½ï¿½ï¿½
 	{
 		if((curr_status.value.rir)&&(curr_status.value.mode == MODE_LUM))
 		{//
@@ -128,14 +128,14 @@ void Led_Blink(void)
 			
 			if(blink_count >100){
 				blink_count = 0;
-				//µÍ8Î»
+				//ï¿½ï¿½8Î»
 				led_manual_updata();
 			}
 			else if(blink_count >50)	
 			{
 				led_status |= (0x01 << 10); //power led
 				led_status |= LED_table[curr_status.value.lum_grade];
-				led_status ^= 0xFFFF;	//°´Î»È¡·´
+				led_status ^= 0xFFFF;	//ï¿½ï¿½Î»È¡ï¿½ï¿½
 				Led_Set_16Bit(led_status);
 				
 			}
@@ -152,11 +152,11 @@ void Led_Blink(void)
 		}
 	}
 	else
-		led_manual_updata();//¶¨Ê±¸üÐÂÏÔÊ¾
+		led_manual_updata();//ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾
 }
 
 
-//ÖØÐÂ¼ÆËã¸÷Í¨µÀÄ¿±êÖµ
+//ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½Ä¿ï¿½ï¿½Öµ
 void Event_Updata_Set(void)
 {
 	union_ch_value *tp_lum_p;
@@ -166,10 +166,10 @@ void Event_Updata_Set(void)
 	
 	if(curr_status.value.pow_fg == ON)
 	{
-		tp_lum_p = &Mode_GP[curr_status.value.mode];//È¡µÃµ±Ç°Ä£Ê½ÏÂµÄ×î´ó×îÐ¡²ÎÊý
+		tp_lum_p = &Mode_GP[curr_status.value.mode];//È¡ï¿½Ãµï¿½Ç°Ä£Ê½ï¿½Âµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½
 		if(curr_status.value.mode < MODE_QJ )
 		{
-			if(curr_status.value.lum_grade == 0){//ÕÕ¶È×îµÍµµ´¦Àí
+			if(curr_status.value.lum_grade == 0){//ï¿½Õ¶ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½
 				temp_p.value.ch1 = tp_lum_p->value.ch1_min;	//fudeng1
 				temp_p.value.ch2 = tp_lum_p->value.ch1_min;	//fudeng2
 				temp_p.value.ch3 = tp_lum_p->value.ch1_min;	//fudeng3
@@ -180,7 +180,7 @@ void Event_Updata_Set(void)
 					temp_p.value.ch5 = tp_lum_p->value.ch4_min; //red = zhudeng
 				#endif
 			}	
-			else if(curr_status.value.lum_grade == (LUM_GRADE_NUMB-1)){//if(curr_status.lum_grade == (LUM_GRADE_NUMB-1))//ÕÕ¶È×î¸ßµµ´¦Àí
+			else if(curr_status.value.lum_grade == (LUM_GRADE_NUMB-1)){//if(curr_status.lum_grade == (LUM_GRADE_NUMB-1))//ï¿½Õ¶ï¿½ï¿½ï¿½ßµï¿½ï¿½ï¿½ï¿½ï¿½
 				temp_p.value.ch1 = tp_lum_p->value.ch1_max;//fudeng1
 				temp_p.value.ch2 = tp_lum_p->value.ch1_max;//fudeng2
 				temp_p.value.ch3 = tp_lum_p->value.ch1_max;//fudeng3
@@ -191,8 +191,8 @@ void Event_Updata_Set(void)
 				temp_p.value.ch5 = tp_lum_p->value.ch4_max; //red = zhudeng
 			#endif
 			}
-			else{// if(curr_status.value.lum_grade < (LUM_GRADE_NUMB-1)){//ÕÕ¶ÈÖÐ¼äµµ´¦Àí
-				//µ±Ç°ÕÕ¶È¼ÆËã¹«Ê½£» ÕÕ¶È= ×îÐ¡Öµ+ ÕÕ¶ÈµÈ¼¶*£¨×î´óÖµ-×îÐ¡Öµ£©/×ÜµÈ¼¶Êý
+			else{// if(curr_status.value.lum_grade < (LUM_GRADE_NUMB-1)){//ï¿½Õ¶ï¿½ï¿½Ð¼äµµï¿½ï¿½ï¿½ï¿½
+				//ï¿½ï¿½Ç°ï¿½Õ¶È¼ï¿½ï¿½ã¹«Ê½ï¿½ï¿½ ï¿½Õ¶ï¿½= ï¿½ï¿½Ð¡Öµ+ ï¿½Õ¶ÈµÈ¼ï¿½*ï¿½ï¿½ï¿½ï¿½ï¿½Öµ-ï¿½ï¿½Ð¡Öµï¿½ï¿½/ï¿½ÜµÈ¼ï¿½ï¿½ï¿½
 				if(tp_lum_p->value.ch1_max > tp_lum_p->value.ch1_min)//
 					temp_p.value.ch1 = tp_lum_p->value.ch1_min + curr_status.value.lum_grade*(tp_lum_p->value.ch1_max - tp_lum_p->value.ch1_min)/(LUM_GRADE_NUMB-1);
 				else
@@ -226,28 +226,28 @@ void Event_Updata_Set(void)
 				
 			}
 						
-			//Ó°Òõ²¹³¥´¦Àí
+			//Ó°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			if((curr_status.value.mode == MODE_LUM)&&(curr_status.value.sys_set & 0x0C))
 			{
-				//Ëã·¨3£º¼Ó¹Ì¶¨µÄ°Ù·Ö±È 	140klx*1.15=161klx
+				//ï¿½ã·¨3ï¿½ï¿½ï¿½Ó¹Ì¶ï¿½ï¿½Ä°Ù·Ö±ï¿½ 	140klx*1.15=161klx
 				if(curr_status.value.rir > 0)
 				{
 					 tp_pwm = temp_p.value.ch1*SYS_PARA.value.gain_step/100;
 					 temp_p.value.ch1 += tp_pwm;
 					 if(temp_p.value.ch1 > MenuIVS[8+1].MaxValue)//PWM_MAX_VALUE)
-					     temp_p.value.ch1 = MenuIVS[8+1].MaxValue;//Ð¡ÓÚ×î´óÖµ
+					     temp_p.value.ch1 = MenuIVS[8+1].MaxValue;//Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 					 temp_p.value.ch2 = temp_p.value.ch1;
 				   temp_p.value.ch3 = temp_p.value.ch1;
 					 
 					 tp_pwm = temp_p.value.ch4*SYS_PARA.value.gain_step/100;
 					 temp_p.value.ch4 += tp_pwm;
-					 if(temp_p.value.ch4 > MenuIVS[8+7].MaxValue)//Ð¡ÓÚ×î´óÖµ
+					 if(temp_p.value.ch4 > MenuIVS[8+7].MaxValue)//Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 						 temp_p.value.ch4 = MenuIVS[8+7].MaxValue;
 					 
 				#ifdef RED_COMPENSATE_ENABLE
 					 tp_pwm = temp_p.value.ch5*SYS_PARA.value.gain_step/100;
 					 temp_p.value.ch5 += tp_pwm;
-					 if(temp_p.value.ch5 > MenuIVS[8+3].MaxValue)//§³??????
+					 if(temp_p.value.ch5 > MenuIVS[8+3].MaxValue)//ï¿½ï¿½??????
 						 temp_p.value.ch5 = MenuIVS[8+3].MaxValue;
 				#else
 					 temp_p.value.ch5 = temp_p.value.ch4;//red = zhudeng
@@ -255,11 +255,11 @@ void Event_Updata_Set(void)
 					 
 				}
 				
-//					//Ëã·¨2£º¼ÓÖ¸¶¨µÄ°Ù·Ö±È 	140klx*1.15=161klx
+//					//ï¿½ã·¨2ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ä°Ù·Ö±ï¿½ 	140klx*1.15=161klx
 //				tp_pwm = temp_p.value.ch1*SYS_PARA.value.gain_step*curr_status.value.rir/100;
 //				temp_p.value.ch1 += tp_pwm;
 //				if(temp_p.value.ch1 > MenuIVS[8+1].MaxValue)//PWM_MAX_VALUE)
-//					temp_p.value.ch1 = MenuIVS[8+1].MaxValue;//Ð¡ÓÚ×î´óÖµ
+//					temp_p.value.ch1 = MenuIVS[8+1].MaxValue;//Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 //				
 //				temp_p.value.ch2 = temp_p.value.ch1;
 //				temp_p.value.ch3 = temp_p.value.ch1;
@@ -267,30 +267,30 @@ void Event_Updata_Set(void)
 //				/*tp_pwm = temp_p.value.ch2*SYS_PARA.value.gain_step*curr_status.value.rir/100;
 //				temp_p.value.ch2 += tp_pwm;
 //				if(temp_p.value.ch2 > MenuIVS[8+3].MaxValue)//PWM_MAX_VALUE)
-//					temp_p.value.ch2 = MenuIVS[8+3].MaxValue;//Ð¡ÓÚ×î´óÖµ
+//					temp_p.value.ch2 = MenuIVS[8+3].MaxValue;//Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 //				
 //				tp_pwm = temp_p.value.ch3*SYS_PARA.value.gain_step*curr_status.value.rir/100;
 //				temp_p.value.ch3 += tp_pwm;
 //				if(temp_p.value.ch3 > MenuIVS[8+5].MaxValue)//PWM_MAX_VALUE)
-//					temp_p.value.ch3 = MenuIVS[8+5].MaxValue;//Ð¡ÓÚ×î´óÖµ
+//					temp_p.value.ch3 = MenuIVS[8+5].MaxValue;//Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 //				*/
 //				
 //				tp_pwm = temp_p.value.ch4*SYS_PARA.value.gain_step*curr_status.value.rir/100;
 //				temp_p.value.ch4 += tp_pwm;
-//				if(temp_p.value.ch4 > MenuIVS[8+7].MaxValue)//Ð¡ÓÚ×î´óÖµ
+//				if(temp_p.value.ch4 > MenuIVS[8+7].MaxValue)//Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 //					temp_p.value.ch4 = MenuIVS[8+7].MaxValue;
 //				
 //				tp_pwm = temp_p.value.ch5*SYS_PARA.value.gain_step*curr_status.value.rir/100;
 //				temp_p.value.ch5 += tp_pwm;
-//				if(temp_p.value.ch5 > MenuIVS[8+3].MaxValue)//Ð¡ÓÚ×î´óÖµ
+//				if(temp_p.value.ch5 > MenuIVS[8+3].MaxValue)//Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 //					temp_p.value.ch5 = MenuIVS[8+3].MaxValue;
 			}
 		}
 		else
-		{//ÖØÐÂ¼ÆËãÇ»¾µÄ£Ê½ÏÂµÄÉè¶¨Öµ
+		{//ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½Ç»ï¿½ï¿½Ä£Ê½ï¿½Âµï¿½ï¿½è¶¨Öµ
 			for(i=0;i<6;i++)
 				temp_p.buf[i] = 0;
-			if(curr_status.value.qj_grade == 0)//ÕÕ¶È×îµÍµµ´¦Àí
+			if(curr_status.value.qj_grade == 0)//ï¿½Õ¶ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½
 				temp_p.value.ch4 = tp_lum_p->value.ch4_min;
 			else if(curr_status.value.qj_grade == (QJ_GP_NUMB-1))
 				temp_p.value.ch4 = tp_lum_p->value.ch4_max;
@@ -316,17 +316,17 @@ void Event_Updata_Set(void)
 		pwm_output_clear();
 	}
 	
-	//Ë¢ÐÂÄ¿±êÖµ
+	//Ë¢ï¿½ï¿½Ä¿ï¿½ï¿½Öµ
 	for(i=0;i<6;i++)
 		set_val.buf[i] = temp_p.buf[i];
 	
-	//Ë¢ÐÂÊÖ±ú×´Ì¬Ö¸Ê¾
+	//Ë¢ï¿½ï¿½ï¿½Ö±ï¿½×´Ì¬Ö¸Ê¾
 	led_manual_updata();
 	//save status;
 	//AT24CXX_WriteOnePage(EEPROM_ARRD2,curr_status.buf);
 }
 
-//Ö¸¶¨µ±Ç°µÄÉè¶¨Öµµ½¸÷Í¨µÀ
+//Ö¸ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½è¶¨Öµï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½
 void Set_V4(uint16_t ch1,uint16_t ch2,uint16_t ch3,uint16_t ch4)
 {
 	set_val.value.ch1 = ch1;
@@ -341,7 +341,7 @@ void Set_Red(uint16_t ch5)
 }
 	
 	
-//¸÷Í¨µÀµ±Ç°µÄÉè¶¨Öµ¼Ó5
+//ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½è¶¨Öµï¿½ï¿½5
 void Add_V4(void)
 {
 	if(set_val.value.ch1 < PARA_MAX)
@@ -369,7 +369,7 @@ void Add_CH4(void)
 	set_val.value.ch5 = set_val.value.ch4;// red = zhudeng
 #endif
 }
-//¸÷Í¨µÀµ±Ç°µÄÉè¶¨Öµ¼Ó5
+//ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½è¶¨Öµï¿½ï¿½5
 void Minus_V4(void)
 {
 	if(set_val.value.ch1>5)
@@ -396,70 +396,70 @@ void Minus_CH4(void)
 	set_val.value.ch5 = set_val.value.ch4;// red = zhudeng
 #endif
 }
-//±£´æµ±Ç°µÄÉè¶¨Öµµ½Ö¸¶¨Ä£Ê½ÏÂµÄminÖµ
+//ï¿½ï¿½ï¿½æµ±Ç°ï¿½ï¿½ï¿½è¶¨Öµï¿½ï¿½Ö¸ï¿½ï¿½Ä£Ê½ï¿½Âµï¿½minÖµ
 void Save_To_MIN(uint16_t mode_no)
 {
 	uint16_t pos,i;
 	pos = mode_no*8;
 	//for(i=0;i<4;i++)
 		//MenuIVS[pos+i*2].ItemValue = set_val.buf[i];
-	MenuIVS[pos].ItemValue = set_val.buf[0];//¸±µÆ
-	MenuIVS[pos+6].ItemValue = set_val.buf[3];//Ö÷µÆ
+	MenuIVS[pos].ItemValue = set_val.buf[0];//ï¿½ï¿½ï¿½ï¿½
+	MenuIVS[pos+6].ItemValue = set_val.buf[3];//ï¿½ï¿½ï¿½ï¿½
 #ifdef RED_COMPENSATE_ENABLE
-	MenuIVS[pos+2].ItemValue = set_val.buf[4];//ºìÉ«µÆ
+	MenuIVS[pos+2].ItemValue = set_val.buf[4];//ï¿½ï¿½É«ï¿½ï¿½
 #else
 #endif
 	backup_data();
 	recover_data();
 }
-//±£´æµ±Ç°µÄÉè¶¨Öµµ½Ö¸¶¨Ä£Ê½ÏÂµÄmaxÖµ
+//ï¿½ï¿½ï¿½æµ±Ç°ï¿½ï¿½ï¿½è¶¨Öµï¿½ï¿½Ö¸ï¿½ï¿½Ä£Ê½ï¿½Âµï¿½maxÖµ
 void Save_To_MAX(uint16_t mode_no)
 {
 	uint16_t pos,i;
 	pos = mode_no*8;
 	//for(i=0;i<4;i++)
 		//MenuIVS[pos+i*2+1].ItemValue = set_val.buf[i];
-	MenuIVS[pos+1].ItemValue = set_val.buf[0];//¸±µÆ
-	MenuIVS[pos+7].ItemValue = set_val.buf[3];//Ö÷µÆ
+	MenuIVS[pos+1].ItemValue = set_val.buf[0];//ï¿½ï¿½ï¿½ï¿½
+	MenuIVS[pos+7].ItemValue = set_val.buf[3];//ï¿½ï¿½ï¿½ï¿½
 #ifdef RED_COMPENSATE_ENABLE
-	MenuIVS[pos+3].ItemValue = set_val.buf[4];//ºìÉ«µÆ
+	MenuIVS[pos+3].ItemValue = set_val.buf[4];//ï¿½ï¿½É«ï¿½ï¿½
 #else
 #endif	
 	backup_data();
 	recover_data();
 }
-//»Ö¸´µ±Ç°Ä£Ê½µÄ×îµÍµµÊý¾Ý
+//ï¿½Ö¸ï¿½ï¿½ï¿½Ç°Ä£Ê½ï¿½ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½
 void Recover_To_MIN(uint16_t mode_no)
 {
 	uint16_t pos,i;
 	pos = mode_no*8;
 	//for(i=0;i<4;i++)
 		//set_val.buf[i] = MenuIVS[pos+i*2].ItemValue;
-	set_val.buf[0] = MenuIVS[pos].ItemValue;//¸±µÆ1
-	set_val.buf[1] = MenuIVS[pos].ItemValue;//¸±µÆ2
-	set_val.buf[2] = MenuIVS[pos].ItemValue;//¸±µÆ3
-	set_val.buf[3] = MenuIVS[pos+6].ItemValue;//Ö÷µÆ
+	set_val.buf[0] = MenuIVS[pos].ItemValue;//ï¿½ï¿½ï¿½ï¿½1
+	set_val.buf[1] = MenuIVS[pos].ItemValue;//ï¿½ï¿½ï¿½ï¿½2
+	set_val.buf[2] = MenuIVS[pos].ItemValue;//ï¿½ï¿½ï¿½ï¿½3
+	set_val.buf[3] = MenuIVS[pos+6].ItemValue;//ï¿½ï¿½ï¿½ï¿½
 #ifdef RED_COMPENSATE_ENABLE
-	set_val.buf[4] = MenuIVS[pos+2].ItemValue;//ºìÉ«µÆ
+	set_val.buf[4] = MenuIVS[pos+2].ItemValue;//ï¿½ï¿½É«ï¿½ï¿½
 #else
-	set_val.buf[4] = set_val.buf[3];//ºìÉ«µÆ = Ö÷µÆ
+	set_val.buf[4] = set_val.buf[3];//ï¿½ï¿½É«ï¿½ï¿½ = ï¿½ï¿½ï¿½ï¿½
 #endif
 }
-//»Ö¸´µ±Ç°Ä£Ê½µÄ×î¸ßµµÊý¾Ý
+//ï¿½Ö¸ï¿½ï¿½ï¿½Ç°Ä£Ê½ï¿½ï¿½ï¿½ï¿½ßµï¿½ï¿½ï¿½ï¿½ï¿½
 void Recover_To_MAX(uint16_t mode_no)
 {
 	uint16_t pos,i;
 	pos = mode_no*8;
 	//for(i=0;i<4;i++)
 		//set_val.buf[i] = MenuIVS[pos+i*2+1].ItemValue;
-	set_val.buf[0] = MenuIVS[pos+1].ItemValue;//¸±µÆ1
-	set_val.buf[1] = MenuIVS[pos+1].ItemValue;//¸±µÆ2
-	set_val.buf[2] = MenuIVS[pos+1].ItemValue;//¸±µÆ3
-	set_val.buf[3] = MenuIVS[pos+7].ItemValue;//Ö÷µÆ
+	set_val.buf[0] = MenuIVS[pos+1].ItemValue;//ï¿½ï¿½ï¿½ï¿½1
+	set_val.buf[1] = MenuIVS[pos+1].ItemValue;//ï¿½ï¿½ï¿½ï¿½2
+	set_val.buf[2] = MenuIVS[pos+1].ItemValue;//ï¿½ï¿½ï¿½ï¿½3
+	set_val.buf[3] = MenuIVS[pos+7].ItemValue;//ï¿½ï¿½ï¿½ï¿½
 #ifdef RED_COMPENSATE_ENABLE
-	set_val.buf[4] = MenuIVS[pos+3].ItemValue;//ºìÉ«µÆ
+	set_val.buf[4] = MenuIVS[pos+3].ItemValue;//ï¿½ï¿½É«ï¿½ï¿½
 #else
-	set_val.buf[4] = set_val.buf[3];//ºìÉ«µÆ = Ö÷µÆ
+	set_val.buf[4] = set_val.buf[3];//ï¿½ï¿½É«ï¿½ï¿½ = ï¿½ï¿½ï¿½ï¿½
 #endif
 }
 
@@ -476,7 +476,7 @@ void Save_Gain(void)
 }
 
 	
-//µçÔ´¿ØÖÆ¹ÜÀí
+//ï¿½ï¿½Ô´ï¿½ï¿½ï¿½Æ¹ï¿½ï¿½ï¿½
 void Event_Power(void)
 {
 	if(curr_status.value.pow_fg==ON){
@@ -496,7 +496,7 @@ void Event_Power(void)
 	}
 	Event_Updata_Set();
 }
-//¸´Î»ºóµÄ×´Ì¬Ë¢ÐÂ
+//ï¿½ï¿½Î»ï¿½ï¿½ï¿½×´Ì¬Ë¢ï¿½ï¿½
 void Event_Updata(void)
 {
 	if(curr_status.value.pow_fg==ON)
@@ -506,7 +506,7 @@ void Event_Updata(void)
 	Event_Power();
 }
 
-//Ä£Ê½ÇÐ»»
+//Ä£Ê½ï¿½Ð»ï¿½
 void Event_Mode(void)
 {
 	if(curr_status.value.pow_fg==OFF)
@@ -576,12 +576,12 @@ MSH_CMD_EXPORT(Event_Mode, mode pressed);
 MSH_CMD_EXPORT(Event_Minus, minus pressed);
 MSH_CMD_EXPORT(Event_Add, add pressed);
 
-//ÒõÓ°²¹³¥´¦Àí
+//ï¿½ï¿½Ó°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 void RIR_CTL(short int rir_c)
 {
 	//uint16_t tpch,tp_dacvalue;
 	short int tp_rir;
-	if(curr_status.value.sys_set&0x80)//ÉèÖÃÖÐ
+	if(curr_status.value.sys_set&0x80)//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		return;
 	
 	tp_rir = curr_status.value.rir;
@@ -620,7 +620,7 @@ void Clear_Factory_Set( void )
 {
 	SET_FACTORY_FLAG = OFF;
 }
-//±¸·ÝÊý¾Ýµ½flash
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ýµï¿½flash
 void backup_data(void)
 {
 	uint16_t i;
@@ -631,7 +631,7 @@ void backup_data(void)
 	Flash_Eeprom_Write(1+MENUITEMVALUE_NO+i);
 }
 
-//´ÓFlashÊý¾Ýµ½ram
+//ï¿½ï¿½Flashï¿½ï¿½ï¿½Ýµï¿½ram
 void recover_data(void)
 {
 	uint16_t i;
@@ -707,29 +707,129 @@ void Panel_Init(void)
 {
 	POW_GPIO_Init();
 	SM4_Init();//system set init
-	//µÚÒ»´ÎÉÏµçÅÐ¶Ï
+	//ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ïµï¿½ï¿½Ð¶ï¿½
 	Flash_Eeprom_Read_HalfWord(FLASH_EEPROM_ADDR1,flash_eeprom_buffer,1);
 	if(flash_eeprom_buffer[0]!=0x5555)
 		SET_FACTORY_FLAG = ON;
 	if((SM4_Get_Date()&0x02)==0x00)
 		SET_FACTORY_FLAG = ON;
 	if(SET_FACTORY_FLAG == ON)
-	{//»Ö¸´³ö³§ÉèÖÃ
+	{//ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		Reset_To_Factory();
 		SET_FACTORY_FLAG = OFF;
 	}
 	
-	//Êý¾Ý»Ö¸´
+	//ï¿½ï¿½ï¿½Ý»Ö¸ï¿½
 	recover_data();//
 	
 	curr_status.value.sys_set = SM4_Get_Date();
 	if(curr_status.value.sys_set&0x01)
-		MY_BUS_ADDR = 0x10;	//Ä¸µÆ
+		MY_BUS_ADDR = 0x11;	//Ä¸ï¿½ï¿½
 	else
-		MY_BUS_ADDR = 0x20;	//×ÓµÆ
-	//Ë¢ÐÂÄ¿±êÊä³ö
+		MY_BUS_ADDR = 0x21;	//ï¿½Óµï¿½
+	//Ë¢ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½
 	Event_Updata();
 	
 	
 }
+
+
+static uint8_t last_bag_number;
+void New_Bag_In(_UART_BAG *tmpbag)
+{
+	uint16_t i = BUTTON_DUMMY;
+	if( (tmpbag->BAG.order == UART_EVENT_BUTTON) || (tmpbag->BAG.order == UART_STATE_REQUST) )
+	{// event button or state request
+		if(last_bag_number != tmpbag->BAG.bag_number)
+		{//check whether the bag is new
+			last_bag_number = tmpbag->BAG.bag_number;
+			if(tmpbag->BAG.order == UART_EVENT_BUTTON)
+			{
+				switch(tmpbag->BAG.para[0])
+				{
+					case UART_BUTTON_POW:
+						Event_Power();
+						break;
+					case UART_BUTTON_MODE:
+						curr_status.value.mode += 1u;
+						if(curr_status.value.mode >= MODE_MAX)
+							curr_status.value.mode = MODE_LUM;
+						Event_Mode();
+						break;
+					case UART_BUTTON_ADD:
+						Event_Add();
+						break;
+					case UART_BUTTON_MINUS:
+						Event_Minus();
+						break;
+					default:
+						i = BUTTON_DUMMY;
+						break;
+					
+				}
+				//process[i](BUTTON_DOWN);
+			}
+			tmpbag->buf[4] = UART_ACK;
+		}
+	}
+	else
+	{//order error
+		tmpbag->buf[4] = UART_PARA_ERROR;
+	}
+	
+	tmpbag->buf[0] = 0xaa;
+	tmpbag->buf[1] = tmpbag->BAG.bag_number;
+	tmpbag->buf[2] = tmpbag->BAG.source_addr;
+	tmpbag->buf[3] = MY_BUS_ADDR;
+	tmpbag->buf[5] = State_Feedback;
+	tmpbag->buf[6] = 0;
+	
+	//crc add 
+	for(i=0;i<BAG_LENGTH-1;i++)
+	{//copy data
+		tmpbag->buf[6] += tmpbag->buf[i];
+	}
+}
+
+// remote bag handle
+uint16_t remote_bag_in(uint8_t *buf)
+{
+	uint8_t i,crc;
+	if(*buf == 0xAA)
+	{//Light control
+		if(*(buf+2)==MY_BUS_ADDR)
+		{
+			crc = 0;
+			//crc add
+			for(i=0;i<BAG_LENGTH-1;i++)
+			{//copy data
+				crc += buf[i];
+			}
+			if(crc==buf[6])//crc correct
+			{
+				New_Bag_In((_UART_BAG *)buf);
+				return 1;//valid bag coming
+			}
+			else //crc error
+				return 0;	//crc error
+		}
+	}
+	// else if(*buf == 0xFF)
+	// {//Camera Control
+	// 	if(*(buf+1)==MYADDR)// 
+	// 	{//send order by usart3
+	// 		New_Bag_In2(buf);
+	// 		send_data_by_uart3();
+	// 	}	
+	// 	return 0;
+	// }
+	else //string input
+	{
+			return 0;
+		//db_dev.scan(buf);	//
+	}
+	
+	return 0;
+}
+
 
