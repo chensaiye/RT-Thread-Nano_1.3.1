@@ -58,6 +58,20 @@ void led_manual_updata(void)
 	}
 	led_status ^= 0xFF;	//��λȡ��
 	Led_Set(led_status);
+	
+	State_Feedback = 0x00u;
+	if(curr_status.value.pow_fg==OFF)
+	{
+		State_Feedback |= 1u <<7u; 	// power flag
+		State_Feedback |= 1u << 4u;	// Level on/off flag
+	}
+	else	
+		State_Feedback |= (curr_status.value.mode) << 5u; //mode
+
+	if(curr_status.value.mode == MODE_QJ)
+		State_Feedback |= (curr_status.value.qj_grade + 1u);
+	else
+		State_Feedback |= (curr_status.value.lum_grade+ 1u);
 }
 #else
 void led_manual_updata(void)
@@ -104,7 +118,7 @@ void led_manual_updata(void)
 	led_status ^= 0xFFFF;	//��λȡ��
 	Led_Set_16Bit(led_status);
 }
-
+#endif
 void Led_Blink(void)
 {
 	static uint16_t blink_count;
