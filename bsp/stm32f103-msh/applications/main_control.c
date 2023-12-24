@@ -731,16 +731,21 @@ void New_Bag_In(_UART_BAG *tmpbag)
 						Event_Power();
 						break;
 					case UART_BUTTON_MODE:
-						curr_status.value.mode += 1u;
-						if(curr_status.value.mode >= MODE_MAX)
-							curr_status.value.mode = MODE_LUM;
-						Event_Mode();
+						if(curr_status.value.pow_fg==ON)
+						{
+							curr_status.value.mode += 1u;
+							if(curr_status.value.mode >= MODE_MAX)
+								curr_status.value.mode = MODE_LUM;
+							Event_Mode();
+						}
 						break;
 					case UART_BUTTON_ADD:
-						Event_Add();
+						if(curr_status.value.pow_fg==ON)
+							Event_Add();
 						break;
 					case UART_BUTTON_MINUS:
-						Event_Minus();
+						if(curr_status.value.pow_fg==ON)
+							Event_Minus();
 						break;
 					default:
 						i = BUTTON_DUMMY;
