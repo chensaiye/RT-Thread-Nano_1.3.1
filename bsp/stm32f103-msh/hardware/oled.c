@@ -294,11 +294,11 @@ void OLED_IIC_Init(void)
 	MX_I2C2_Init();//IIC≥ı ºªØ
 }
 
-void OLED_Read(uint16_t ReadAddr,uint8_t *pBuffer,uint16_t NumToRead)
-{
-	//I2C_Master_BufferRead(I2C1,pBuffer,NumToRead,0XA0,ReadAddr);
-	HAL_I2C_Mem_Read(&hi2c2,OLED_SLAVE_ADDRESS,ReadAddr,I2C_MEMADD_SIZE_8BIT,pBuffer,NumToRead,10000);
-}
+//void OLED_Read(uint16_t ReadAddr,uint8_t *pBuffer,uint16_t NumToRead)
+//{
+//	//I2C_Master_BufferRead(I2C1,pBuffer,NumToRead,0XA0,ReadAddr);
+//	HAL_I2C_Mem_Read(&hi2c2,OLED_SLAVE_ADDRESS,ReadAddr,I2C_MEMADD_SIZE_8BIT,pBuffer,NumToRead,10000);
+//}
 
 /**********************************************
 // IIC Write Data
@@ -371,6 +371,8 @@ void OLED_Init(void)
 	OLED_Clear();
 }  
 extern pwm_value_union curr_val;
+extern uint16_t ad_value[8];
+uint16_t temperature_display;
 void OLED_Test(void)
 {
 	char str[25];
@@ -381,9 +383,9 @@ void OLED_Test(void)
 //	sprintf(str,"Mode:%d   RIR:%d",curr_status.value.mode,curr_status.value.rir);
 //	OLED_ShowString(0,1*8, (uint8_t *)str,CHARSIZE_8X6);	
 	
-	sprintf(str,"Run Info   NRF:   ");
+	sprintf(str,"6Touch 10Lvl NRF:   ");
 	OLED_ShowString(0,0, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"Run Info   NRF:%d  ",NRF_ERROR);
+	sprintf(str,"6Touch 10Lvl NRF:%d  ",NRF_ERROR);
 	OLED_ShowString(0,0, (uint8_t *)str,CHARSIZE_8X6);
 	
 	sprintf(str,"Mode:  RIR:  Dis:    ");
@@ -395,27 +397,84 @@ void OLED_Test(void)
 	sprintf(str,"Levl:     ");
 	OLED_ShowString(0,2*8, (uint8_t *)str,CHARSIZE_8X6);
 	sprintf(str,"Levl:%d",curr_status.value.lum_grade);
-	OLED_ShowString(0,2*8, (uint8_t *)str,CHARSIZE_8X6);	
+	OLED_ShowString(0,2*8, (uint8_t *)str,CHARSIZE_8X6);
+		
+	sprintf(str,"TEMP:     ");
+	OLED_ShowString(54,2*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"TEMP:%d",temperature_display);
+	OLED_ShowString(54,2*8, (uint8_t *)str,CHARSIZE_8X6);	
 	
-	sprintf(str,"Current Set1:     ");
+	sprintf(str,"CS1:     ");
 	OLED_ShowString(0,3*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"Current Set1:%d",curr_val.value.ch1);
+	sprintf(str,"CS1:%d ",curr_val.value.ch1);
 	OLED_ShowString(0,3*8, (uint8_t *)str,CHARSIZE_8X6);
-	
-	sprintf(str,"Current Set2:     ");
+	sprintf(str,"CS2:     ");
 	OLED_ShowString(0,4*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"Current Set2:%d",curr_val.value.ch2);
+	sprintf(str,"CS2:%d ",curr_val.value.ch2);
 	OLED_ShowString(0,4*8, (uint8_t *)str,CHARSIZE_8X6);
-	
-	sprintf(str,"Current Set3:     ");
+	sprintf(str,"CS3:     ");
 	OLED_ShowString(0,5*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"Current Set3:%d",curr_val.value.ch3);
+	sprintf(str,"CS3:%d ",curr_val.value.ch3);
 	OLED_ShowString(0,5*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"CS4:     ");
+	OLED_ShowString(0,6*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"CS4:%d ",curr_val.value.ch4);
+	OLED_ShowString(0,6*8, (uint8_t *)str,CHARSIZE_8X6);
 	
-	sprintf(str,"Current Set4:     ");
-	OLED_ShowString(0,6*8, (uint8_t *)str,CHARSIZE_8X6);
-	sprintf(str,"Current Set4:%d",curr_val.value.ch4);
-	OLED_ShowString(0,6*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"CS5:     ");
+	OLED_ShowString(0,7*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"CS5:%d ",curr_val.value.ch5);
+	OLED_ShowString(0,7*8, (uint8_t *)str,CHARSIZE_8X6);
+	
+	sprintf(str,"I1:     ");
+	OLED_ShowString(54,3*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I1:%d ",ad_value[0]);
+	OLED_ShowString(54,3*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I2:     ");
+	OLED_ShowString(54,4*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I2:%d ",ad_value[1]);
+	OLED_ShowString(54,4*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I3:     ");
+	OLED_ShowString(54,5*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I3:%d ",ad_value[2]);
+	OLED_ShowString(54,5*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I7:     ");
+	OLED_ShowString(54,6*8, (uint8_t *)str,CHARSIZE_8X6);
+	sprintf(str,"I7:%d ",ad_value[6]);
+	OLED_ShowString(54,6*8, (uint8_t *)str,CHARSIZE_8X6);
+	
+//	sprintf(str,"I4:    ");
+//	OLED_ShowString(0,7*8, (uint8_t *)str,CHARSIZE_8X6);
+//	sprintf(str,"I4:%d",ad_value[3]);
+//	OLED_ShowString(0,7*8, (uint8_t *)str,CHARSIZE_8X6);
+//	sprintf(str,"I5:    ");
+//	OLED_ShowString(42,7*8, (uint8_t *)str,CHARSIZE_8X6);
+//	sprintf(str,"I5:%d",ad_value[4]);
+//	OLED_ShowString(42,7*8, (uint8_t *)str,CHARSIZE_8X6);
+//	sprintf(str,"I6:    ");
+//	OLED_ShowString(84,7*8, (uint8_t *)str,CHARSIZE_8X6);
+//	sprintf(str,"I6:%d",ad_value[5]);
+//	OLED_ShowString(84,7*8, (uint8_t *)str,CHARSIZE_8X6);
+	
+//	sprintf(str,"CSet1:      I1:    ");
+//	OLED_ShowString(0,3*8, (uint8_t *)str,CHARSIZE_8X6);
+//	sprintf(str,"CSet1:%d   I1:%d",curr_val.value.ch1,ad_value[0]);
+//	OLED_ShowString(0,3*8, (uint8_t *)str,CHARSIZE_8X6);
+//	
+//	sprintf(str,"CSet2:      I2:    ");
+//	OLED_ShowString(0,4*8, (uint8_t *)str,CHARSIZE_8X6);
+//	sprintf(str,"CSet2:%d   I2:%d",curr_val.value.ch2,ad_value[1]);
+//	OLED_ShowString(0,4*8, (uint8_t *)str,CHARSIZE_8X6);
+//	
+//	sprintf(str,"CSet3:      I3:    ");
+//	OLED_ShowString(0,5*8, (uint8_t *)str,CHARSIZE_8X6);
+//	sprintf(str,"CSet3:%d   I3:%d",curr_val.value.ch3,ad_value[2]);
+//	OLED_ShowString(0,5*8, (uint8_t *)str,CHARSIZE_8X6);
+//	
+//	sprintf(str,"CSet4:      I7:    ");
+//	OLED_ShowString(0,6*8, (uint8_t *)str,CHARSIZE_8X6);
+//	sprintf(str,"CSet4:%d   I7:%d",curr_val.value.ch4,ad_value[6]);
+//	OLED_ShowString(0,6*8, (uint8_t *)str,CHARSIZE_8X6);
 	
 //	sprintf(str,"Distence:   ");
 //	OLED_ShowString(0,7*8, (uint8_t *)str,CHARSIZE_8X6);
@@ -434,15 +493,18 @@ ALIGN(RT_ALIGN_SIZE)
 static char thd_oled_stack[OLED_THREAD_STACK_SIZE];
 static struct rt_thread thd_oled;
 
-
+#include "LM75A.h"
 static void oled_display_entey(void *parameter)
 {
 	//OLED_Init();
 	while(1)
   {
 		rt_thread_mdelay(1000);
+		temperature_display = LM75A_Read_Test();
 		if(oled_error == 0)
 			OLED_Test();
+		
+		
 	}
 }
 

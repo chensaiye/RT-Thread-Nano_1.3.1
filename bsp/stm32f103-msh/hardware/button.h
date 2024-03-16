@@ -29,7 +29,10 @@
 #define BUTTON_2 		1				//
 #define BUTTON_3 		2				//
 #define BUTTON_4 		3				//
-#define BUTTON_DUMMY 	4
+#define BUTTON_5 		4				//
+#define BUTTON_6 		5				//
+
+#define BUTTON_DUMMY 	6
 
 #define BUTTON_RIR1			8
 #define BUTTON_RIR2			9

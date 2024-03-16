@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 /* USER CODE END Includes */
-
+#include "main_control.h"
 //extern void MX_USART2_UART_Init(void);
 extern uint8_t USART3_RX_BUF[USART3_REC_LEN];
 extern uint16_t USART3_RX_STA;
@@ -34,19 +34,20 @@ static struct rt_thread thd_usart3;
 static void usart3_ctl_entey(void *parameter)
 {
   /* USER CODE BEGIN 1 */
-	char str[50]="test for uart3";
+	//char str[50]="test for uart3";
 	USART3_RX_STA = 0;
 	//MX_USART3_UART_Init();
 	
-	#ifdef USART3_TXSEND_WITH_DMA
-		HAL_UART_Transmit_DMA(&huart3,(uint8_t *)str,12);//strlen(str));
-	#else
-		HAL_UART_Transmit(&huart3,(uint8_t *)str,strlen(str),10000);
-	#endif
+	// #ifdef USART3_TXSEND_WITH_DMA
+	// 	HAL_UART_Transmit_DMA(&huart3,(uint8_t *)str,strlen(str));
+	// #else
+	// 	HAL_UART_Transmit(&huart3,(uint8_t *)str,strlen(str),10000);
+	// #endif
 	
 	HAL_UART_Receive_IT(&huart3,USART3_RX_BUF,USART3_REC_LEN);
 	while (1)
   {
+		#if 0	//RX TX test
 		if(USART3_RX_STA&0x8000)
 		{
 			#ifdef USART3_TXSEND_WITH_DMA
@@ -60,6 +61,23 @@ static void usart3_ctl_entey(void *parameter)
 			HAL_UART_Receive_IT(&huart3,USART3_RX_BUF,USART3_REC_LEN);
 			
 		}
+		#endif
+		#if 1 // add logic
+		if(USART3_RX_STA&0x8000)
+		{
+			if(remote_bag_in(USART3_RX_BUF)==1)
+			{
+				#ifdef USART3_TXSEND_WITH_DMA
+					HAL_UART_Transmit_DMA(&huart3,USART3_RX_BUF,BAG_LENGTH);
+				#else
+					HAL_UART_Transmit(&huart3,USART3_RX_BUF,BAG_LENGTH,10000);
+				#endif
+			}
+			USART3_RX_STA = 0;
+			huart3.RxState = HAL_UART_STATE_READY;
+			HAL_UART_Receive_IT(&huart3,USART3_RX_BUF,USART3_REC_LEN);
+		}
+		#endif
 		rt_thread_mdelay(10);
 	}
 }

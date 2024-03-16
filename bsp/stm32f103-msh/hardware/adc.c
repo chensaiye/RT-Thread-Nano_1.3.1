@@ -66,13 +66,30 @@ uint16_t temp_adv;
 //获得ADC值
 uint16_t Get_Adc(void)
 {
-	HAL_StatusTypeDef error;
-	
-	error = HAL_ADC_Start(&hadc1);
-	error = HAL_ADC_PollForConversion(&hadc1,1000);
+	HAL_ADC_Start(&hadc1);
+	HAL_ADC_PollForConversion(&hadc1,1000);
 	temp_adv = HAL_ADC_GetValue(&hadc1);
 	//HAL_ADC_Stop(&hadc1);
-	return temp_adv;
+	return (temp_adv&0x0FFF);
+}
+
+static uint16_t Get_ADC_Buf_Average(uint16_t len,uint16_t* buf)
+{
+	uint16_t min=5000,max=0,i;
+	uint32_t temp32=0;
+	uint16_t temp16=0;
+	for(i=0;i<len;i++,buf++)
+	{
+		if(*buf < min)
+			min = *buf;
+		if(*buf > max)
+			max = *buf;
+		temp32 += *buf;
+	}
+	temp32 -= (min+max);
+	temp32 = temp32/(len-2);
+	temp16 = (uint16_t)temp32;
+	return temp16;
 }
 
 #define ADC_THREAD_PRIORITY         (RT_THREAD_PRIORITY_MAX - 4)
@@ -84,20 +101,127 @@ static char thd_adc_stack[ADC_THREAD_STACK_SIZE];
 static struct rt_thread thd_adc;
 
 #include "cd4051.h"
+#include "main_control.h"
+extern union_status curr_status;//当前状态
+extern pwm_value_union set_val;//设定值
+extern pwm_value_union curr_val;//当前值
+extern rt_sem_t sem_warning;
+
 uint16_t ch = 0;
+uint16_t numb = 0;
 uint16_t ad_value[8];
+uint16_t ad_group[8][5];
+#define ADC_I_MIN  200
+#define ADC_I_MAX  3000
+
+//错误检测逻辑 --
+//开灯情况下，PWM值达到设定值后开始采样，123通道为1组，456通道为一组，7通道为主灯
+//副灯异常判断逻辑：当前通道的值与其他2个通道的平均值 差异超过25%，则通道错误标志置1，否则清零。
+
+static void Error_Check(uint16_t avg,uint16_t diff,uint16_t ch)
+{
+	rt_sem_take(sem_warning,RT_WAITING_FOREVER);
+	if((avg > ADC_I_MIN))//&&(avg < ADC_I_MAX))
+	{
+		if((ad_value[ch]>avg+diff)||((ad_value[ch]<avg-diff))||(ad_value[ch]>ADC_I_MAX))//||(ad_value[ch]<ADC_I_MIN))
+			curr_status.value.error_Flag |= 0x01<<ch;
+		else
+			curr_status.value.error_Flag &= ~(0x01<<ch);
+  }
+	else
+		curr_status.value.error_Flag &= ~(0x01<<ch);
+	rt_sem_release(sem_warning);
+}
+
+uint8_t old_error_flag=0;
+//LED驱动电压反馈值 异常判断
+static void CH_Error_Test(void)
+{
+	uint16_t tp_value=0, diff_val=0;
+	
+	old_error_flag = curr_status.value.error_Flag;
+	//通道1
+	tp_value = (ad_value[1]+ad_value[2])>>1;//平均值
+	diff_val = tp_value>>2;
+	Error_Check(tp_value,diff_val,0);
+	
+	//通道2
+	tp_value = (ad_value[0]+ad_value[2])>>1;//平均值
+	diff_val = tp_value>>2;
+	Error_Check(tp_value,diff_val,1);
+	
+	//通道3
+	tp_value = (ad_value[0]+ad_value[1])>>1;//平均值
+	diff_val = tp_value>>2;
+	Error_Check(tp_value,diff_val,2);
+	
+	//通道4
+	tp_value = (ad_value[4]+ad_value[5])>>1;//平均值
+	diff_val = tp_value>>2;
+	Error_Check(tp_value,diff_val,3);
+	
+	//通道5
+	tp_value = (ad_value[3]+ad_value[5])>>1;//平均值
+	diff_val = tp_value>>2;
+	Error_Check(tp_value,diff_val,4);
+	
+	//通道6
+	tp_value = (ad_value[3]+ad_value[4])>>1;//平均值
+	diff_val = tp_value>>2;
+	Error_Check(tp_value,diff_val,5);
+	
+	//通道7 //主灯异常判断逻辑：
+	rt_sem_take(sem_warning,RT_WAITING_FOREVER);
+	if((ad_value[6]>ADC_I_MAX))// ||(ad_value[6]<ADC_I_MIN))
+		curr_status.value.error_Flag |= 0x40;
+	else
+		curr_status.value.error_Flag &= ~(0x40);
+	rt_sem_release(sem_warning);
+	if(old_error_flag != curr_status.value.error_Flag)
+		led_manual_updata();
+}
+
+
 static void ADCread_scan_entey(void *parameter)
 {
 	while(1)
 	{
-		CD4051_Ch_Select(ch);
-		rt_thread_mdelay(20);
-		ad_value[ch] = Get_Adc();
-		if(++ch>7)
-			ch = 0;
-		rt_thread_mdelay(500);
+		if(curr_status.value.pow_fg == ON)
+		{
+			if((set_val.buf[0]== curr_val.buf[0]) && (set_val.buf[1]== curr_val.buf[1]) && (set_val.buf[2]== curr_val.buf[2]))
+			{
+					for(ch=0;ch<7;ch++)
+					{
+						CD4051_Ch_Select(ch);
+						rt_thread_mdelay(100);
+						//每通道采样5次
+						for(numb=0;numb<5;numb++)
+							ad_group[ch][numb] = Get_Adc();
+					}
+				
+				CD4051_Ch_Select(7);
+				//取平均值
+				for(ch=0;ch<7;ch++)
+				{	
+					ad_value[ch] = Get_ADC_Buf_Average(5,&(ad_group[ch][0]));
+					if(ad_value[ch]>4095)
+						ad_value[ch] = 4095;
+				}
+				CH_Error_Test();//LED驱动电压反馈值 异常判断
+			}
+			else
+				curr_status.value.error_Flag &= 0x80;//clear all ch error
+		}
+		else
+		{	
+			curr_status.value.error_Flag &= 0x80;//clear all ch error
+			for(ch=0;ch<7;ch++)
+				ad_value[ch] = 0;
+		}
+		rt_thread_mdelay(250);
 	}
 }
+
 
 int thread_adc_init(void)
 {

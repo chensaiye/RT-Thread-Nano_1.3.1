@@ -1,5 +1,6 @@
 #include "tof10120.h" 
 #include "iic_bus.h" 
+#include "myiic.h" 
 #include "button.h"
 #include "main_control.h"
 //////////////////////////////////////////////////////////////////////////////////	 
@@ -8,7 +9,7 @@
 //tof10120 驱动代码	   
 ////////////////////////////////////////////////////////////////////////////////// 
 
-#define TOF_BUF_SIZE 20
+#define TOF_BUF_SIZE 10
 #define TOF_MAX_DIS 800
 uint16_t TOF_Error=0;
 uint16_t TOF_Buf_Set=0;
@@ -24,7 +25,7 @@ extern void Error_Handler(void);
 extern I2C_HandleTypeDef hi2c1;
 extern uint8_t Channels_RIR[CHANNEL_RIR_MAX];
 extern union_status curr_status;//当前状态
-
+extern rt_sem_t sem_warning;
 void TOF10120_EN_Init(void)
 {
    GPIO_InitTypeDef  GPIO_InitStructure;
@@ -45,7 +46,8 @@ int TOF10120_Init(void)
 	rt_thread_mdelay(50);
 	HAL_GPIO_WritePin(TOF1010_EN_Port,TOF1010_EN,GPIO_PIN_RESET);
 	//io init
-	MX_I2C1_Init();
+	//MX_I2C1_Init();
+	UserI2c_Init();
 	
 	//data init
 	for(i=0;i<TOF_BUF_SIZE;i++)
@@ -54,70 +56,40 @@ int TOF10120_Init(void)
 	rt_thread_mdelay(500);
 	if(TOF10120_Read_Distence(&(TOF_Value_Buf[0]))!= HAL_OK)
 	{
-		//TOF_Error = 1;
 		rt_kprintf("TOF Error!\r\n");
 		return HAL_ERROR;
 	}
 	return HAL_OK;
 }
 
-//INIT_BOARD_EXPORT(TOF10120_Init);
+////INIT_BOARD_EXPORT(TOF10120_Init);
 
-//在TOF10120_Write指定地址写入一个数据
-//WriteAddr  :写入数据的目的地址    
-//DataToWrite:要写入的数据
-void TOF10120_WriteOneByte(uint16_t WriteAddr,uint8_t DataToWrite)
-{				   	  	    																 
-	//I2C_Master_BufferWrite(I2C1,&DataToWrite,0x01,TOF_ADDRESS1,WriteAddr);
-	//HAL_I2C_Master_Transmit
-}
 
-//在TOF10120_Write里面的指定地址开始写入指定个数的数据
-//WriteAddr :开始写入的地址 对24c02为0~255
-//pBuffer   :数据数组首地址
-//NumToWrite:要写入数据的个数
-HAL_StatusTypeDef TOF10120_Write(uint16_t WriteAddr,uint8_t *pBuffer,uint16_t NumToWrite)
-{
-	HAL_StatusTypeDef tperror = HAL_OK;
-	tperror =	HAL_I2C_Mem_Write(&hi2c1,TOF_ADDRESS1,WriteAddr,I2C_MEMADD_SIZE_8BIT,pBuffer,NumToWrite,100);
-	return tperror;
-}
+//uint32_t HAL_GetTick(void)
+//{
+//  return rt_tick_get();
+//}
 
-//在TOF10120_Write里面的指定地址开始读出指定个数的数据
-//ReadAddr :开始读出的地址 对24c02为0~255
-//pBuffer  :数据数组首地址
-//NumToRead:要读出数据的个数
-HAL_StatusTypeDef TOF10120_Read(uint16_t ReadAddr,uint8_t *pBuffer,uint16_t NumToRead)
-{
-	HAL_StatusTypeDef tperror = HAL_OK;
-	//I2C_Master_BufferRead(I2C1,pBuffer,NumToRead,TOF_ADDRESS1,ReadAddr);
-	tperror = HAL_I2C_Mem_Read(&hi2c1,TOF_ADDRESS1,ReadAddr,I2C_MEMADD_SIZE_8BIT,pBuffer,NumToRead,100);
-	return tperror;
-} 
-
-uint32_t HAL_GetTick(void)
-{
-  return rt_tick_get();
-}
-
+//
 
 HAL_StatusTypeDef TOF10120_Read_Distence(uint16_t *dis)
 {
-	uint8_t buf[2];
-	HAL_StatusTypeDef error;
-	error = HAL_I2C_Mem_Read(&hi2c1,TOF_ADDRESS1,FILTERED_DIS_REG,I2C_MEMADD_SIZE_8BIT,buf,0x02,10);
+	//uint8_t buf[2];
+	unsigned char error;
+	error = SensorReadnByte(TOF_ADDRESS1,(unsigned char *)dis,FILTERED_DIS_REG,2);
+	//error = TOF10120_Mem_Read(TOF_ADDRESS1,FILTERED_DIS_REG,*dis);
 	if(error==HAL_OK)
 	{	
-		*dis = (buf[0]<<8) + buf[1];
+		//*dis = (buf[0]<<8) + buf[1];
 		return HAL_OK;
 	}
 	else
-		return error;
+		return (HAL_StatusTypeDef)error;
 }
  
 //平均值滤波
 //len > 2 
-uint16_t Get_Buf_Average(uint16_t len,uint16_t* buf)
+static uint16_t Get_Buf_Average(uint16_t len,uint16_t* buf)
 {
 	uint16_t min=5000,max=0,i;
 	uint32_t temp32=0;
@@ -148,25 +120,27 @@ uint16_t TOF10120_Read_Scan(void)
 		if(TOF_Buf_Set > TOF_BUF_SIZE-1)
 			TOF_Buf_Set=0;
 		TOF_Value = Get_Buf_Average(TOF_BUF_SIZE,TOF_Value_Buf);
-		return TOF_Value;
-  }
+	}
 	else
-		return 1000;
+	{
+		TOF_Value = 1000;
+	}
+	return TOF_Value;
 }
 
 
 #define TOFREAD_THREAD_PRIORITY         (RT_THREAD_PRIORITY_MAX - 2)
 #define TOFREAD_THREAD_STACK_SIZE       256
-#define TOFREAD_THREAD_TIMESLICE        20
+#define TOFREAD_THREAD_TIMESLICE        50
 
 ALIGN(RT_ALIGN_SIZE)
 static char thd_tofread_stack[TOFREAD_THREAD_STACK_SIZE];
 static struct rt_thread thd_tofread;
 
-
 static void Tofread_scan_entey(void *parameter)
 {
 	uint16_t distance;
+	
 	while(1)
   {
 		while(1)
@@ -178,12 +152,35 @@ static void Tofread_scan_entey(void *parameter)
 				bt_rir_7(BUTTON_LONG_RELEASE);
 			if((distance<=425) && Channels_RIR[6]==0)
 				bt_rir_7(BUTTON_LONG_PRESSED);
+			
+			if(curr_status.value.error_Flag & 0x80)
+			{
+				TOF_Error = 0;
+				rt_sem_take(sem_warning,RT_WAITING_FOREVER);
+				curr_status.value.error_Flag &= 0x7F; 
+				rt_sem_release(sem_warning);
+				led_manual_updata();
+			}
 			rt_thread_mdelay(200);
 		}
+		
 		HAL_GPIO_WritePin(TOF1010_EN_Port,TOF1010_EN,GPIO_PIN_SET);
-		rt_thread_mdelay(1000);
-		HAL_GPIO_WritePin(TOF1010_EN_Port,TOF1010_EN,GPIO_PIN_RESET);
 		rt_thread_mdelay(500);
+		
+		HAL_GPIO_WritePin(TOF1010_EN_Port,TOF1010_EN,GPIO_PIN_RESET);
+		rt_thread_mdelay(1000);
+		
+		if(++TOF_Error > 5)
+		{
+			TOF_Error = 0;
+			if((curr_status.value.error_Flag & 0x80)==0)
+			{
+				rt_sem_take(sem_warning,RT_WAITING_FOREVER);
+				curr_status.value.error_Flag |= 0x80; 
+				rt_sem_release(sem_warning);
+			  led_manual_updata();
+			}
+		}	
 	}
 }
 
@@ -191,8 +188,9 @@ int tof_read_start(void)
 {
 	if((curr_status.value.sys_set & 0x08)==0x00)
 		return 1;
-	 if(TOF10120_Init()!=HAL_OK)
-		 return 1;
+	  TOF10120_Init();
+//	 if(TOF10120_Init()!=HAL_OK)
+//		 return 1;
 	 rt_thread_init(&thd_tofread,
 									 "tof_read",
 									 Tofread_scan_entey,

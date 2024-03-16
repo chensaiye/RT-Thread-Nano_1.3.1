@@ -22,7 +22,7 @@
 
 
 //cd4051 IO初始化
-void CD4051_Init(void)
+int CD4051_Init(void)
 {
    GPIO_InitTypeDef  GPIO_InitStructure;
 	//cd4051端口设置
@@ -32,8 +32,9 @@ void CD4051_Init(void)
     GPIO_InitStructure.Pull  = GPIO_NOPULL;
     GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_LOW;
 	 HAL_GPIO_Init(CD4051_Port, &GPIO_InitStructure);					 //根据设定参数初始化GPIOC
-	 
+	 return 0;
 }
+
 INIT_BOARD_EXPORT(CD4051_Init);
 
 //4051输出 ,ch通道 ，endis

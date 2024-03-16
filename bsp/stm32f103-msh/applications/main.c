@@ -20,6 +20,7 @@
 #include "pwm_tim3.h"
 #include "oled.h"
 #include "main_control.h"
+#include "adc.h"
 
 #define RUN_GPIO_PORT  GPIOB
 #define RUN_PIN        GPIO_PIN_12
@@ -28,9 +29,11 @@
 #define LED1_Pin GPIO_PIN_1
 #define LED1_GPIO_Port GPIOB
 
-/* ¶¨Ê±Æ÷µÄ¿ØÖÆ¿é */
+/* ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½Æ¿ï¿½ */
 static rt_timer_t timer1;
 static rt_timer_t timer2;
+
+extern rt_sem_t  sem_warning;
 
 extern uint8_t Channels_RIR[CHANNEL_RIR_MAX];
 
@@ -86,25 +89,25 @@ void Error_Handler(void)
 //	HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_RESET);
 //	HAL_GPIO_WritePin(QJ_POW_GPIO_Port, QJ_POW_Pin, GPIO_PIN_RESET);
 //	//HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_SET);
-//	rt_enter_critical();//µ÷¶ÈÆ÷ÉÏËø
+//	rt_enter_critical();//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //	backup_data();
 //  /* USER CODE END PVD_IRQn 0 */
 //  HAL_PWR_PVD_IRQHandler();
 //  /* USER CODE BEGIN PVD_IRQn 1 */
 //	//HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_RESET);
-//	rt_exit_critical();//µ÷¶ÈÆ÷½âËø	
+//	rt_exit_critical();//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	
 //  /* USER CODE END PVD_IRQn 1 */
 //}
 
 
-/* ¶¨Ê±Æ÷1³¬Ê±º¯Êý */
+/* ï¿½ï¿½Ê±ï¿½ï¿½1ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ */
 static void time1_out(void *parameter)
 {
  // HAL_GPIO_TogglePin(RUN_GPIO_PORT, RUN_PIN);
 	Led_Blink();
 }
 static uint8_t PD_Count= 0;
-///* ¶¨Ê±Æ÷1³¬Ê±º¯Êý */
+///* ï¿½ï¿½Ê±ï¿½ï¿½1ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ */
 static void time2_out(void *parameter)
 {
 	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_2)==GPIO_PIN_SET)
@@ -112,12 +115,12 @@ static void time2_out(void *parameter)
 		PD_Count++;
 		if(PD_Count>= 2)
 		{
-			rt_enter_critical();//µ÷¶ÈÆ÷ÉÏËø
+			rt_enter_critical();//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(QJ_POW_GPIO_Port, QJ_POW_Pin, GPIO_PIN_RESET);
 			backup_data();
 			HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
-			rt_exit_critical();//µ÷¶ÈÆ÷½âËø
+			rt_exit_critical();//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			rt_timer_stop(timer2);
 		}
 		else
@@ -136,26 +139,31 @@ static void time2_out(void *parameter)
 
 static void times_init(void)
 {
-		/* ´´½¨¶¨Ê±Æ÷1  ÖÜÆÚ¶¨Ê±Æ÷ */
+		/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½1  ï¿½ï¿½ï¿½Ú¶ï¿½Ê±ï¿½ï¿½ */
     timer1 = rt_timer_create("timer1", time1_out,
                              RT_NULL, 20,
                              RT_TIMER_FLAG_PERIODIC);
-    /* Æô¶¯¶¨Ê±Æ÷1 */
+    /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½1 */
     if (timer1 != RT_NULL)
         rt_timer_start(timer1);
 		
-//		/* ´´½¨¶¨Ê±Æ÷2  ÖÜÆÚ¶¨Ê±Æ÷ */
+//		/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½2  ï¿½ï¿½ï¿½Ú¶ï¿½Ê±ï¿½ï¿½ */
     timer2 = rt_timer_create("timer2", time2_out,
                              RT_NULL, 10,
                              RT_TIMER_FLAG_PERIODIC);
-    /* Æô¶¯¶¨Ê±Æ÷2 */
+    /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½2 */
     if (timer2 != RT_NULL)
         rt_timer_start(timer2);
 }
 	
 
+
 int main(void)
 {
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½Åºï¿½ï¿½ï¿½
+		sem_warning = rt_sem_create("sem_warning", 1 ,RT_IPC_FLAG_FIFO);
+		if(sem_warning == RT_NULL)
+			rt_kprintf("creat sem error\r\n");
 		
     MX_GPIO_Init();
 		thread_button_init();
@@ -163,16 +171,18 @@ int main(void)
 		tof_read_start();//TOF10120_Init();
 	
 		thread_pwm_start();
-	  thread_adc_init();
+	  //thread_adc_init();
 		thread_nrf_init();
 		oled_thd_start();
-		//thread_usart3_init();
+		thread_usart3_init();
 		
 		rt_thread_mdelay(200);
 		//MX_EXTI_GPIO_Init();
 		//PowDown_Test_Init();
 	
 		times_init();
+	
+		
 		
 		while (1)
     {
@@ -189,8 +199,8 @@ static void MX_GPIO_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-		__HAL_RCC_AFIO_CLK_ENABLE();//io¸´ÓÃÊ¹ÄÜ
-		__HAL_AFIO_REMAP_SWJ_NOJTAG();//¹Ø±Õjtag£¬Ê¹ÄÜSWD£¬¿ÉÒÔÓÃSWDÄ£Ê½µ÷ÊÔ ,Ê¹ÓÃjtagµ÷ÊÔ¿Ú×öÆÕÍ¨ioÊ±£¬±ØÐëÊ¹ÄÜio¸´ÓÃ
+		__HAL_RCC_AFIO_CLK_ENABLE();//ioï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½
+		__HAL_AFIO_REMAP_SWJ_NOJTAG();//ï¿½Ø±ï¿½jtagï¿½ï¿½Ê¹ï¿½ï¿½SWDï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½SWDÄ£Ê½ï¿½ï¿½ï¿½ï¿½ ,Ê¹ï¿½ï¿½jtagï¿½ï¿½ï¿½Ô¿ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ioÊ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ioï¿½ï¿½ï¿½ï¿½
     __HAL_RCC_GPIOB_CLK_ENABLE();
     HAL_GPIO_WritePin(RUN_GPIO_PORT, RUN_PIN, GPIO_PIN_RESET);
 
@@ -242,7 +252,7 @@ static void MX_GPIO_Init(void)
 //  /* USER CODE BEGIN EXTI2_IRQn 0 */
 //	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_2)==GPIO_PIN_SET)
 //	{
-//		rt_enter_critical();//µ÷¶ÈÆ÷ÉÏËø
+//		rt_enter_critical();//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //		HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_RESET);
 //		HAL_GPIO_WritePin(QJ_POW_GPIO_Port, QJ_POW_Pin, GPIO_PIN_RESET);
 //		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
@@ -252,7 +262,7 @@ static void MX_GPIO_Init(void)
 //		//rt_thread_mdelay(10);
 //		backup_data();
 //		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
-//		rt_exit_critical();//µ÷¶ÈÆ÷½âËø
+//		rt_exit_critical();//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //		/* USER CODE END EXTI2_IRQn 1 */
 //	}
 //	else

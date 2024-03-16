@@ -21,7 +21,7 @@
 #define CD4051_C GPIO_PIN_15
 #define CD4051_Port GPIOB
 
-void CD4051_Init(void);//初始化
+int CD4051_Init(void);//初始化
 void CD4051_Ch_Select(uint16_t ch);//通道选择
 
 #endif
