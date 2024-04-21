@@ -13,7 +13,7 @@
 #include "flash_eeprom.h"
 #include "sm4.h"
 
-#define RED_COMPENSATE_ENABLE	1
+//#define RED_COMPENSATE_ENABLE	1
 
 const uint16_t QJ_Min=100,QJ_Max=1000;
 
