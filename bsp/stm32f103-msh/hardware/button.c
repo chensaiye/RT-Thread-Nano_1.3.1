@@ -1,17 +1,17 @@
 /********************************************************************************/
 //////////////////////////////////////////////////////////////////////////////////	
-//°´¼üÉ¨Ãè¼°´¦Àí´úÂë
-//±¾³ÌÐòÖ»¹©Ñ§Ï°Ê¹ÓÃ£¬Î´¾­×÷ÕßÐí¿É£¬²»µÃÓÃÓÚÆäËüÈÎºÎÓÃÍ¾
-//STM32¿ª·¢°å
+//ï¿½ï¿½ï¿½ï¿½É¨ï¿½è¼°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö»ï¿½ï¿½Ñ§Ï°Ê¹ï¿½Ã£ï¿½Î´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îºï¿½ï¿½ï¿½Í¾
+//STM32ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //CSY
-//ÈÕÆÚ:2020/4/09
-//°æ±¾£ºV1.0
-//°æÈ¨ËùÓÐ£¬µÁ°æ±Ø¾¿¡£
+//ï¿½ï¿½ï¿½ï¿½:2020/4/09
+//ï¿½æ±¾ï¿½ï¿½V1.0
+//ï¿½ï¿½È¨ï¿½ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½ï¿½
 //Copyright(C) 
 //All rights reserved									   
 //////////////////////////////////////////////////////////////////////////////////
 /********************************************************************************/
-//ÐÞ¸ÄËµÃ÷ 
+//ï¿½Þ¸ï¿½Ëµï¿½ï¿½ 
 //V1.0	
 ////////////////////////////////////////////////////////////////////////////////// 
 /********************************************************************************/
@@ -142,7 +142,7 @@ static int Button_IO_Init_GP2(void)
 }
 INIT_BOARD_EXPORT(Button_IO_Init_GP2);
 
-//»ñÈ¡Ò»¸öÓÐÐ§°´¼üÖµ
+//ï¿½ï¿½È¡Ò»ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½Öµ
 //uint8_t get_button(void)
 //{
 //	uint16_t temp;
@@ -244,7 +244,7 @@ void button_trigger( unsigned char button_name, unsigned char flag )
 		process[button_name]( flag );
 }
 
-extern union_status curr_status;//µ±Ç°×´Ì¬
+extern union_status curr_status;//ï¿½ï¿½Ç°×´Ì¬
 //--------------------------------- button_1
 void button_1( unsigned char flag )
 {
@@ -273,7 +273,7 @@ void button_1( unsigned char flag )
 								else
 									Save_To_MIN(MODE_QJ);
 						}
-						curr_status.value.sys_set &= 0x7F;//ÍË³öÉèÖÃ
+						curr_status.value.sys_set &= 0x7F;//ï¿½Ë³ï¿½ï¿½ï¿½ï¿½ï¿½
 					}
 					else
 					{	
@@ -281,26 +281,26 @@ void button_1( unsigned char flag )
 						{
 							if(curr_status.value.lum_grade==(LUM_GRADE_NUMB-1))//max level
 							{
-								Recover_To_MAX(MODE_LUM);//»Ö¸´ÕÕ¶È£¬È¥³ý²¹³¥Ó°Ïì
-								curr_status.value.sys_set |= 0x80;//Ê¹ÄÜÉèÖÃ
+								Recover_To_MAX(MODE_LUM);//ï¿½Ö¸ï¿½ï¿½Õ¶È£ï¿½È¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½
+								curr_status.value.sys_set |= 0x80;//Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 							}
 							if(curr_status.value.lum_grade==0)//min level	
 							{
-								Recover_To_MIN(MODE_LUM);//»Ö¸´ÕÕ¶È£¬È¥³ý²¹³¥Ó°Ïì
-								curr_status.value.sys_set |= 0x80;//Ê¹ÄÜÉèÖÃ
+								Recover_To_MIN(MODE_LUM);//ï¿½Ö¸ï¿½ï¿½Õ¶È£ï¿½È¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½
+								curr_status.value.sys_set |= 0x80;//Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 							}
 						}
 						else if(curr_status.value.mode == MODE_QJ)//Ä£Ê½0
 						{
 							if(curr_status.value.qj_grade ==(QJ_GP_NUMB-1))//max level
 							{
-								Recover_To_MAX(MODE_QJ);//»Ö¸´ÕÕ¶È£¬È¥³ý²¹³¥Ó°Ïì
-								curr_status.value.sys_set |= 0x80;//Ê¹ÄÜÉèÖÃ
+								Recover_To_MAX(MODE_QJ);//ï¿½Ö¸ï¿½ï¿½Õ¶È£ï¿½È¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½
+								curr_status.value.sys_set |= 0x80;//Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 							}
 							if(curr_status.value.qj_grade==0)//min level	
 							{
-								Recover_To_MIN(MODE_QJ);//»Ö¸´ÕÕ¶È£¬È¥³ý²¹³¥Ó°Ïì
-								curr_status.value.sys_set |= 0x80;//Ê¹ÄÜÉèÖÃ
+								Recover_To_MIN(MODE_QJ);//ï¿½Ö¸ï¿½ï¿½Õ¶È£ï¿½È¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó°ï¿½ï¿½
+								curr_status.value.sys_set |= 0x80;//Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 							}
 						}
 					}
@@ -323,7 +323,7 @@ void button_1( unsigned char flag )
 	}
 		
 }//---------------------------------
-extern union_status curr_status;//µ±Ç°×´Ì¬
+extern union_status curr_status;//ï¿½ï¿½Ç°×´Ì¬
 //---------------------------------button_2
 void button_2( unsigned char flag )
 {
@@ -333,8 +333,11 @@ void button_2( unsigned char flag )
 		if(curr_status.value.pow_fg==ON)
 		{
 			if((curr_status.value.sys_set&0x80)==0)
-			{//·ÇÉèÖÃ×´Ì¬
-				curr_status.value.mode = MODE_LUM;
+			{//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬
+				if(curr_status.value.mode == MODE_LUM)
+					curr_status.value.mode = MODE_QJ;
+				else
+					curr_status.value.mode = MODE_LUM;
 				Event_Mode();
 			}
 		}
@@ -361,7 +364,7 @@ void button_3( unsigned char flag )
 	if( flag == BUTTON_DOWN )
 	{
 		if(curr_status.value.sys_set&0x80)
-		{//ÉèÖÃ×´Ì¬
+		{//ï¿½ï¿½ï¿½ï¿½×´Ì¬
 			if(curr_status.value.mode == MODE_LUM)
 				Minus_V4();
 			else
@@ -393,7 +396,7 @@ void button_4( unsigned char flag )
 	if( flag == BUTTON_DOWN )
 	{
 		if(curr_status.value.sys_set&0x80)
-		{//ÉèÖÃ×´Ì¬
+		{//ï¿½ï¿½ï¿½ï¿½×´Ì¬
 				if(curr_status.value.mode == MODE_LUM)
 					Add_V4();
 				else
@@ -426,7 +429,7 @@ void button_5( unsigned char flag )
 		if(curr_status.value.pow_fg==ON)
 		{
 			if((curr_status.value.sys_set&0x80)==0)
-			{//·ÇÉèÖÃ×´Ì¬
+			{//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬
 				curr_status.value.mode = MODE_QJ ;
 				Event_Mode();
 			}
@@ -456,7 +459,7 @@ void button_6( unsigned char flag )
 		if(curr_status.value.pow_fg==ON)
 		{
 			if((curr_status.value.sys_set&0x80)==0)
-			{//·ÇÉèÖÃ×´Ì¬
+			{//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬
 				curr_status.value.mode = MODE_DEPTH;
 				Event_Mode();
 			}

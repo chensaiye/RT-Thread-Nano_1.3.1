@@ -33,12 +33,12 @@ typedef enum
   ON = !OFF
 }SwitchStatus;
 
-#define MAX_LEVEL 10
+#define MAX_LEVEL 8
 
-#define LUM_GRADE_NUMB 	10		
+#define LUM_GRADE_NUMB 	8		
 //#define FACULA_GP_NUMB 	5
 //#define SEWEN_GP_NUMB 	5
-#define QJ_GP_NUMB 			10
+#define QJ_GP_NUMB 			8
 
 #define GP1_POW_Pin GPIO_PIN_0
 #define GP1_POW_GPIO_Port GPIOA
