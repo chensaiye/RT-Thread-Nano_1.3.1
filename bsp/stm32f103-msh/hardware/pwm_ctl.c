@@ -95,7 +95,7 @@ void pwm_output_clear(void)
 	TIM4_PWM_Set_Channel(2,curr_val.value.ch5);
 }
 
-#define PWM_STARTUP_VALUE	(550u)
+#define PWM_STARTUP_VALUE	(250u)
 //通道值缓冲变化
 void pwm_buffer(void)
 {
@@ -109,14 +109,14 @@ void pwm_buffer(void)
 			curr_val.buf[i]=set_val.buf[i];
 #endif
 #if 1
-			// if(curr_val.buf[i] < PWM_STARTUP_VALUE)
-			// {
-			// 	 if(set_val.buf[i] < PWM_STARTUP_VALUE)
-			// 			curr_val.buf[i]=set_val.buf[i];
-			// 	 else
-			// 		  curr_val.buf[i]=PWM_STARTUP_VALUE;
-			// }
-			// else
+			if(curr_val.buf[i] < PWM_STARTUP_VALUE)
+			{
+				 if(set_val.buf[i] < PWM_STARTUP_VALUE)
+						curr_val.buf[i]=set_val.buf[i];
+				 else
+					  curr_val.buf[i]=PWM_STARTUP_VALUE;
+			}
+			else
 			{
 				if(curr_val.buf[i]>set_val.buf[i])
 				{
