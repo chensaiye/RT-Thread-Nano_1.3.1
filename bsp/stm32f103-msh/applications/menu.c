@@ -44,82 +44,9 @@ uint32_t Menu_View_Flag; //菜单预览标志
 //	{0x001B,0x001B,0x0001,0x002D,1},
 //};
 
-//604Plus para 2020.9.20
-//mode 0: 630*4  --- 1670*4		41kLx - 155kLx
-//mode 1: 630*4  --- 1670*4		41kLx - 155kLx
-//mode 2: 550*3+900  --- 1300*3+2300		42kLx - 149kLx
-//mode 3: 0*3+50  --- 0*3+2200		0kLx - 22kLx
-//gain :20
-#if 0
-sMenuItemValue MenuIVS[MENUITEMVALUE_NO] = {
-//	{630,630,0x0046,PARA_MAX,1},// 当前值， 默认值， 最小值， 最大值 ，放大倍数
-//	{1640,1640,0x0046,PARA_MAX,1},	
-//	{630,630,0x0046,PARA_MAX,1},
-//	{1640,1640,0x0046,PARA_MAX,1},
-//	{630,630,0x0046,PARA_MAX,1},
-//	{1640,1640,0x0046,PARA_MAX,1},
-//	{630,630,0x0046,PARA_MAX-300,1},
-//	{1640,1640,0x0046,PARA_MAX-300,1},
-	
-	{630,630,0x0046,PARA_MAX,1},// 当前值， 默认值， 最小值， 最大值 ，放大倍数
-	{1640,1640,0x0046,PARA_MAX,1},	
-	{630,630,0x0046,PARA_MAX,1},
-	{1640,1640,0x0046,PARA_MAX,1},
-	{630,630,0x0046,PARA_MAX,1},
-	{1640,1640,0x0046,PARA_MAX,1},
-	{630,630,0x0046,PARA_MAX-300,1},
-	{1640,1640,0x0046,PARA_MAX-300,1},
-	
-	{550,550,0x0046,PARA_MAX,1},// 当前值， 默认值， 最小值， 最大值 ，放大倍数
-	{1300,1300,0x0046,PARA_MAX,1},	
-	{550,550,0x0046,PARA_MAX,1},
-	{1300,1300,0x0046,PARA_MAX,1},
-	{550,550,0x0046,PARA_MAX,1},
-	{1300,1300,0x0046,PARA_MAX,1},
-	{900,900,0x0046,PARA_MAX-300,1},
-	{2300,2300,0x0046,PARA_MAX-300,1},
-	
-	{0x0000,0x0000,0x0000,PARA_MAX,1},// 当前值， 默认值， 最小值， 最大值 ，放大倍数
-	{0x0000,0x0000,0x0000,PARA_MAX,1},	
-	{0x0000,0x0000,0x0000,PARA_MAX,1},
-	{0x0000,0x0000,0x0000,PARA_MAX,1},
-	{0x0000,0x0000,0x0000,PARA_MAX,1},
-	{0x0000,0x0000,0x0000,PARA_MAX,1},
-	{150,150,0x0046,PARA_MAX-300,1},
-	{2200,2200,0x0046,PARA_MAX-300,1},
-	
-	{0x0014,0x0014,0x0001,0x002D,1},
-	{0x001B,0x001B,0x0001,0x002D,1},
-};
-#endif
-//704Plus para 2020.8.5 //测试工具：TENMARS TM-720
-//mode 0: 400*4  --- 1200*4		41kLx - 155kLx
-//mode 1: 400*4  --- 1200*4		41kLx - 155kLx
-//mode 2: 350*3+1000  --- 700*3+2000		42kLx - 149kLx
-//mode 3: 0*3+30  --- 0*3+2200		0kLx - 22kLx
-//gain :20
 
-//704Plus para 2020.9.6	//测试工具：OPTIMUM  SRI-MD-3000
-//mode 0: 320*4  --- 960*4		41kLx - 155kLx
-//mode 1: 320*4  --- 960*4		41kLx - 155kLx
-//mode 2: 280*3+560  --- 800*3+1600		42kLx - 149kLx
-//mode 3: 0*3+50  --- 0*3+800		0kLx - 22kLx
-//gain :20
 
-//704Plus para 2020.9.20	//测试工具：OPTIMUM  SRI-MD-3000
-//mode 0: 370*4  --- 1060*4		41kLx - 155kLx
-//mode 1: 370*4  --- 1060*4		41kLx - 155kLx
-//mode 2: 300*3+600  --- 800*3+1600		42kLx - 149kLx
-//mode 3: 0*3+50  --- 0*3+800		0kLx - 22kLx
-//gain :20
-
-//704Plus para 2020.9.20	//测试工具：OPTIMUM  SRI-MD-3000
-//mode 0: 350*4  --- 990*4		41kLx - 155kLx
-//mode 1: 350*4  --- 990*4		41kLx - 155kLx
-//mode 2: 300*3+600  --- 800*3+1600		42kLx - 149kLx
-//mode 3: 0*3+50  --- 0*3+800		0kLx - 22kLx
-//gain :20
-#if 1
+#if 0	// test on 604 on HW4.1
 sMenuItemValue MenuIVS[MENUITEMVALUE_NO] = {
 
 	// 当前值， 默认值， 最小值， 最大值 ，放大倍数 //普通模式和阴影补偿模式
@@ -156,53 +83,44 @@ sMenuItemValue MenuIVS[MENUITEMVALUE_NO] = {
 	{0x0064,0x0064,0x0001,0x0064,1},		//阴影管理最大Gain
 };
 #endif
+#if 1	// test on 704 on HW4.1
+sMenuItemValue MenuIVS[MENUITEMVALUE_NO] = {
+// current,default,min,max,gain //normal mode and compensation mode 普通模式和阴影补偿模式
+	{700,700,200,PARA_MAX,1},		//副灯最低档
+	{1640,1640,350,PARA_MAX,1},		//副灯最高档
+	{700,700,200,PARA_MAX,1},		//红灯最低档
+	{1640,1640,350,PARA_MAX,1},		//红灯最高档
+	{700,700,200,PARA_MAX,1},		//保留，未用
+	{1640,1640,350,PARA_MAX,1},		//保留，未用
+	{700,700,200,PARA_MAX,1},		//主灯最低档
+	{1640,1640,350,PARA_MAX,1},		//主灯最高档
+	
+	// 当前值， 默认值， 最小值， 最大值 ，放大倍数 //光柱深度模式 deep mode
+	{300,300,200,PARA_MAX,1},
+	{1200,1200,0x05,PARA_MAX,1},	
+	{700,700,200,PARA_MAX,1},
+	{2000,2000,0x05,PARA_MAX,1},
+	{300,300,200,PARA_MAX,1},
+	{2000,2000,0x05,PARA_MAX,1},
+	{700,700,200,PARA_MAX,1},
+	{2000,2000,0x05,PARA_MAX,1},
+	
+	// 当前值， 默认值， 最小值， 最大值 ，放大倍数 //腔镜模式	endoscpoe mode
+	{0x0000,0x0000,0x0000,PARA_MAX,1},
+	{0x0000,0x0000,0x0000,PARA_MAX,1},	
+	{0x0000,0x0000,0x0000,PARA_MAX,1},
+	{0x0000,0x0000,0x0000,PARA_MAX,1},
+	{0x0000,0x0000,0x0000,PARA_MAX,1},
+	{0x0000,0x0000,0x0000,PARA_MAX,1},
+	{750,750,200,PARA_MAX,1},		//主灯最低档
+	{1350,1350,350,PARA_MAX,1},		//主灯最高档
+	
+	{0x0032,0x0032,0x0001,0x0064,1},		//阴影管理Gain
+	{0x0064,0x0064,0x0001,0x0064,1},		//阴影管理最大Gain
+};
+#endif
 
 //菜单项值数组
-
-//sMenuItemValue MODE_GP1_Item[8] = {
-//	{400,400,0x0046,PARA_MAX,1},// 当前值， 默认值， 最小值， 最大值 ，放大倍数
-//	{1200,1200,0x0046,PARA_MAX,1},	
-//	{400,400,0x0046,PARA_MAX,1},
-//	{1200,1200,0x0046,PARA_MAX,1},
-//	
-//	{400,400,0x0046,PARA_MAX,1},// 当前值， 默认值， 最小值， 最大值 ，放大倍数
-//	{1200,1200,0x0046,PARA_MAX,1},	
-//	{400,400,0x0046,PARA_MAX,1},
-//	{1200,1200,0x0046,PARA_MAX,1},
-//};
-//sMenuItemValue MODE_GP2_Item[8] = {
-//	{0x0064,0x0064,0x0046,PARA_MAX,1},// 当前值， 默认值， 最小值， 最大值 ，放大倍数
-//	{0x0708,PARA_MAX,0x0046,PARA_MAX,1},	
-//	{0x0064,0x0064,0x0046,PARA_MAX,1},
-//	{0x0708,PARA_MAX,0x0046,PARA_MAX,1},
-//	
-//	{0x0064,0x0064,0x0046,PARA_MAX,1},
-//	{0x0708,PARA_MAX,0x0046,PARA_MAX,1},
-//	{0x0064,0x0064,0x0046,PARA_MAX,1},
-//	{0x0708,PARA_MAX,0x0046,PARA_MAX,1},
-//};
-//sMenuItemValue MODE_GP3_Item[8] = {
-//	{0x0064,0x0064,0x0046,PARA_MAX,1},// 当前值， 默认值， 最小值， 最大值 ，放大倍数
-//	{0x0708,PARA_MAX,0x0046,PARA_MAX,1},	
-//	{0x0064,0x0064,0x0046,PARA_MAX,1},
-//	{0x0708,PARA_MAX,0x0046,PARA_MAX,1},
-//	
-//	{0x0064,0x0064,0x0046,PARA_MAX,1},
-//	{0x0708,PARA_MAX,0x0046,PARA_MAX,1},
-//	{0x0064,0x0064,0x0046,PARA_MAX,1},
-//	{0x0708,PARA_MAX,0x0046,PARA_MAX,1},
-//};
-//sMenuItemValue MODE_GP4_Item[8] = {
-//	{0x0064,0x0064,0x0046,PARA_MAX,1},// 当前值， 默认值， 最小值， 最大值 ，放大倍数
-//	{0x0708,PARA_MAX,0x0046,PARA_MAX,1},	
-//	{0x0064,0x0064,0x0046,PARA_MAX,1},
-//	{0x0708,PARA_MAX,0x0046,PARA_MAX,1},
-//	
-//	{0x0064,0x0064,0x0046,PARA_MAX,1},
-//	{0x0708,PARA_MAX,0x0046,PARA_MAX,1},
-//	{0x0064,0x0064,0x0046,PARA_MAX,1},
-//	{0x0708,PARA_MAX,0x0046,PARA_MAX,1},
-//};
 
 sMenuGroup* CurrentMenuGroup;//当前指向的菜单组
 sMenuItem*  CurrentMenuItem; //当前指向的菜单项
@@ -224,36 +142,6 @@ sMenuItem MainMenu[];		//主菜单，一级菜单
 //};
 //sMenuGroup MODE1Group1={8,0,MODE_Gp1};
 
-//sMenuItem MODE_Gp2[] = {
-//	{"CH1-MIN ", MainMenu, NULL , NULL,0,&MODE_GP2_Item[0]},
-//	{"CH1-MAX ", MainMenu, NULL , NULL,0,&MODE_GP2_Item[1]},
-//	{"CH2-MIN ", MainMenu, NULL , NULL,0,&MODE_GP2_Item[2]},
-//	{"CH2-MAX ", MainMenu, NULL , NULL,0,&MODE_GP2_Item[3]},
-//	{"CH3-MIN ", MainMenu, NULL , NULL,0,&MODE_GP2_Item[4]},
-//	{"CH3-MAX ", MainMenu, NULL , NULL,0,&MODE_GP2_Item[5]},
-//	{"CH4-MIN ", MainMenu, NULL , NULL,0,&MODE_GP2_Item[6]},
-//	{"CH4-MAX ", MainMenu, NULL , NULL,0,&MODE_GP2_Item[7]},
-//};
-//sMenuItem MODE_Gp3[] = {
-//	{"CH1-MIN ", MainMenu, NULL , NULL,0,&MODE_GP3_Item[0]},
-//	{"CH1-MAX ", MainMenu, NULL , NULL,0,&MODE_GP3_Item[1]},
-//	{"CH2-MIN ", MainMenu, NULL , NULL,0,&MODE_GP3_Item[2]},
-//	{"CH2-MAX ", MainMenu, NULL , NULL,0,&MODE_GP3_Item[3]},
-//	{"CH3-MIN ", MainMenu, NULL , NULL,0,&MODE_GP3_Item[4]},
-//	{"CH3-MAX ", MainMenu, NULL , NULL,0,&MODE_GP3_Item[5]},
-//	{"CH4-MIN ", MainMenu, NULL , NULL,0,&MODE_GP3_Item[6]},
-//	{"CH4-MAX ", MainMenu, NULL , NULL,0,&MODE_GP3_Item[7]},
-//};
-//sMenuItem MODE_Gp4[] = {
-//	{"CH1-MIN ", MainMenu, NULL , NULL,0,&MODE_GP4_Item[0]},
-//	{"CH1-MAX ", MainMenu, NULL , NULL,0,&MODE_GP4_Item[1]},
-//	{"CH2-MIN ", MainMenu, NULL , NULL,0,&MODE_GP4_Item[2]},
-//	{"CH2-MAX ", MainMenu, NULL , NULL,0,&MODE_GP4_Item[3]},
-//	{"CH3-MIN ", MainMenu, NULL , NULL,0,&MODE_GP4_Item[4]},
-//	{"CH3-MAX ", MainMenu, NULL , NULL,0,&MODE_GP4_Item[5]},
-//	{"CH4-MIN ", MainMenu, NULL , NULL,0,&MODE_GP4_Item[6]},
-//	{"CH4-MAX ", MainMenu, NULL , NULL,0,&MODE_GP4_Item[7]},
-//};
 
 //level 1****************************
 //sMenuItem MainMenu[] = {
