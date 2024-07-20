@@ -107,27 +107,34 @@ static void time1_out(void *parameter)
 	Led_Blink();
 }
 static uint8_t PD_Count= 0;
+static uint8_t PD_Write_Flag = 0;
 ///* ��ʱ��1��ʱ���� */
 static void time2_out(void *parameter)
 {
 	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_2)==GPIO_PIN_SET)
 	{
 		PD_Count++;
-		if(PD_Count>= 2)
+		if((PD_Count>= 2)&&(PD_Write_Flag==0))
 		{
 			rt_enter_critical();//����������
-			HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(QJ_POW_GPIO_Port, QJ_POW_Pin, GPIO_PIN_RESET);
+			// HAL_GPIO_WritePin(GP1_POW_GPIO_Port, GP1_POW_Pin, GPIO_PIN_RESET);
+			// HAL_GPIO_WritePin(QJ_POW_GPIO_Port, QJ_POW_Pin, GPIO_PIN_RESET);
 			backup_data();
-			HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+			
 			rt_exit_critical();//����������
-			rt_timer_stop(timer2);
+			PD_Write_Flag = 1;
+			HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+			
+			//rt_timer_stop(timer2);
 		}
 		else
 			return;
 	}
 	else
+	{
 		PD_Count = 0;
+		PD_Write_Flag = 0;
+	}
 	
 //		uint16_t distance;
 //		distance = TOF10120_Read_Scan();
