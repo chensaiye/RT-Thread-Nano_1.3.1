@@ -177,7 +177,7 @@ void Run_Test_Mode( void );
 void Set_Factory_Test( void );
 
 void Panel_Init(void);//��ʼ��
-void Led_Blink(void);
+void Led_Auto_Updated(void);
 void pwm_buffer(void);
 
 void led_manual_updata(void);

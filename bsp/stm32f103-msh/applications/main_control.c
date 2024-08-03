@@ -98,22 +98,22 @@ void led_manual_updata(void)
 
 }
 
-void Led_Blink(void)
+void Led_Auto_Updated(void)
 {
 	static uint16_t blink_count;
-	static uint16_t led_blink;
+	// static uint16_t led_blink;
 	static uint16_t led_status;
 	led_status = 0;
-	if(curr_status.value.pow_fg == OFF) 
-		return;
-//	if(curr_status.value.mode != MODE_LUM) 
-//		return;
+	// if(curr_status.value.pow_fg == OFF) 
+	// 	return;
+	// if(curr_status.value.mode != MODE_LUM) 
+	// 	return;
 		
-	if(curr_status.value.sys_set & 0x0C)//ʹ������Ӱ����
+	if(curr_status.value.sys_set & 0x0C)//IR sensor enabled
 	{
-		if((curr_status.value.rir)&&(curr_status.value.mode == MODE_LUM))
-		{//
-			led_blink =1;
+		if((curr_status.value.rir)&&(curr_status.value.mode == MODE_LUM)&&(curr_status.value.pow_fg == ON))
+		{//start blink
+			// led_blink =1; 
 			if(curr_status.value.rir > 4)
 				blink_count += 4;
 			else
@@ -138,10 +138,8 @@ void Led_Blink(void)
 			}
 		}
 		else{	
-			if(led_blink){
-				led_blink =0;
-				led_manual_updata();
-			}
+			// led_blink =0;
+			led_manual_updata();
 		}
 	}
 	else

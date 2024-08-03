@@ -42,7 +42,7 @@ static void MX_GPIO_Init(void);
 
 extern void Panel_Init(void);
 extern void backup_data(void);
-extern void Led_Blink(void);
+extern void Led_Auto_Updated(void);
 
 extern int thread_usart3_init(void);
 extern int thread_pwm_start(void);
@@ -104,7 +104,7 @@ void Error_Handler(void)
 static void time1_out(void *parameter)
 {
  // HAL_GPIO_TogglePin(RUN_GPIO_PORT, RUN_PIN);
-	Led_Blink();
+	Led_Auto_Updated();
 }
 static uint8_t PD_Count= 0;
 static uint8_t PD_Write_Flag = 0;
