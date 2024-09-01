@@ -386,7 +386,7 @@ void OLED_Test(void)
 	//sprintf(str,"6Touch 10Lvl NRF:   ");
 	//OLED_ShowString(0,0, (uint8_t *)str,CHARSIZE_8X6);
 	//sprintf(str,"6Touch 10Lvl NRF:%d  ",NRF_ERROR);
-	sprintf(str,"4.11_6L_NO_RED NRF:%d",NRF_ERROR); //length limited 21
+	sprintf(str,"4.12_6L_NO_RED NRF:%d",NRF_ERROR); //length limited 21
 	//sprintf(str,"V410_10L_RED NRF:%d",NRF_ERROR);
 	OLED_ShowString(0,0, (uint8_t *)str,CHARSIZE_8X6);
 	
